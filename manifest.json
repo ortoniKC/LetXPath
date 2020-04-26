@@ -1,0 +1,22 @@
+{
+    "name": "LetX",
+    "description": "Open-source project - XPath Finder",
+    "version": "1.0",
+    "manifest_version": 2,
+    "icons": {
+        "128": "assets/32.png"
+    },
+    "permissions": [
+        "<all_urls>"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "app/src/content.js"
+            ]
+        }
+    ]
+}
