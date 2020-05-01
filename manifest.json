@@ -1,13 +1,15 @@
 {
     "name": "LetX",
     "description": "Open-source project - XPath Finder",
+    "author": "Koushik Chatterjee",
     "version": "1.0",
     "manifest_version": 2,
     "icons": {
         "128": "assets/32.png"
     },
     "permissions": [
-        "<all_urls>"
+        "<all_urls>",
+        "contextMenus"
     ],
     "content_scripts": [
         {
@@ -18,5 +20,11 @@
                 "app/src/content.js"
             ]
         }
-    ]
+    ],
+    "background": {
+        "persistent": false,
+        "scripts": [
+            "eventPage.js"
+        ]
+    }
 }
