@@ -4,12 +4,18 @@ chrome.contextMenus.create({
     "contexts": ["all"]
 })
 
+let getXPath = (info, tab) => {
+    let msg = {
+        type: 'getXPath'
+    }
+    chrome.tabs.sendMessage(tab.id, msg, () => {
+        console.log("Message sent");
+    })
+    console.log(tab);
 
+
+}
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-    alert(Object.keys(info))
-
-
+    getXPath(info, tab)
 })
-// chrome.contextMenus.onClicked.addListener(function() {
 
-// })
