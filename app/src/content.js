@@ -1,6 +1,40 @@
 // alert("Welcome")
-
+let targetElemt = null;
 let receiver = (message, sender, sendResponse) => {
-    console.log(message);
+    if (message.type === "getXPath") {
+        console.log(message);
+        parseDOM();
+    }
 };
 chrome.runtime.onMessage.addListener(receiver);
+
+window.addEventListener('DOMContentLoaded', (event) => {
+    init();
+});
+
+function init() {
+    document.addEventListener("mousedown", (event) => {
+        // console.log(event.target);
+        targetElemt = event.target;
+    }, false);
+}
+function parseDOM() {
+    let tag = targetElemt.tagName.toLowerCase();
+    let idValue = targetElemt.id;
+    let idPattern = `//*[@id='${idValue}']`;
+    let count = getCountOfXPath(idPattern);
+    if (count == 1) {
+        idPattern = `//${tag}[@id='${idValue}']`;
+        console.log(idPattern);
+    } else {
+        console.log("Duplicate");
+    }
+}
+
+function getCountOfXPath(xpath) {
+    let count = document.evaluate(
+        `count(${xpath})`, document, null, XPathResult.ANY_TYPE, null
+    ).numberValue;
+    console.log('The count of the XPath is : ' + count);
+    return count;
+}
