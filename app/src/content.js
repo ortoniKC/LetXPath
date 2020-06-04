@@ -29,6 +29,23 @@ function parseDOM() {
     } else {
         console.log("Duplicate");
     }
+    let attributes = targetElemt.attributes;
+    addAllXPathAttributes(attributes, tag)
+}
+
+
+function addAllXPathAttributes(attributes, tagName) {
+    Array.prototype.slice.call(attributes).forEach(element => {
+        // console.log(element);
+        let temp = `//${tagName}[@${element.name}='${element.value}']`;
+        let count = getCountOfXPath(temp);
+        if (count == 1) {
+            console.log(temp);
+        } else {
+            // console.log("Duplicate");
+        }
+
+    });
 }
 
 function getCountOfXPath(xpath) {
