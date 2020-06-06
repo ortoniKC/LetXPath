@@ -1,9 +1,7 @@
-#LetXPath
-----------
+# LetXPath
 LetXPath is the first open-source project in the category.
 LetXPath is used to find the best XPath, CSS, and unique locators in any DOM. Mostly built for testers to reduce their effort, so that they can focus more on the business requirements.
 ## Why LetXPath?
-----------
 * LetXPath is a product developed by the QA community and for the QA community.
 * LetXPath is used to find the best XPath, CSS, and unique locators in any DOM.
 * Mostly built for testers to reduce their effort, so that they can focus more on the business requirements.
@@ -16,9 +14,7 @@ LetXPath is not only a product that you can install and use, but LetXPath is als
 See also the list of [contributors](https://github.com/ortoniKC/LetXPath/graphs/contributors) who participated in this project.
 
 ## License
-----------
 This project is licensed under the BSD-3-Clause - see the [LICENSE.md](LICENSE.md) file for details
 
-# Contributing
-----------
+## Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
