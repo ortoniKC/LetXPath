@@ -1,5 +1,6 @@
-// alert("Welcome")
 let targetElemt = null;
+
+// used to send/recive message with in extension
 let receiver = (message, sender, sendResponse) => {
     if (message.type === "getXPath") {
         console.log(message);
@@ -8,25 +9,30 @@ let receiver = (message, sender, sendResponse) => {
 };
 chrome.runtime.onMessage.addListener(receiver);
 
+// capture mouse events once the DOM is loaded
 window.addEventListener('DOMContentLoaded', (event) => {
     init();
 });
 
+// get the target element once click on the context menu
 function init() {
     document.addEventListener("mousedown", (event) => {
         // console.log(event.target);
         targetElemt = event.target;
     }, false);
 }
+
+// find different patterns of XPath 
 function parseDOM() {
     let tag = targetElemt.tagName.toLowerCase();
     let attributes = targetElemt.attributes;
     addAllXPathAttributes(attributes, tag, targetElemt);
+    getTextXPath(targetElemt);
     console.log(XPATHDATA);
     XPATHDATA = [];
 }
 
-
+// get all attribtes based XPath
 function addAllXPathAttributes(attributes, tagName, targetElemt) {
     Array.prototype.slice.call(attributes).forEach(element => {
         switch (element.name) {
@@ -35,7 +41,8 @@ function addAllXPathAttributes(attributes, tagName, targetElemt) {
                 break;
             case "name":
                 getUniqueName(targetElemt, tagName);
-                break; case "className":
+                break;
+            case "className":
                 getUniqueClassName(targetElemt, tagName);
                 break;
             default:
@@ -46,16 +53,18 @@ function addAllXPathAttributes(attributes, tagName, targetElemt) {
     });
 }
 
+// find the no.of elements matches with XPath
 function getCountOfXPath(xpath) {
     let count = document.evaluate(
         `count(${xpath})`, document, null, XPathResult.ANY_TYPE, null
     ).numberValue;
-    // console.log('The count of the XPath is : ' + count);
     return count;
 }
-// id
+
+// store all the XPath values in an array
 let XPATHDATA = [];
 
+// id
 function getUniqueId(elemet, tag) {
     let idValue = elemet.id;
     let idPattern = `//*[@id='${idValue}']`;

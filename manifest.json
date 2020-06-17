@@ -1,5 +1,5 @@
 {
-    "name": "LetX",
+    "name": "LetXPath",
     "description": "Open-source project - XPath Finder",
     "author": "Koushik Chatterjee",
     "version": "1.0",
@@ -19,7 +19,8 @@
                 "<all_urls>"
             ],
             "js": [
-                "app/src/content.js"
+                "app/src/content.js",
+                "app/src/textXPath.js"
             ]
         }
     ],
