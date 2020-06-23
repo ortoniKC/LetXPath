@@ -29,5 +29,6 @@
         "scripts": [
             "eventPage.js"
         ]
-    }
+    },
+    "devtools_page": "devtools.html"
 }
