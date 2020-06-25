@@ -1,7 +1,11 @@
 console.log("Hey I am from devtools");
 
-chrome.devtools.panels.elements.createSidebarPane("LetXPath", () => {
+chrome.devtools.panels.elements.createSidebarPane("LetXPath", (panel) => {
     console.log("Hey!");
+    chrome.devtools.panels.elements.onSelectionChanged
+        .addListener(() => {
+            panel.setExpression(`$0.attributes`)
+        })
 
 });
 

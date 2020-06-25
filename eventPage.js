@@ -1,5 +1,5 @@
 chrome.contextMenus.create({
-    "id": "LetX",
+    "id": "LetXPath",
     "title": "Get XPath",
     "contexts": ["all"]
 })
