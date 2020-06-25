@@ -2,11 +2,9 @@ let targetElemt = null;
 
 // used to send/recive message with in extension
 let receiver = (message, sender, sendResponse) => {
-    alert(message + ' CS');
-
     if (message.type === "getXPath") {
         console.log(message);
-        parseDOM(targetElemt);
+        parseDOM();
     }
 };
 chrome.runtime.onMessage.addListener(receiver);
@@ -18,14 +16,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 // get the target element once click on the context menu
 function init() {
-    document.addEventListener("click", (event) => {
+    document.addEventListener("mousedown", (event) => {
         // console.log(event.target);
         targetElemt = event.target;
     }, false);
 }
 
 // find different patterns of XPath 
-function parseDOM(targetElemt) {
+function parseDOM() {
     let tag = targetElemt.tagName.toLowerCase();
     let attributes = targetElemt.attributes;
     addAllXPathAttributes(attributes, tag, targetElemt);
@@ -116,23 +114,5 @@ function attributesBasedXPath(element, tagName) {
     let count = getCountOfXPath(temp);
     if (count == 1) {
         XPATHDATA.push(["attributes based Xpath:", temp]);
-    }
-}
-
-/**
- * Saves unique selector for the given element into chrome.storage
- *
- * The function invokes by panel.js ("chrome.devtools.inspectedWindow.eval")
- * @param el {HTMLElement}
- */
-function saveUniqueSelector(el) {
-    if (el) {
-        console.log(el);
-        // const selectorGenerator = new CssSelectorGenerator();
-        // const selector = selectorGenerator.getSelector(el);
-        // if (selector) {
-        //     console.log('Saving selector', selector);
-        //     chrome.storage.local.set({ prev_selected: selector });
-        // }
     }
 }
