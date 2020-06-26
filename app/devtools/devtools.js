@@ -14,7 +14,7 @@ var devtools_connections = chrome.runtime.connect({
 
 let name = "LetXPath";
 let icon = "assets/32.png"
-let html = "devtools.html";
+let html = "panel.html";
 let show = () => {
     // chrome.extension.sendMessage({ type: "getXPath" });
 }
@@ -26,10 +26,10 @@ chrome.devtools.panels.elements.createSidebarPane(name, (panel) => {
             .eval("parseDOM($0)", {
                 useContentScriptContext: true
             });
-        chrome.tabs.sendMessage(chrome.devtools.inspectedWindow.tabId, { request: "element_change" })
+        chrome.extension.sendMessage({ request: "on_element_change" })
     });
 
-    panel.setPage('panel.html');
+    panel.setPage(html);
     // panel.
 });
 devtools_connections.postMessage({
