@@ -20,11 +20,22 @@
       "match_about_blank": true,
       "all_frames": true,
       "matches": ["<all_urls>"],
-      "js": ["app/src/content.js"]
+      "js": [
+        "app/src/content.js",
+        "app/src/anchorXPath.js",
+        "app/src/getCSS.js",
+        "app/src/getLabel.js",
+        "app/src/methodName.js",
+        "app/src/record.js",
+        "app/src/search.js",
+        "app/src/textXPath.js",
+        "app/src/utils.js",
+        "app/src/parentElements.js"
+      ]
     }
   ],
   "background": {
-    "persistent": false,
+    "persistent": true,
     "scripts": ["eventPage.js"]
   },
   "devtools_page": "devtools.html",

@@ -2,7 +2,6 @@
  * @see https://developer.chrome.com/extensions/examples/api/devtools/panels/chrome-query/devtools.js
  * @see https://developer.chrome.com/extensions/devtools#selected-element
  */
-
 /**
  * @author Koushik Chatterjee <koushik@letcode.in>
  */
@@ -22,12 +21,20 @@ let show = () => {
 chrome.devtools.panels.elements.createSidebarPane(name, (panel) => {
     // listen for the elements changes
     function updatePanel() {
+        // console.log("$0.attributes");
+        // panel.onHidden
         chrome.devtools.inspectedWindow.eval("parseDOM($0)", {
             useContentScriptContext: true
         }, (result, exceptipon) => {
-            console.log(result, exceptipon);
+            if (result) {
+                console.log(result)
+            }
+            if (exceptipon) {
+                console.log(exceptipon)
+            }
         });
     }
+    // updatePanel();
     chrome.devtools.panels.elements.onSelectionChanged.addListener(updatePanel);
     panel.setPage(html);
 });
