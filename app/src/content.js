@@ -6,7 +6,7 @@ let receiver = (message, sender, sendResponse) => {
 
     switch (message.request) {
         case "on_element_change":
-            // TODO: send message to devtools
+            parseDOM(targetElemt);
             break;
         case "context_menu_click":
             parseDOM(targetElemt);
@@ -36,10 +36,10 @@ function parseDOM(targetElemt) {
     let tag = targetElemt.tagName.toLowerCase();
     let attributes = targetElemt.attributes;
     addAllXPathAttributes(attributes, tag, targetElemt);
-    getTextXPath(targetElemt);
+    // getTextXPath(targetElemt);
     console.log(XPATHDATA);
     dominfo = {
-        type: "send_to_dev",
+        request: "send_to_dev",
         data: XPATHDATA
 
     }

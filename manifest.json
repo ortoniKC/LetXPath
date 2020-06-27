@@ -1,34 +1,50 @@
 {
-    "name": "LetXPath",
-    "description": "Open-source project - XPath Finder",
-    "author": "Koushik Chatterjee",
-    "version": "1.0",
-    "manifest_version": 2,
-    "icons": {
-        "128": "assets/32.png"
-    },
-    "permissions": [
-        "<all_urls>",
-        "contextMenus",
-        "tabs"
-    ],
-    "content_scripts": [
-        {
-            "run_at": "document_start",
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "app/src/content.js",
-                "app/src/textXPath.js"
-            ]
-        }
-    ],
-    "background": {
-        "persistent": false,
-        "scripts": [
-            "eventPage.js"
-        ]
-    },
-    "devtools_page": "devtools.html"
+  "name": "LetXPath",
+  "description": "Open-source project - XPath Finder",
+  "author": "Koushik Chatterjee",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "icons": {
+    "128": "assets/32.png"
+  },
+  "permissions": [
+    "<all_urls>",
+    "contextMenus",
+    "tabs",
+    "storage",
+    "notifications"
+  ],
+  "content_scripts": [
+    {
+      "run_at": "document_start",
+      "match_about_blank": true,
+      "all_frames": true,
+      "matches": ["<all_urls>"],
+      "js": ["app/src/content.js"]
+    }
+  ],
+  "background": {
+    "persistent": false,
+    "scripts": ["eventPage.js"]
+  },
+  "devtools_page": "devtools.html",
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "homepage_url": "https://www.letcode.in",
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "windows": "Alt+L",
+        "mac": "Alt+L",
+        "linux": "Alt+L",
+        "default": "Alt+L"
+      },
+      "description": "Open pop up page"
+    }
+  },
+  "browser_action": {
+    "default_title": "LetCode - open source",
+    "default_popup": "popup/popup.html"
+  },
+  "options_page": "option/option.html",
+  "offline_enabled": true
 }

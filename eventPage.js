@@ -1,3 +1,4 @@
+// create context menu to get XPath on click
 chrome.contextMenus.create({
     "id": "LetXPath",
     "title": "Get XPath",
@@ -11,19 +12,12 @@ let getXPath = (info, tab) => {
     chrome.tabs.sendMessage(tab.id, msg, () => {
         console.log("Message sent");
     })
-    console.log(tab);
-
-
 }
+
+// on context menu click send message to content script
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     getXPath(info, tab)
 })
-
-// chrome.runtime.onMessage.addListener((s, r, res) => {
-//     if (s.type === "send_to_dev") {
-//         console.log(s.data);
-//     }
-// })
 
 // background.js
 var connections = {};
@@ -40,7 +34,9 @@ chrome.runtime.onConnect.addListener(function (port) {
             connections[message.tabId] = port;
             return;
         }
-
+        // else if (message.request === "on_element_change") {
+        //     console.log("on connecting", "on_element_chang");
+        // }
         // other message handling
     }
 
@@ -64,20 +60,36 @@ chrome.runtime.onConnect.addListener(function (port) {
 // current tab
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     console.log("with in on message");
-
     console.log(request);
-
-    // Messages from content scripts should have sender.tab set
-    if (sender.tab) {
-        var tabId = sender.tab.id;
-        if (tabId in connections) {
-            connections[tabId].postMessage(request);
-            // alert(request + ' BG')
+    if (request.type === "send_to_dev") {
+        // Messages from content scripts should have sender.tab set
+        if (sender.tab) {
+            var tabId = sender.tab.id;
+            if (tabId in connections) {
+                connections[tabId].postMessage(request);
+                // alert(request + ' BG')
+            } else {
+                console.log("Tab not found in connection list.");
+            }
         } else {
-            console.log("Tab not found in connection list.");
+            console.log("sender.tab not defined.");
         }
-    } else {
-        console.log("sender.tab not defined.");
+    } if (request.request == "on_element_change") {
+        if (sender.tab) {
+            var tabId = sender.tab.id;
+            if (tabId in connections) {
+                connections[tabId].postMessage(request);
+            } else {
+                console.log("Tab not found in connection list.");
+            }
+        } else {
+            console.log("sender.tab not defined.");
+        }
+        sendToContentScript(request);
     }
+
     return true;
 });
+var sendToContentScript = (request) => {
+    chrome.tabs.sendMessage(request.id, request);
+}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LetXPath</title>
+    <script src="../assets/jquery.min.js"></script>
+    <link rel="stylesheet" href="../assets/bulma.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css"
+    />
+    <script defer src="../panel/panel.js"></script>
+    <script src="../panelconfig.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 2px;
+        font-family: "Roboto", sans-serif;
+      }
+
+      #tab_container .container_item {
+        display: none;
+      }
+
+      #tab_container .container_item.is-active {
+        display: block;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="tabs is-right" id="tab_header">
+      <ul>
+        <li class="item is-active" data-option="1"><a>XPath</a></li>
+        <li class="item" data-option="2"><a>Customize</a></li>
+        <li class="item" data-option="3"><a>Help</a></li>
+      </ul>
+    </div>
+    <div class="box" id="tab_container">
+      <div class="container_item is-active" data-item="1">
+        <div class="field is-grouped">
+          <p class="control has-icons-right is-expanded">
+            <input class="input" type="text" id="change" />
+            <span class="icon is-small has-text-info is-right">
+              <i class="fas fa-clipboard"></i>
+            </span>
+          </p>
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <div class="select is-fullwidth">
+                <select name="country">
+                  <option value="snippet">Snippet</option>
+                  <option value="click">Click</option>
+                  <option value="getText">Text</option>
+                  <option value="getAttribute">Attribute</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- xpath -->
+      <div class="container_item" data-item="2">
+        <pre><code>todo</code></pre>
+      </div>
+      <!-- cusomt -->
+      <div class="container_item" data-item="3">
+        <pre><code>todo</code></pre>
+      </div>
+      <!-- help -->
+    </div>
+  </body>
+</html>
