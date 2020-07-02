@@ -6,7 +6,7 @@ LetXPath is used to find the best XPath, CSS, and unique locators in any DOM. Mo
 * LetXPath is used to find the best XPath, CSS, and unique locators in any DOM.
 * Mostly built for testers to reduce their effort, so that they can focus more on the business requirements.
 LetXPath is not only a product that you can install and use, but LetXPath is also more than that, You can learn how to works, what is the core engineering behind this.
-[LetCode](https://youtub.com/letcode) offers a tutorial on the same, please feel free to check out that.
+[LetCode](https://youtube.com/letcode) offers a tutorial on the same, please feel free to check out that.
 
 ## Authors
 * **Koushik Chatterjee** - *Initial work* - [ortoniKC](https://github.com/ortonikc)
