@@ -4,7 +4,7 @@ let targetElemt = null;
 let receiver = (message, sender, sendResponse) => {
     if (message.type === "getXPath") {
         console.log(message);
-        parseDOM();
+        parseDOM(targetElemt);
     }
 };
 chrome.runtime.onMessage.addListener(receiver);
@@ -23,7 +23,7 @@ function init() {
 }
 
 // find different patterns of XPath 
-function parseDOM() {
+function parseDOM(targetElemt) {
     let tag = targetElemt.tagName.toLowerCase();
     let attributes = targetElemt.attributes;
     addAllXPathAttributes(attributes, tag, targetElemt);

@@ -4,7 +4,9 @@ chrome.devtools.panels.elements.createSidebarPane("LetXPath", (panel) => {
     console.log("Hey!");
     chrome.devtools.panels.elements.onSelectionChanged
         .addListener(() => {
-            panel.setExpression(`$0.attributes`)
+            // panel.setExpression(`$0.attributes`)
+            chrome.devtools.inspectedWindow.eval("parseDOM($0)",
+                { useContentScriptContext: true });
         })
 
 });
