@@ -28,7 +28,13 @@ function parseDOM(targetElemt) {
     let attributes = targetElemt.attributes;
     addAllXPathAttributes(attributes, tag, targetElemt);
     getTextXPath(targetElemt);
-    console.log(XPATHDATA);
+    // console.log(XPATHDATA);
+    let message = {
+        request: "sendtodevtools",
+        xpath: XPATHDATA
+    }
+
+    chrome.runtime.sendMessage(message)
     XPATHDATA = [];
 }
 

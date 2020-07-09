@@ -1,34 +1,23 @@
 {
-    "name": "LetXPath",
-    "description": "Open-source project - XPath Finder",
-    "author": "Koushik Chatterjee",
-    "version": "1.0",
-    "manifest_version": 2,
-    "icons": {
-        "128": "assets/32.png"
-    },
-    "permissions": [
-        "<all_urls>",
-        "contextMenus",
-        "tabs"
-    ],
-    "content_scripts": [
-        {
-            "run_at": "document_start",
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "app/src/content.js",
-                "app/src/textXPath.js"
-            ]
-        }
-    ],
-    "background": {
-        "persistent": false,
-        "scripts": [
-            "eventPage.js"
-        ]
-    },
-    "devtools_page": "devtools.html"
+  "name": "LetXPath - Tutorial",
+  "description": "Open-source project - XPath Finder",
+  "author": "Koushik Chatterjee",
+  "version": "1.0",
+  "manifest_version": 2,
+  "icons": {
+    "128": "assets/32.png"
+  },
+  "permissions": ["<all_urls>", "contextMenus", "tabs"],
+  "content_scripts": [
+    {
+      "run_at": "document_start",
+      "matches": ["<all_urls>"],
+      "js": ["app/src/content.js", "app/src/textXPath.js"]
+    }
+  ],
+  "background": {
+    "persistent": false,
+    "scripts": ["eventPage.js"]
+  },
+  "devtools_page": "devtools.html"
 }
