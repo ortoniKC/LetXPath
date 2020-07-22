@@ -13,12 +13,30 @@ let installReason = (detail) => {
             url: installURL
         })
     } else if (detail.reason === "update") {
-        chrome.tabs.create({
-            url: updateURL
-        })
+        notification();
+        chrome.notifications.onClicked.addListener(onClickNotification);
     }
-
 }
+
+
+function onClickNotification() {
+    chrome.tabs.create({
+        url: updateURL
+    });
+}
+
+function notification() {
+    chrome.notifications.create(
+        {
+            title: 'LetXPath',
+            message: 'LetXPath got an update!',
+            iconUrl: 'assets/32.png',
+            type: 'basic'
+        }
+    )
+}
+
+
 chrome.runtime.onInstalled.addListener((details) => {
     installReason(details)
 })
