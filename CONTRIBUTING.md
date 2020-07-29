@@ -44,7 +44,7 @@ Something missing feel free to add
 
 ## How Can I Contribute?
 
-Anyone can contribute to our project in three ways
+Anyone can contribute to our project in four ways
 
 1. By developing the XPath pattern
 2. By designing the UI
