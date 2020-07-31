@@ -7,17 +7,30 @@
   "icons": {
     "128": "assets/32.png"
   },
-  "permissions": ["<all_urls>", "contextMenus", "tabs", "notifications"],
+  "permissions": [
+    "<all_urls>",
+    "contextMenus",
+    "tabs",
+    "notifications",
+    "storage"
+  ],
   "content_scripts": [
     {
       "run_at": "document_start",
-      "matches": ["<all_urls>"],
-      "js": ["app/src/content.js", "app/src/textXPath.js"]
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "app/src/content.js",
+        "app/src/textXPath.js"
+      ]
     }
   ],
   "background": {
     "persistent": false,
-    "scripts": ["eventPage.js"]
+    "scripts": [
+      "eventPage.js"
+    ]
   },
   "devtools_page": "devtools.html"
 }

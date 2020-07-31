@@ -33,7 +33,7 @@ function parseDOM(targetElemt) {
         request: "sendtodevtools",
         xpath: XPATHDATA
     }
-
+    chrome.storage.local.set({ len: XPATHDATA.length })
     chrome.runtime.sendMessage(message)
     XPATHDATA = [];
 }
