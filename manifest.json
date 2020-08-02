@@ -12,7 +12,8 @@
     "contextMenus",
     "tabs",
     "storage",
-    "notifications"
+    "notifications",
+    "debugger"
   ],
   "content_scripts": [
     {
@@ -30,7 +31,8 @@
         "app/src/search.js",
         "app/src/textXPath.js",
         "app/src/utils.js",
-        "app/src/parentElements.js"
+        "app/src/parentElements.js",
+        "app/src/handleTable.js"
       ]
     }
   ],
@@ -53,7 +55,7 @@
     }
   },
   "browser_action": {
-    "default_title": "LetCode - open source",
+    "default_title": "LetXPath",
     "default_popup": "popup/popup.html"
   },
   "options_page": "option/option.html",

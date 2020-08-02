@@ -177,7 +177,7 @@ function getParentTextForVariable(element) {
         }
         return ep.textContent.trim();
     } catch (e) {
-        console.log(e);
+        
     }
 }
 // sepearting varibale and method Name

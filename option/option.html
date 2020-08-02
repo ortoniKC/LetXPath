@@ -1,13 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LetXPath Setting</title>
-  </head>
-  <body>
-    <section>
-      <h1>TODO</h1>
-    </section>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LetXPath Setting</title>
+  <script src="../app/utils/jquery.js"></script>
+  <script src="option.js"></script>
+  <link rel="stylesheet" href="../app/styles/bulma.min.css" />
+  <link rel="stylesheet" href="../app/styles/agate.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 1.5px;
+      /* font-family: "Roboto", sans-serif; */
+    }
+
+    #tab_container .container_item {
+      display: none;
+    }
+
+    #tab_container .container_item.is-active {
+      display: block;
+    }
+
+    .custom-svg {
+      width: 100%;
+      /* filter: invert(1); */
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="container">
+        <figure class="image is-96x96 is-inline-block">
+          <span data-tilt>
+            <a href="https://www.letcode.in" target="_blank"">
+            <img class=" is-rounded" src="../assets/logo.png">
+            </a>
+          </span>
+        </figure>
+      </div>
+    </div>
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <a href="https://www.letcode.in" target="blank">
+          <p class="buttons">
+            <button class="button is-primary">
+              <span class="icon is-small">
+                <img src="../assets/icons/options/heart-rate.svg" alt="xpath" class="icon custom-svg is-small">
+              </span>
+              <span>Rate us</span>
+            </button>
+          </p>
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div class="tabs is-toggle is-fullwidth" id="tab_header">
+    <ul>
+      <li class="item is-active" data-option="1">
+        <a>
+          <span class="icon is-small"><i class="fas fa-code" aria-hidden="true"></i></span>
+          <span>Snippets Configuration</span>
+        </a>
+      </li>
+      <!-- <li class="item" data-option="2">
+        <a>
+          <span class="icon is-small"><i class="fas fa-hand-holding-usd" aria-hidden="true"></i></span>
+          <span>Donation</span>
+        </a>
+      </li> -->
+      <!-- <li class="item" data-option="3">
+        <a>
+          <span class="icon is-small"><i class="fas fa-film" aria-hidden="true"></i></span>
+          <span>Videos</span>
+        </a>
+      </li>
+      <li class="item" data-option="4">
+        <a>
+          <span class="icon is-small"><i class="far fa-file-alt" aria-hidden="true"></i></span>
+          <span>Documents</span>
+        </a>
+      </li> -->
+    </ul>
+  </div>
+  <div class="block" id="tab_container">
+    <div class="container_item is-active" id="addXPath" data-item="1">
+      <div class="box">
+        <div class="section">
+          <h1 class="subtitle has-text-primary">Select the default snippet to generate</h1>
+          <div class="field">
+            <div class="control">
+              <label class="radio">
+                <input type="radio" name="snippetLanguage" value="Selenium - Java" id="javas">
+                Selenium
+                <img src="../assets/icons/options/java.svg" alt="xpath" class="icon custom-svg is-small">
+              </label>
+              <label class="radio">
+                <input type="radio" name="snippetLanguage" value="Protractor - JS" id="protractorjs">
+                Protractor
+                <img src="../assets/icons/options/js.svg" alt="xpath" class="icon custom-svg is-small">
+              </label>
+              <label class="radio">
+                <input type="radio" name="snippetLanguage" value="Python" id="py">
+                Selenium
+                <img src="../assets/icons/options/python.svg" alt="xpath" class="icon custom-svg is-small">
+              </label>
+              <label class="radio">
+                <input type="radio" name="snippetLanguage" value="C#" id="csharp">
+                Selenium C#
+                <img src="../assets/icons/options/hashtag.svg" alt=" xpath" class="icon custom-svg is-small">
+              </label>
+              <label class="radio" disabled>
+                <input type="radio" name="snippetLanguage" value=" Custom framework" id="cstfw" disabled>
+                Custom framework
+                <img src="../assets/icons/options/terminal.svg" alt=" xpath" class="icon custom-svg is-small">
+              </label>
+            </div>
+          </div>
+          <div id="snippetnotification"></div>
+          <div id="customFW" class="is-hidden">
+            <div class="section">
+              <h1 class="subtitle has-text-secondary">Please configure the snippet as per your need</h1>
+              <div class="block">
+                <div class="tags has-addons">
+                  <span class="tag is-dark">LetXPath provides you the following data, It's upto you how you use
+                    it</span>
+                  <!-- <span class="tag is-info"></span> -->
+                </div>
+              </div>
+              <div class="field is-grouped is-grouped-multiline">
+                <div class="control">
+                  <div class="tags has-addons">
+                    <span class="tag is-dark">Variable Name</span>
+                    <span class="tag is-info">{{vn}}</span>
+                  </div>
+                </div>
+                <div class="control">
+                  <div class="tags has-addons">
+                    <span class="tag is-dark">Locator Type</span>
+                    <span class="tag is-primary">{{lt}}</span>
+                  </div>
+                </div>
+                <div class="control">
+                  <div class="tags has-addons">
+                    <span class="tag is-dark">Locator Value</span>
+                    <span class="tag is-success">{{xp}}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="control">
+                <textarea class="textarea is-focused is-primary" placeholder="Please enter your pattern"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="container_item" id="a" data-item="2">
+      <div class="box">
+        <p>Donation</p>
+      </div>
+    </div> -->
+  </div>
+
+</body>
+
 </html>

@@ -21,32 +21,32 @@ function gen(locator, val, variable, pom) {
                 str = `@FindBy(how = How.CSS, using="${val}") private WebElement ${variable};`
             } else str = `WebElement ${variable} = driver.findElement(By.cssSelector("${val}"));`;
             break;
-        case "ClassName is unique":
+        case "Unique Class Atrribute":
             if (pom) {
                 str = `@FindBy(how = How.CLASS_NAME, using="${val}") private WebElement ${variable};`
             } else str = `WebElement ${variable} = driver.findElement(By.className("${val}"));`;
             break;
-        case "Tag Name is unique":
+        case "Unique TagName":
             if (pom) {
                 str = `@FindBy(how = How.TAG_NAME, using="${val}") private WebElement ${variable};`
             } else str = `WebElement ${variable} = driver.findElement(By.tagName("${val}"));`;
             break;
-        case "Link Text:":
+        case "Unique LinkText":
             if (pom) {
                 str = `@FindBy(how = How.LINK_TEXT, using="${val}") private WebElement ${variable};`
             } else str = `WebElement ${variable} = driver.findElement(By.linkText("${val}"));`;
             break;
-        case "Id is unique:":
+        case "Unique ID":
             if (pom) {
                 str = `@FindBy(how = How.ID, using="${val}") private WebElement ${variable};`
             } else str = `WebElement ${variable} = driver.findElement(By.id("${val}"));`;
             break;
-        case "Name is unique:":
+        case "Unique Name":
             if (pom) {
                 str = `@FindBy(how = How.NAME, using="${val}") private WebElement ${variable};`
             } else str = `WebElement ${variable} = driver.findElement(By.name("${val}"));`;
             break;
-        case "Partial Link Text:":
+        case "Unique PartialLinkText":
             if (pom) {
                 str = `@FindBy(how = How.PARTIAL_LINK_TEXT, using="${val}") private WebElement ${variable};`
             } else str = `WebElement ${variable} = driver.findElement(By.partialLinkText("${val}"));`;

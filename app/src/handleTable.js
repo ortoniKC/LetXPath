@@ -1,7 +1,7 @@
 // Handle Table 
 function handleTable(ele) {
     let orgEle = ele;
-    let no_of_tables = document.getElementsByTagName('table').length;
+    let no_of_tables = elementOwnerDocument.getElementsByTagName('table').length;
     // find if its table is unique
     ele = ele.closest('table');
     ele.setAttribute('letxpath', 'letxpathtable');
@@ -34,7 +34,7 @@ function handleTable(ele) {
         count = getNumberOfXPath(tableElementFound);
     }
     let tablePath;
-    let ev = evaluateXpath(tableElementFound);
+    let ev = evaluateXPathExpression(tableElementFound);
     if (ev.singleNodeValue != null) {
         if (ev.singleNodeValue.hasAttribute('letxpath')) {
             tablePath = tableElementFound;
@@ -44,7 +44,7 @@ function handleTable(ele) {
         }
     }
     // Removed added identifier
-    ele = evaluateXpath(tablePath).singleNodeValue;
+    ele = evaluateXPathExpression(tablePath).singleNodeValue;
     ele.removeAttribute('letxpath', 'letxpathtable');
     // find no.of rows
     // get no.of rows in xpath
@@ -106,7 +106,7 @@ function getLongTableRow(ele, tablePath) {
 function addTableIndexToXpath(allXpathAttr) {
     try {
         var index = 0;
-        let doc = document.evaluate(allXpathAttr, document, null, XPathResult.ANY_TYPE, null);
+        let doc = elementOwnerDocument.evaluate(allXpathAttr, elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
         var next = doc.iterateNext();
         try {
             while (next) {

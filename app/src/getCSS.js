@@ -54,10 +54,10 @@ function getCSS(element, tagName) {
 
 function extractElefromNode(ele, array) {
     if (ele.hasAttribute('id')) {
-        if (document.querySelectorAll(`[id='${ele.id}']`).length == 1)
+        if (elementOwnerDocument.querySelectorAll(`[id='${ele.id}']`).length == 1)
             return array.unshift(`//${ele.tagName.toLowerCase()}[@id='${ele.id}']`);
     } else if (ele.hasAttribute('name')) {
-        if (document.querySelectorAll(`[name='${ele.name}']`).length == 1)
+        if (elementOwnerDocument.querySelectorAll(`[name='${ele.name}']`).length == 1)
             return array.unshift(`//${ele.tagName.toLowerCase()}[@name='${ele.name}']`);
     }
     return null;

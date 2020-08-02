@@ -17,25 +17,11 @@ function getTextBasedXPath(element, tagName) {
         if (tagName === 'a') {
             link = element.textContent;
             if (element.childElementCount > 0) {
-                let first = element.textContent;
-                let x = `//${tagName}[.='${first}']`;
-                if (getNumberOfXPath(x) == 1) {
-                    XPATHDATA.push([0, 'Link text', x]);
-                    return;
-                } else {
-                    let t = addIndexToXpath(x);
-                    if (t != null && t != undefined) {
-                        XPATHDATA.push([0, 'Link text', t]);
-                        return;
-                    }
-                }
-            }
-            if (element.childElementCount > 0) {
                 link = element.children[0].innerText;
-                if (link != undefined && link.length > 0) {
+                if (link != undefined) {
                     let partialLink = `//a[contains(text(),'${link.trim()}')]`;
                     if (getNumberOfXPath(partialLink) == 1) {
-                        XPATHDATA.push([0, 'Partial Link Text: ', partialLink])
+                        XPATHDATA.push([0, 'Partial Link Text', link.trim()])
                         gotPartial = true;
                     }
                 } else {
@@ -49,23 +35,14 @@ function getTextBasedXPath(element, tagName) {
                 hasSpace = link.match(/\s/g);
                 if (hasSpace) {
                     link = link.replace(/\s+/g, " ");
-                    XPATHDATA.push([0, 'Link Text: ', temp])
+                    XPATHDATA.push([0, 'Link Text', link.trim()])
                 }
+            } else if (gotPartial == false && getNumberOfXPath(temp) == 1) {
+                XPATHDATA.push([0, 'Link Text', link.trim()])
             } else if (gotPartial == false && getNumberOfXPath(`//a[text()='${link.trim()}']`) == 1) {
-                XPATHDATA.push([0, 'Link Text: ', temp])
-            } else if (gotPartial == false) {
-                if (getNumberOfXPath(temp) == 1) {
-                    XPATHDATA.push([0, 'Link Text: ', temp])
-                } else {
-                    let t = addIndexToXpath(temp)
-                    if (t != null && t != undefined) XPATHDATA.push([0, 'Link Text: ', t])
-                }
-
+                XPATHDATA.push([0, 'Link Text', link.trim()])
             }
         }
-        // link = element.textContent; 
-        // link = link.replace(/[\r\n\x0B\x0C\u0085\u2028\u2029]+/g, " ")
-        // hasSpace = link.match(/\s/g);
         if (hasSpace) {
             let normalizeSpace = `//${tagName}[text()[normalize-space()='${link.trim()}']]`;
             let validNSXP = getNumberOfXPath(normalizeSpace)

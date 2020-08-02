@@ -45,105 +45,107 @@ function addPreviousSibling(preSib, tagName) {
         let classHasSpace = false;
         let temp;
         let previousSiblingTagName = preSib.tagName.toLowerCase();
-        Array.prototype.slice.call(preSib.attributes).forEach(function (item) {
-            if (!(filterAttributesFromElement(item))) {
-                let tempvalue = null;
-                switch (item.name) {
-                    case 'id':
-                        if (preSib.hasAttribute('id')) {
-                            let id = preSib.id;
-                            let re = new RegExp('\\d{' + maxId + ',}', '\g');
-                            let matches = re.test(id);
-                            if ((id != null) && (id.length > 0) && matches == false) {
-                                tempvalue = id;
+        if (previousSiblingTagName != "script") {
+            Array.prototype.slice.call(preSib.attributes).forEach(function (item) {
+                if (!(filterAttributesFromElement(item))) {
+                    let tempvalue = null;
+                    switch (item.name) {
+                        case 'id':
+                            if (preSib.hasAttribute('id')) {
+                                let id = preSib.id;
+                                let re = new RegExp('\\d{' + maxId + ',}', '\g');
+                                let matches = re.test(id);
+                                if ((id != null) && (id.length > 0) && matches == false) {
+                                    tempvalue = id;
+                                }
                             }
-                        }
-                        break;
-                    case 'class':
-                        if (preSib.hasAttribute('class')) {
-                            tempvalue = preSib.className;
-                            let splClass = tempvalue.trim().split(" ");
-                            if (splClass.length > 2) {
-                                tempvalue = `contains(@class,'${splClass[0]} ${splClass[1]}')`;
-                                classHasSpace = true;
+                            break;
+                        case 'class':
+                            if (preSib.hasAttribute('class')) {
+                                tempvalue = preSib.className;
+                                let splClass = tempvalue.trim().split(" ");
+                                if (splClass.length > 2) {
+                                    tempvalue = `contains(@class,'${splClass[0]} ${splClass[1]}')`;
+                                    classHasSpace = true;
+                                }
                             }
-                        }
-                        break;
-                    case 'name':
-                        if (preSib.hasAttribute('name')) {
-                            tempvalue = preSib.name;
-                        }
-                        break;
-                    default:
-                        tempvalue = item.value;
-                }
-                if (tempvalue == '') {
-                    tempvalue = null;
-                }
-                if (classHasSpace) {
-                    temp = `//${previousSiblingTagName}[${tempvalue}]/following-sibling::${tagName}[1]`
-                    if (temp.startsWith('//')) {
-                        if (getNumberOfXPath(temp) == 1 && evaluateXPathExpression(temp).singleNodeValue.attributes.letXxpath != undefined) {
-                            XPATHDATA.push([8, 'Following sibling based XPath', temp]);
-                        } else {
-                            let t = addIndexToXpath(`//${previousSiblingTagName}[${tempvalue}]/following-sibling::${tagName}`)
-                            if (t != undefined) {
-                                XPATHDATA.push([8, 'Following sibling based XPath', t])
-                            } else
-                                temp = null;
-                        }
+                            break;
+                        case 'name':
+                            if (preSib.hasAttribute('name')) {
+                                tempvalue = preSib.name;
+                            }
+                            break;
+                        default:
+                            tempvalue = item.value;
                     }
+                    if (tempvalue == '') {
+                        tempvalue = null;
+                    }
+                    if (classHasSpace) {
+                        temp = `//${previousSiblingTagName}[${tempvalue}]/following-sibling::${tagName}[1]`
+                        if (temp.startsWith('//')) {
+                            if (getNumberOfXPath(temp) == 1 && evaluateXPathExpression(temp).singleNodeValue.attributes.letXxpath != undefined) {
+                                XPATHDATA.push([8, 'Following sibling based XPath', temp]);
+                            } else {
+                                let t = addIndexToXpath(`//${previousSiblingTagName}[${tempvalue}]/following-sibling::${tagName}`)
+                                if (t != undefined) {
+                                    XPATHDATA.push([8, 'Following sibling based XPath', t])
+                                } else
+                                    temp = null;
+                            }
+                        }
 
-                } else if (tempvalue != null) {
-                    temp = `//${previousSiblingTagName}[@${item.name}='${tempvalue}']/following-sibling::${tagName}[1]`
-                    if (temp.startsWith('//')) {
-                        if (getNumberOfXPath(temp) == 1 && evaluateXPathExpression(temp).singleNodeValue.attributes.letXxpath != undefined) {
-                            XPATHDATA.push([8, 'Following sibling based XPath', temp]);
-                        } else {
-                            let t = addIndexToXpath(`//${previousSiblingTagName}[@${item.name}='${tempvalue}']/following-sibling::${tagName}`)
-                            if (t != undefined) {
-                                XPATHDATA.push([8, 'Following sibling based XPath', t])
-                            } else
-                                temp = null;
+                    } else if (tempvalue != null) {
+                        temp = `//${previousSiblingTagName}[@${item.name}='${tempvalue}']/following-sibling::${tagName}[1]`
+                        if (temp.startsWith('//')) {
+                            if (getNumberOfXPath(temp) == 1 && evaluateXPathExpression(temp).singleNodeValue.attributes.letXxpath != undefined) {
+                                XPATHDATA.push([8, 'Following sibling based XPath', temp]);
+                            } else {
+                                let t = addIndexToXpath(`//${previousSiblingTagName}[@${item.name}='${tempvalue}']/following-sibling::${tagName}`)
+                                if (t != undefined) {
+                                    XPATHDATA.push([8, 'Following sibling based XPath', t])
+                                } else
+                                    temp = null;
+                            }
                         }
                     }
                 }
-            }
-        });
-        if (temp == null || (preSib.innerText.length > 1)) {
-            let temp1;
-            let labelText;
-            let tag;
-            let bo = false;
-            let child = preSib.parentNode.children;
-            for (let i in child) {
-                let text = child[i].textContent;
-                if (text != '') {
-                    labelText = text;
-                    tag = child[i].tagName.toLowerCase()
-                    break;
+            });
+            if (temp == null || (preSib.innerText.length > 1)) {
+                let temp1;
+                let labelText;
+                let tag;
+                let bo = false;
+                let child = preSib.parentNode.children;
+                for (let i in child) {
+                    let text = child[i].textContent;
+                    if (text != '') {
+                        labelText = text;
+                        tag = child[i].tagName.toLowerCase()
+                        break;
+                    }
                 }
-            }
-            if (labelText.match(/[\r\n\x0B\x0C\u0085\u2028\u2029]+/g)) {
-                labelText = labelText.replace(/[\r\n\x0B\x0C\u0085\u2028\u2029]+/g, " ")
-                bo = true;
-            }
-            if (bo && labelText.trim().length > 1) {
-                temp1 = `//${tag}[text()[normalize-space()='${labelText.trim()}']]/following-sibling::${tagName}[1]`;
-            } else {
-                temp1 = `//${tag}[text()='${labelText}']/following-sibling::${tagName}[1]`;
-            }
-            let c = getNumberOfXPath(temp1)
-            temp1 = `//${tag}[text()='${labelText}']/following-sibling::${tagName}`;
-            if (c == 0) {
-                return null
-            }
-            if (c == 1 && evaluateXPathExpression(temp1).singleNodeValue.attributes.letXxpath != undefined) {
-                XPATHDATA.push([8, 'Following sibling based XPath', temp1])
-            } else if ((c != undefined) || (c != null)) {
-                xp = addIndexToXpath(temp1)
-                if (xp != undefined) {
-                    XPATHDATA.push([8, 'Following sibling based XPath', xp])
+                if (labelText.match(/[\r\n\x0B\x0C\u0085\u2028\u2029]+/g)) {
+                    labelText = labelText.replace(/[\r\n\x0B\x0C\u0085\u2028\u2029]+/g, " ")
+                    bo = true;
+                }
+                if (bo && labelText.trim().length > 1) {
+                    temp1 = `//${tag}[text()[normalize-space()='${labelText.trim()}']]/following-sibling::${tagName}[1]`;
+                } else {
+                    temp1 = `//${tag}[text()='${labelText}']/following-sibling::${tagName}[1]`;
+                }
+                let c = getNumberOfXPath(temp1)
+                temp1 = `//${tag}[text()='${labelText}']/following-sibling::${tagName}`;
+                if (c == 0) {
+                    return null
+                }
+                if (c == 1 && evaluateXPathExpression(temp1).singleNodeValue.attributes.letXxpath != undefined) {
+                    XPATHDATA.push([8, 'Following sibling based XPath', temp1])
+                } else if ((c != undefined) || (c != null)) {
+                    xp = addIndexToXpath(temp1)
+                    if (xp != undefined) {
+                        XPATHDATA.push([8, 'Following sibling based XPath', xp])
+                    }
                 }
             }
         }
@@ -222,12 +224,12 @@ function getParent(element, tagName) {
                                 XPATHDATA.push([9, `Parent based ${locator} XPath`, te]);
                             }
                         } catch (e) {
-                            console.log(e);
+                            
                         }
                     }
                 }
             } catch (e) {
-                console.log(e);
+                
             }
         } else if (c > 1) {
             tem = `${parent}//${tagName}`;

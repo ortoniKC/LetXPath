@@ -6,22 +6,22 @@
  * @param {*} element 
  */
 
-function anchorXPath(getsingleXPath, tagArr, dupArray, element) {
+function getAnchorXPath(getsingleXPath, tagArr, dupArray, element) {
     if (dupArray.length == 0) {
         let r = evaluateXPathExpression("//*[@letXxpath='letX']");
         r.singleNodeValue.removeAttribute('letXxpath');
     }
     dupArray.push(getsingleXPath);
     let length = dupArray.length
-    if (length == 1) {
-        targetElemt.className += ' letXPFinder1';
-        setStorage('+1')
-        try {
-            removeLetXXpath(element);
-        } catch (e) {
-            console.log(e);
-        }
-    }
+    // if (length == 1) {
+    //     targetElemt.className += ' letXPFinder1';
+    //     setStorage('+1')
+    //     try {
+    //         removeLetXXpath(element);
+    //     } catch (e) {
+    //         
+    //     }
+    // }
     if (length == 2) {
         let srcArrayXP = [];
         let dstArrayXP = [];
@@ -67,10 +67,8 @@ function anchorXPath(getsingleXPath, tagArr, dupArray, element) {
             dst: dstArrayXP,
             defaultXPath: defaultXP,
         }
-        targetElemt.className += ' letXPFinder2';
-        if (_doc == document) {
-            chrome.runtime.sendMessage(dom);
-        }
+        chrome.runtime.sendMessage({ request: "anchor", data: dom })
+        
         webTableDetails = null;
         // make xpath to 0 so it can be used again
         tagArrHolder = [];

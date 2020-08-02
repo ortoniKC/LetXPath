@@ -2,51 +2,45 @@
  * @see https://developer.chrome.com/extensions/examples/api/devtools/panels/chrome-query/devtools.js
  * @see https://developer.chrome.com/extensions/devtools#selected-element
  */
+// --------------------------------------------------------------------------------------------------
 /**
  * @author Koushik Chatterjee <koushik@letcode.in>
  */
 
 // Create a connection to the background page
 var devtools_connections = chrome.runtime.connect({
-    name: "ortoni_devtools_message"
+    name: "devtools_panel"
 });
-
+// long-term message connection
+devtools_connections.postMessage({
+    name: 'init',
+    tabId: chrome.devtools.inspectedWindow.tabId
+});
 let name = "LetXPath";
 let html = "panel/panel.html";
-let show = () => {
-    // send msg to panel.js
-    chrome.extension.sendMessage({ message: "sendSelectedElement" });
+let onShown = (win) => {
+    // 
+    chrome.extension.sendMessage({ request: "send_to_dev" });
 }
+// TODO:
+let onHidden = () => {
+    chrome.devtools.panels.elements.onSelectionChanged.removeListener(() => {
+    });
+}
+
 // Create a sidebar panle
 chrome.devtools.panels.elements.createSidebarPane(name, (panel) => {
+    // executes only once -> when user open the panel UI gets rendered
+    panel.onShown.addListener(updatePanel);
     // listen for the elements changes
+    chrome.devtools.panels.elements.onSelectionChanged.addListener(updatePanel);
     function updatePanel() {
-        // console.log("$0.attributes");
-        // panel.onHidden
+        // send the selected element to the content script to build the XPath
         chrome.devtools.inspectedWindow.eval("parseDOM($0)", {
             useContentScriptContext: true
         }, (result, exceptipon) => {
-            if (result) {
-                console.log(result)
-            }
-            if (exceptipon) {
-                console.log(exceptipon)
-            }
         });
     }
-    // updatePanel();
-    chrome.devtools.panels.elements.onSelectionChanged.addListener(updatePanel);
+    // set the HTML page only once, and listen to the changes & update the UI using message passing
     panel.setPage(html);
 });
-
-
-
-//  devtools_connections.postMessage({
-//         name: 'ortoni_devtools_message',
-//         tabId: chrome.devtools.inspectedWindow.tabId
-//     });
-// send the selected element using - $0
-// chrome.extension.sendMessage({
-//     id: chrome.devtools.inspectedWindow.tabId,
-//     request: "on_element_change"
-// })

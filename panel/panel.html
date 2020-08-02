@@ -1,120 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LetXPath</title>
-    <script src="../assets/jquery.min.js"></script>
-    <script src="../assets/bulma.js"></script>
-    <link rel="stylesheet" href="../assets/bulma.min.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css"
-    />
-    <script defer src="../panel/panel.js"></script>
-    <script src="../panelconfig.js"></script>
-    <style>
-      body {
-        margin: 0;
-        padding: 2px;
-        font-family: "Roboto", sans-serif;
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LetXPath</title>
+  <script src="../app/utils/jquery.js"></script>
+  <link rel="stylesheet" href="../app/styles/bulma.min.css" />
+  <script src="../panelconfig.js"></script>
+  <script defer src="../panel/panel.js"></script>
+  <link rel="stylesheet" href="../app/styles/agate.css" />
+  <script defer src="../app/utils/highlight.pack.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 2px;
+      font-family: "Roboto", sans-serif;
+      /* background-image: url(../assets/bg.svg); */
+    }
+
+    .column {
+      display: flex;
+      justify-content: space-evenly;
+    }
+
+    #tab_container .container_item {
+      display: none;
+    }
+
+    #tab_container .container_item.is-active {
+      display: block;
+    }
+
+    .copied::after {
+      font-family: 'Oxygen Mono', monospace;
+      position: absolute;
+      top: 25%;
+      display: block;
+      content: "Copied";
+      font-size: 0.75em;
+      padding: 2px 3px;
+      color: #fff;
+      background-color: rgb(243, 149, 26);
+      border-radius: 3px;
+      opacity: 0;
+      will-change: opacity, transform;
+      animation: showcopied 1.5s cubic-bezier(0, 1.14, 0, 1.14);
+    }
+
+    ::-moz-focus-inner {
+      padding: 0;
+      border: 0;
+    }
+
+    @keyframes showcopied {
+      0% {
+        opacity: 0;
+        transform: translateX(100%);
       }
 
-      #tab_container .container_item {
-        display: none;
+      70% {
+        opacity: 1;
+        transform: translateX(0);
       }
 
-      #tab_container .container_item.is-active {
-        display: block;
+      100% {
+        opacity: 0;
       }
-    </style>
-  </head>
+    }
+  </style>
+</head>
 
-  <body>
-    <div
-      class="tabs is-small is-right is-toggle is-toggle-rounded"
-      id="tab_header"
-    >
-      <ul>
-        <li class="item is-active" data-option="1"><a>XPath</a></li>
-        <li class="item" data-option="2"><a>Utilities</a></li>
-        <li class="item" data-option="3"><a>Assist</a></li>
-      </ul>
+<body>
+  <div class="tabs is-small is-right is-toggle is-toggle-rounded" id="tab_header">
+    <ul>
+      <li class="item is-active" data-option="1"><a>
+          <img src="../assets/icons/panel/mission.svg" alt="xpath" class="icon custom-svg is-small">XPath</a>
+      </li>
+      <li class="item" data-option="2"><a>
+          <img src="../assets/icons/panel/axe.svg" alt="xpath" class="icon custom-svg is-small">Axes</a>
+      </li>
+      <li class="item is-hidden" data-option="3"><a>
+          <img src="../assets/icons/panel/tool-belt.svg" alt="xpath" class="icon custom-svg is-small">Utils</a>
+      </li>
+      <li class="item is-hidden" data-option="4"><a>
+          <img src="../assets/icons/panel/search.svg" alt="xpath" class="icon custom-svg is-small">Test-Data</a>
+      </li>
+      <li id="openSetting"><a>
+          <img src="../assets/icons/panel/settings.svg" alt="xpath" class="icon custom-svg is-small">Config</a>
+      </li>
+      <li class="item" data-option="5"><a>&nbsp;
+          <figure class="image is-24x24px">
+            <img src="../assets/16.png">
+          </figure>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="box" id="tab_container">
+    <!-- xpath -->
+    <div class="container_item is-active" id="addXPath" data-item="1">
     </div>
-    <div class="box" id="tab_container">
-      <div class="container_item is-active" data-item="1">
-        <div class="field is-grouped">
-          <p class="control has-icons-right is-expanded">
-            <input class="input is-small" type="text" id="change" />
-            <span class="icon is-small has-text-info is-right">
-              <i class="fas fa-clipboard"></i>
-            </span>
-          </p>
-          <div class="field has-addons">
-            <div class="control is-expanded">
-              <div class="select is-small is-fullwidth">
-                <select name="country">
-                  <option value="snippet">Snippet</option>
-                  <option value="click">Click</option>
-                  <option value="getText">Text</option>
-                  <option value="getAttribute">Attribute</option>
+    <!-- xpath -->
+
+    <!-- utils -->
+    <div class="container_item" data-item="3">
+      <div class="columns is-vcentered">
+        <div class="column is-half">
+          <section class="section">
+            <div class="container">
+              <h1 class="subtitle">Get multiple elements</h1>
+              <h2 class="is-small">
+                Select any of the value in drop-down & get the
+                <strong>locator</strong> or<strong> XPath</strong>
+              </h2>
+              <div class="select is-small">
+                <select name="selector" id="selector">
+                  <option value="Selector">Select</option>
+                  <option value="inputs">Input fields</option>
+                  <option value="dropdown">Dropdowns</option>
+                  <option value="buttons">Buttons</option>
+                  <option value="labels">Label</option>
                 </select>
               </div>
             </div>
-          </div>
+          </section>
         </div>
-        <div class="card">
-          <header class="card-header">
-            <p class="card-header-title">
-              More XPath
-            </p>
-            <a
-              href="#collapsible-card"
-              data-action="collapse"
-              class="card-header-icon is-hidden-fullscreen"
-              aria-label="more options"
-            >
-              <span class="icon">
-                <i class="fas fa-angle-down" aria-hidden="true"></i>
-              </span>
-            </a>
-          </header>
-          <div id="collapsible-card" class="is-collapsible is-active">
-            <div class="card-content">
-              <div class="field is-grouped">
-                <p class="control has-icons-right is-expanded">
-                  <input class="input is-small" type="text" id="change" />
-                  <span class="icon is-small has-text-info is-right">
-                    <i class="fas fa-clipboard"></i>
-                  </span>
-                </p>
-                <div class="field has-addons">
-                  <div class="control is-expanded">
-                    <div class="select is-small is-fullwidth">
-                      <select name="country">
-                        <option value="snippet">Snippet</option>
-                        <option value="click">Click</option>
-                        <option value="getText">Text</option>
-                        <option value="getAttribute">Attribute</option>
-                      </select>
-                    </div>
-                  </div>
+        <div class="column is-half">
+          <section class="section">
+            <div class="container">
+              <h1 class="subtitle">Inspect with break-point</h1>
+              <p class="text is-small">
+                Get <strong>Locator</strong> or <strong>XPath</strong> of a <strong>Toast message</strong>
+              </p>
+              <p class="is-small">Set timeout</p>
+              <div class="block">
+                <div class="field has-addons has-addons-centered">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="default timeout is 5 sec">
+                  </p>
+                  <p class="control">
+                    <a class="button is-primary" id="setdebugger">
+                      Generate
+                    </a>
+                  </p>
                 </div>
               </div>
-            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <!-- utils -->
+    <!-- Test Data -->
+    <div class="container_item block" data-item="4">
+      <h1 class="subtitle has-text-info">Select the check box to get the <strong
+          class="has-text-primary">Random</strong> test data</h1>
+      <div class="block"> <label class="checkbox">
+          <input type="checkbox">
+          Name:
+        </label>
+        <label class="checkbox">
+          <input type="checkbox">
+          Email:
+        </label>
+        <label class="checkbox">
+          <input type="checkbox">
+          Lorem - Lines:
+        </label>
+        <label class="checkbox">
+          <input type="checkbox">
+          Lorem - Sentences:
+        </label></div>
+      <div class="block">
+        <div class="field has-addons has-addons-centered">
+          <p class="control">
+            <input class="input" type="text" placeholder="Number of Data?">
+          </p>
+          <p class="control">
+            <a class="button is-primary" id="genData">
+              Generate
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="container_item block" data-item="2">
+      <div id="anchorXPath">
+        <div class="notification is-primary">
+          <p>Please use the context menu to select parent & child element</p>
+        </div>
+      </div>
+    </div>
+    <!-- About -->
+    <div class="container_item block" data-item="5">
+      <div class="box">
+        <p class="title is-4 has-text-primary">LetXPath Preview Version 1.0.0</p>
+      </div>
+      <div class="content">
+        <div class="container has-text-centered">
+          <div class="box has-text-centered">
+            <p>Thank you for your time! Please take a minute to leave your feedback. Your Review helps me not only
+              to improve the product but also to let others know about the product and its usage.
+              I will be forever grateful. Thank you in advance for helping me out!
+            </p>
           </div>
         </div>
       </div>
-
-      <!-- xpath -->
-      <div class="container_item" data-item="2">
-        <pre><code>todo</code></pre>
+      <div class="box is-hidden">
+        <div class="field has-addons has-addons-centered">
+          <a href="http://www.letcode.in" target="_blank">
+            <button class="button is-link is-light">💓 Your review is very important, help us to improve 💓</button>
+          </a>
+        </div>
+        <div class="field has-addons has-addons-centered">
+          <div class="column">
+            <a href="https://twitter.com/intent/tweet?text=url" _blank">
+              <button class="button is-primary">
+                <span class="icon">
+                  <img src="../assets/icons/panel/twitter.svg" alt="tweet">
+                </span>
+                <span>Share</span>
+              </button>
+            </a>
+          </div>
+          <div class="column">
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url=url" target="_blank">
+              <button class="button is-primary">
+                <span class="icon">
+                  <img src="../assets/icons/panel/linkedin.svg" alt="linkedin">
+                </span>
+                <span>Share</span>
+              </button>
+            </a>
+          </div>
+          <div class="column">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=url" target="_blank">
+              <button class="button is-primary">
+                <span class="icon">
+                  <img src="../assets/icons/panel/facebook.svg" alt="fb">
+                </span>
+                <span>Share</span>
+              </button>
+            </a>
+          </div>
+        </div>
       </div>
-      <!-- cusomt -->
-      <div class="container_item" data-item="3">
-        <pre><code>todo</code></pre>
-      </div>
-      <!-- help -->
     </div>
-  </body>
+    <!-- About -->
+  </div>
+</body>
+
 </html>

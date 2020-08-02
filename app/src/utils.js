@@ -4,14 +4,14 @@
  */
 // Filter values not to push
 function filterAttributesFromElement(item) {
-    return (item.name === 'letxxpath') || (item.name === 'jsname') || (item.name === 'jsmodel') || (item.name === 'jsdata') || (item.name === 'jscontroller') || (item.name === 'face') || (item.name.includes('pattern')) || (item.name.includes('length')) || (item.name === 'border') || (item.name === 'formnovalidate') || (item.name === 'required-field') || (item.name === 'ng-click') || (item.name === 'tabindex') || (item.name === 'required') || (item.name === 'strtindx') || ((item.name === 'title') && (item.value === '')) || (item.name === 'autofocus') || (item.name === 'tabindex') || ((item.name === 'type') && (item.value === 'text')) || (item.name === 'ac_columns') || // (item.name.startsWith('d')) ||
-        (item.name === 'ac_order_by') || (item.name.startsWith('aria-')) || (item.name === 'href' && !(item.value.length <= 50)) || (item.name === 'aria-autocomplete') || (item.name === 'autocapitalize') || (item.name === 'jsaction') || (item.name === 'autocorrect') || (item.name === 'aria-haspopup') || (item.name === 'style') || (item.name === 'size') || (item.name === 'height') || (item.name === 'width') || (item.name.startsWith('on')) || (item.name === 'autocomplete') || (item.name === 'value' && item.value.length <= 2) || (item.name === 'ng-model-options') || (item.name === 'ng-model-update-on-enter') || (item.name === 'magellan-navigation-filter') || (item.name === 'ng-blur') || (item.name === 'ng-focus') || (item.name === 'ng-trim') || (item.name === 'spellcheck') || (item.name === 'target') || (item.name === 'rel') || (item.name === 'maxlength');
+    return (item.name === 'letxxpath') || (item.name === "script") || (item.name === 'jsname') || (item.name === 'jsmodel') || (item.name === 'jsdata') || (item.name === 'jscontroller') || (item.name === 'face') || (item.name.includes('pattern')) || (item.name.includes('length')) || (item.name === 'border') || (item.name === 'formnovalidate') || (item.name === 'required-field') || (item.name === 'ng-click') || (item.name === 'tabindex') || (item.name === 'required') || (item.name === 'strtindx') || ((item.name === 'title') && (item.value === '')) || (item.name === 'autofocus') || (item.name === 'tabindex') || ((item.name === 'type') && (item.value === 'text')) || (item.name === 'ac_columns') || // (item.name.startsWith('d')) ||
+        (item.name === 'ac_order_by') || (item.name.startsWith('data-ember')) || (item.name.startsWith('aria-') && !(item.name === "aria-label")) || (item.name === 'href' && !(item.value.length <= 50)) || (item.name === 'aria-autocomplete') || (item.name === 'autocapitalize') || (item.name === 'jsaction') || (item.name === 'autocorrect') || (item.name === 'aria-haspopup') || (item.name === 'style') || (item.name === 'size') || (item.name === 'height') || (item.name === 'width') || (item.name.startsWith('on')) || (item.name === 'autocomplete') || (item.name === 'value' && item.value.length <= 2) || (item.name === 'ng-model-options') || (item.name === 'ng-model-update-on-enter') || (item.name === 'magellan-navigation-filter') || (item.name === 'ng-blur') || (item.name === 'ng-focus') || (item.name === 'ng-trim') || (item.name === 'spellcheck') || (item.name === 'target') || (item.name === 'rel') || (item.name === 'maxlength');
 }
 // Add Index to All XPATH
 function addIndexToXpath(allXpathAttr) {
     try {
         let index = 0;
-        let doc = document.evaluate(allXpathAttr, document, null, XPathResult.ANY_TYPE, null);
+        let doc = elementOwnerDocument.evaluate(allXpathAttr, elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
         let next = doc.iterateNext();
         try {
             while (next && index <= maxIndex) {
@@ -36,13 +36,13 @@ function addIndexToXpath(allXpathAttr) {
 // To get count of each element - returns int
 function getNumberOfXPath(element) {
     try {
-        return document.evaluate('count(' + element + ')', document, null, XPathResult.ANY_TYPE, null).numberValue;
+        return elementOwnerDocument.evaluate('count(' + element + ')', elementOwnerDocument, null, XPathResult.ANY_TYPE, null).numberValue;
     } catch (error) { }
 }
 // Check if xpath is correct or not - returns boolean
 function evaluateXPathExpression(element) {
     try {
-        return document.evaluate(element, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+        return elementOwnerDocument.evaluate(element, elementOwnerDocument, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
     } catch (error) { }
 }
 // Set XPath length in Chrome Badge
@@ -61,19 +61,19 @@ function highlightSelectedDOM() {
 }
 
 function clearHighlights() {
-    let els = document.getElementsByClassName('letXPFinder');
+    let els = elementOwnerDocument.getElementsByClassName('letXPFinder');
     while (els.length) {
         els[0].className = els[0].className.replace(' letXPFinder', '');
     }
 };
 function clearHighlights1() {
-    let els = document.getElementsByClassName('letXPFinder1');
+    let els = elementOwnerDocument.getElementsByClassName('letXPFinder1');
     while (els.length) {
         els[0].className = els[0].className.replace(' letXPFinder1', '');
     }
 };
 function clearHighlights2() {
-    let els = document.getElementsByClassName('letXPFinder2');
+    let els = elementOwnerDocument.getElementsByClassName('letXPFinder2');
     while (els.length) {
         els[0].className = els[0].className.replace(' letXPFinder2', '');
     }

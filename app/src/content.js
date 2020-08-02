@@ -6,19 +6,52 @@
 // get the target element with context click
 "use strict";
 let targetElemt = null;
-
-// Extension namespaces
-// var letXPath = letXPath || {};
-var enablegcx = false;
-var isRecordEnabled = false;
+let enablegcx = false;
+let isRecordEnabled = false;
+let attachedTabs = {};
+let version = "1.3";
 
 // used to send/receive message with in extension
 let receiver = (message, sender, sendResponse) => {
+    if (message.selector) {
+        let selected = message.selector.selectedValue;
+        switch (selected) {
+            case "inputs":
+                let ip = document.querySelectorAll("input");
+                for (let index = 0; index < ip.length; index++) {
+                    buildSelectedFileds(ip[index]);
+                }
+                break;
+            case "dropdown":
+                let dd = document.querySelectorAll("select");
+                for (let index = 0; index < dd.length; index++) {
+                    buildSelectedFileds(dd[index]);
+                }
+                break;
+            case "labels":
+                let l = document.querySelectorAll("label");
+                for (let index = 0; index < l.length; index++) {
+                    buildSelectedFileds(l[index]);
+                }
+                break;
+            case "buttons":
+                let bt = elementOwnerDocument.querySelectorAll("button");
+                for (let index = 0; index < bt.length; index++) {
+                    buildSelectedFileds(bt[index]);
+                }
+                break;
+            default:
+                break;
+        }
+    }
     switch (message.request) {
+        case "utilsSelector":
+
+            break;
         case 'OFF':
             enablegcx = false;
-            document.removeEventListener("mouseover", mouseOver, true);
-            document.removeEventListener("mouseout", mouseOut, true);
+            elementOwnerDocument.removeEventListener("mouseover", mouseOver, true);
+            elementOwnerDocument.removeEventListener("mouseout", mouseOut, true);
             chrome.storage.local.set({
                 'gcx': 'false', 'isRecord': 'false'
             });
@@ -30,9 +63,9 @@ let receiver = (message, sender, sendResponse) => {
             chrome.runtime.sendMessage(domInfo);
             break;
         case 'validateAnchorDetails':
-            if (_doc == document) {
+            if (_doc == elementOwnerDocument) {
                 let value = request.data;
-                let snapShot = document.evaluate(value, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                let snapShot = elementOwnerDocument.evaluate(value, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
                 let count = snapShot.snapshotLength;
                 if (count == 0 || count == undefined) {
                     chrome.storage.local.set({
@@ -64,30 +97,7 @@ let receiver = (message, sender, sendResponse) => {
             return true;
         // build possible xpath
         case "context_menu_click":
-            parseDOM(targetElemt);
-            try {
-                if (XPATHDATA != undefined) {
-                    let domInfo = {
-                        angXP: angularArray,
-                        cssPath: cssPathArray,
-                        webtabledetails: webTableDetails,
-                        xpathid: XPATHDATA.sort(),
-                        tag: tag,
-                        type: type,
-                        hasFrame: hasFrame,
-                        variableFromBg: variableFromBg,
-                        anchor: false,
-                        atrributesArray: atrributesArray
-                    };
-                    if (_doc == document) {
-                        chrome.runtime.sendMessage(domInfo);
-                    }
-                    console.log(domInfo);
-                    anchorXPath = [];
-                    atrributesArray = [];
-                    webTableDetails = null;
-                }
-            } catch (error) { }
+            parseAnchorXP(targetElemt);
             return true;
         case 'startRecord':
             try {
@@ -107,6 +117,9 @@ let receiver = (message, sender, sendResponse) => {
                 stopRecord();
             } catch (error) { }
             break;
+        // case "on_element_change":
+        //     // parseDOM($0);
+        //     break;
         default:
             return true;
     }
@@ -115,20 +128,17 @@ chrome.runtime.onMessage.addListener(receiver);
 
 // capture mouse events once the DOM is loaded
 window.addEventListener('DOMContentLoaded', (event) => {
-    init();
-});
-
-// get the target element once click on the context menu
-function init() {
+    // get the target element once click on the context menu
     document.addEventListener("mousedown", (event) => {
         targetElemt = event.target;
     }, false);
-}
+});
+
 // get index value from user!
 // get index value from user!
 // gcx  - get clicked xpath
-let maxIndex = 5;
-let tempMaxIndex = 5;
+let maxIndex = 3;
+let tempMaxIndex = 3;
 let maxId = 3;
 chrome.storage.local.get(['index', 'idNum'], function (data) {
     if (data.index != undefined) {
@@ -142,7 +152,7 @@ let setPreOrFol = null;
 let variableName = null;
 let methodName = null;
 let hasFrame = null;
-let variableFromBg = null;
+let variablename = null;
 let type = null;
 let tag = null;
 let tagArrHolder = [];
@@ -154,63 +164,76 @@ let letXInc = null
 let letXP = "[@letXxpath='letX']";
 let _doc = '';
 let atrributesArray = [];
+var anchroXPathData;
 let webTableDetails = null;
 // Angular
 let angularArray = null;
 // find different patterns of XPath 
-function parseDOM(targetElemt) {
-    if (targetElemt != null) {
-        try {
-            clearHighlights()
-        } catch (error) { }
+var isframeDoc = false;
+var ownerDoc;
+var elementOwnerDocument;
+function buildSelectedFileds(targetElement) {
+    elementOwnerDocument = targetElement.ownerDocument;
+    if (targetElement != null) {
         try {
             maxIndex = tempMaxIndex != null ? tempMaxIndex : 5;
-            buildXpath(targetElemt, 0);
+            buildXpath(targetElement, 0);
+
+
         } catch (error) {
             if (error.message === 'shadow dom not yet supported')
                 XPATHDATA = undefined
         }
-        let domInfo = {
-            angXP: angularArray,
-            cssPath: cssPathArray,
-            webtabledetails: webTableDetails,
-            xpathid: XPATHDATA.sort(),
-            tag: tag,
-            type: type,
-            hasFrame: hasFrame,
-            variableFromBg: variableFromBg,
-            anchor: false,
-            atrributesArray: atrributesArray
-        };
-        if (_doc == document) {
-            console.log(domInfo.xpathid[0][2]);
-            // chrome.runtime.sendMessage(domInfo);
-        }
-        highlightSelectedDOM()
-        setTimeout(() => {
-            clearHighlights()
-        }, 100);
     }
 }
-function parseAnchorXP() {
+
+function parseDOM(targetElement) {
+    try {
+        if (targetElement != null) {
+            elementOwnerDocument = targetElement.ownerDocument;
+            try {
+                maxIndex = tempMaxIndex != null ? tempMaxIndex : 5;
+                buildXpath(targetElement, 0);
+            } catch (error) {
+                if (error.message === 'shadow dom not yet supported')
+                    XPATHDATA = undefined
+            }
+            let domInfo = {
+                request: "send_to_dev",
+                angXP: angularArray,
+                cssPath: cssPathArray,
+                webtabledetails: webTableDetails,
+                xpathid: XPATHDATA.sort(),
+                tag: tag,
+                type: type,
+                hasFrame: hasFrame,
+                variablename: variablename,
+                anchor: false,
+                atrributesArray: atrributesArray
+            };
+            // 
+            chrome.runtime.sendMessage(domInfo);
+            atrributesArray = [];
+            // getAnchorXPath = [];
+            // anchroXPathData = [];
+            webTableDetails = null;
+        }
+    } catch (error) { }
+}
+
+function parseAnchorXP(targetElement) {
     if (targetElemt != null) {
-        try {
-            clearHighlights1()
-            // ortoni.clearHighlights2()
-        } catch (error) { }
         try {
             maxIndex = 20;
             buildXpath(targetElemt, 1);
-        } catch (error) { }
-        // ortoni.highlightSelectedDOM()
-        setTimeout(() => {
-            clearHighlights2()
-        }, 100);
+        } catch (error) {
+
+        }
     }
 }
+
 function buildXpath(element, boolAnchor) {
     if (element.shadowRoot != null) {
-        setStorage('-1');
         chrome.runtime.sendMessage({
             shadowRoot: true,
             anchor: undefined
@@ -222,25 +245,23 @@ function buildXpath(element, boolAnchor) {
     if (re.singleNodeValue != null) {
         re.singleNodeValue.removeAttribute('letXxpath');
     }
-    // To avoid  multiple message calling
-    _doc = document;
     // add a attribute to locate the element
     element.setAttribute('letXxpath', 'letX')
     // generate method and varible name
     try {
         let name = getMethodOrVarText(element);
         getVariableAndMethodName(name);
-        methodName = methodName.length >= 2 && methodName.length < 25 ? methodName : methodName.slice(0, 10);
+        methodName = methodName.length >= 2 && methodName.length < 25 ? methodName : methodName.slice(0, 12);
         chrome.storage.local.set({
             'methodName': methodName
         });
-        variableName = variableName.length >= 2 && variableName.length < 25 ? variableName : variableName.slice(0, 10);
+        variableName = variableName.length >= 2 && variableName.length < 25 ? variableName : variableName.slice(0, 12);
         chrome.storage.local.set({
             'variableName': variableName
         });
-        variableFromBg = variableName;
+        variablename = variableName;
     } catch (error) {
-        variableFromBg = null;
+        variablename = null;
         chrome.storage.local.set({
             'methodName': null
         });
@@ -266,8 +287,8 @@ function buildXpath(element, boolAnchor) {
         type = element.type
     }
 
-    if (document.getElementsByTagName(tag).length == 1) {
-        XPATHDATA.push([10, 'Tag Name is unique', tag])
+    if (elementOwnerDocument.getElementsByTagName(tag).length == 1) {
+        XPATHDATA.push([10, 'Unique TagName', tag])
     }
     // to find whether element is in frame
     hasFrame = frameElement != null ? frameElement : null;
@@ -287,14 +308,14 @@ function buildXpath(element, boolAnchor) {
     try {
         addAllXpathAttributesBbased(attributeElement, tagName, element);
     } catch (e) {
-        console.log(e);
+
     }
 
     // Following-sibling push to array
     try {
         xpathFollowingSibling(preiousSiblingElement, tagName);
     } catch (e) {
-        console.log(e);
+
     }
 
     // Text Based xpath
@@ -302,7 +323,7 @@ function buildXpath(element, boolAnchor) {
         if (element.innerText != '')
             xpathText(element, tagName);
     } catch (e) {
-        console.log(e);
+
     }
 
     // to find label - following xpath only if tag name name is 'input or textarea'
@@ -311,7 +332,7 @@ function buildXpath(element, boolAnchor) {
             findLabel(element, tagName)
         }
     } catch (e) {
-        console.log(e);
+
     }
 
     // get Parent node
@@ -321,30 +342,27 @@ function buildXpath(element, boolAnchor) {
 
     try {
         if (element.closest('table')) {
+            tag = 'select';
             handleTable(element);
         }
     } catch (error) { }
-    // if no xpath found
+    // Based on parent XPath
     try {
-        if (XPATHDATA.length < 3)
-            XPATHDATA.push([90, 'Long XPATH', getXPathWithPosition(element)])
+        XPATHDATA.push([90, 'Id XPath', getXPathWithPosition(element)])
     } catch (error) { }
     try {
         cssPathArray = [];
         let css = getLongCssPath(element)
-        if (document.querySelectorAll(css).length == 1)
+        if (elementOwnerDocument.querySelectorAll(css).length == 1)
             cssPathArray.push([11, 'CSS', css]);
     } catch (error) { }
 
     // ANCHOR BASED XPATH
     switch (boolAnchor) {
         case 0:
-            setStorage(XPATHDATA.length + cssPathArray.length)
             try {
                 removeLetXXpath(element);
-            } catch (e) {
-                console.log(e);
-            }
+            } catch (e) { }
             // TODO check condition
             if (isRecordEnabled) {
                 XPATHDATA.sort();
@@ -353,12 +371,10 @@ function buildXpath(element, boolAnchor) {
             break;
         case 1:
             tagArrHolder.push(tagName);
-            anchorXPath(XPATHDATA, tagArrHolder, dupArray, element);
+            getAnchorXPath(XPATHDATA, tagArrHolder, dupArray, element);
             break;
     }
 }
-
-
 
 // Add xpath following-sibling
 function xpathFollowingSibling(preiousSiblingElement, tagName) {
@@ -385,7 +401,7 @@ function getNameXPath(element, tagName) {
         let tem = `//*${tempName}`;
         let count = getNumberOfXPath(tem)
         if (count == 1) {
-            XPATHDATA.push([102, 'Unique Name Attribute', clickedItemName])
+            XPATHDATA.push([102, 'Unique Name', clickedItemName])
         } else if (count > 1) {
             tem = `//${tagName}${tempName}`;
             nameBasedXpath = addIndexToXpath(tem)
@@ -431,6 +447,7 @@ function getClassXPath(element, tagName) {
     }
     return classBasedXpath;
 }
+
 function getIDXPath(element, tagName) {
     let idBasedXpath = null;
     let clicketItemId = element.id;
@@ -461,14 +478,16 @@ function getIDXPath(element, tagName) {
 function addAllXpathAttributesBbased(attribute, tagName, element) {
     Array.prototype.slice.call(attribute).forEach(function (item) {
         // Filter attribute not to shown in xpath
-        atrributesArray.push(item.name);
+        if (item.value != 'letX') {
+            atrributesArray.push(item.name);
+        }
         if (!(filterAttributesFromElement(item))) {
             // Pushing xpath to arrays
             switch (item.name) {
                 case 'id':
                     let id = getIDXPath(element, tagName)
                     if (id != null) {
-                        XPATHDATA.push([1, 'Id is unique:', id])
+                        XPATHDATA.push([1, 'Unique ID', id])
                     }
                     ; break;
                 case 'class':
