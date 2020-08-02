@@ -56,23 +56,26 @@ $(document).ready(function () {
     });
     // --- open option page
     $('body').on('click', '#openSetting', () => {
-        chrome.runtime.openOptionsPage(() => {
-        });
+        chrome.runtime.openOptionsPage(() => { });
     })
     // --- click to copy code
     $('body').on('click', '#copyCode', (t) => {
-        var from = document.getElementById("sniplang");
-        var range = document.createRange();
-        copyToClipBoard(range, from);
+        try {
+            var from = document.getElementById("sniplang");
+            var range = document.createRange();
+            copyToClipBoard(range, from);
+        } catch (error) { }
     })
     // To copy Xpath
     $('body').on('click', 'button.is-primary.is-small', (e) => {
-        let t = e.target;
-        let c = t.dataset.copytarget;
-        c = c.replace("#", "");
-        var from = document.getElementById(c);
-        var range = document.createRange();
-        copyToClipBoard(range, from);
+        try {
+            let t = e.target;
+            let c = t.dataset.copytarget;
+            c = c.replace("#", "");
+            var from = document.getElementById(c);
+            var range = document.createRange();
+            copyToClipBoard(range, from);
+        } catch (error) { }
     })
 
     // debugger
@@ -113,15 +116,16 @@ $(document).ready(function () {
     }
 });
 function copyToClipBoard(range, node) {
-    window.getSelection().removeAllRanges();
-    range.selectNodeContents(node);
-    window.getSelection().addRange(range);
-    document.execCommand('copy');
-    window.getSelection().removeAllRanges();
-    node.classList.add('copied');
-    setTimeout(function () { node.classList.remove('copied'); }, 1500);
+    try {
+        window.getSelection().removeAllRanges();
+        range.selectNodeContents(node);
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+        node.classList.add('copied');
+        setTimeout(function () { node.classList.remove('copied'); }, 1500);
+    } catch (error) { }
 }
-
 function generateSnippet(type, codeType, codeValue, vn) {
     let isPOM = false;
     chrome.storage.local.get(['langID'], function (result) {
@@ -240,12 +244,12 @@ function jsSnippet(type, codeType, codeValue, variable) {
     }
     switch (type) {
         case "click":
-            // str += `.click();`
-            str = `private ${variable} = ${str}`
+            str += `.click();`
+            // str = `private ${variable} = ${str}`
             break;
         case "sendKeys":
-            str = `private ${variable} = ${str}`
-            // str += `.sendKeys();`
+            // str = `private ${variable} = ${str}`
+            str += `.sendKeys();`
             break;
         case "getAttribute":
             str += `.getAttribute();`
@@ -308,4 +312,3 @@ function pySnippet(type, codeType, codeValue, variable) {
     }
     return str;
 }
-

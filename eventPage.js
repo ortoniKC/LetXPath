@@ -112,7 +112,7 @@ let installURL = chrome.runtime.getURL("install.html");
 let updateURL = "https://github.com/ortoniKC/LetXPath";
 let uninstallURL = "https://www.letcode.in/products";
 
-chrome.runtime.setUninstallURL(uninstallURL, () => { });
+// chrome.runtime.setUninstallURL(uninstallURL, () => { });
 
 let installReason = (detail) => {
     console.log(detail);
@@ -121,10 +121,11 @@ let installReason = (detail) => {
         chrome.tabs.create({
             url: installURL
         })
-    } else if (detail.reason === "update") {
-        notification();
-        chrome.notifications.onClicked.addListener(onClickNotification);
     }
+    // else if (detail.reason === "update") {
+    //     notification();
+    //     chrome.notifications.onClicked.addListener(onClickNotification);
+    // }
 }
 
 function onClickNotification() {
