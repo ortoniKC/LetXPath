@@ -18,10 +18,6 @@ devtools_connections.postMessage({
 });
 let name = "LetXPath";
 let html = "panel/panel.html";
-let onShown = (win) => {
-    // 
-    chrome.extension.sendMessage({ request: "send_to_dev" });
-}
 // TODO:
 let onHidden = () => {
     chrome.devtools.panels.elements.onSelectionChanged.removeListener(() => {
@@ -30,17 +26,16 @@ let onHidden = () => {
 
 // Create a sidebar panle
 chrome.devtools.panels.elements.createSidebarPane(name, (panel) => {
-    // executes only once -> when user open the panel UI gets rendered
-    panel.onShown.addListener(updatePanel);
-    // listen for the elements changes
-    chrome.devtools.panels.elements.onSelectionChanged.addListener(updatePanel);
     function updatePanel() {
         // send the selected element to the content script to build the XPath
         chrome.devtools.inspectedWindow.eval("parseDOM($0)", {
             useContentScriptContext: true
-        }, (result, exceptipon) => {
-        });
+        }, (result, exceptipon) => { });
     }
+    // listen for the elements changes
+    chrome.devtools.panels.elements.onSelectionChanged.addListener(updatePanel);
+    // executes only once -> when user open the panel UI gets rendered
+    panel.onShown.addListener(updatePanel);
     // set the HTML page only once, and listen to the changes & update the UI using message passing
     panel.setPage(html);
 });

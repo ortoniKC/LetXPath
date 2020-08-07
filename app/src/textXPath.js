@@ -17,12 +17,30 @@ function getTextBasedXPath(element, tagName) {
         if (tagName === 'a') {
             link = element.textContent;
             if (element.childElementCount > 0) {
+
+                // changes to //a[contains(.,'text')]
+                if (link) {
+                    let t = `//a[.='${link.trim()}']`;
+                    let c = getNumberOfXPath(t);
+                    if (c == 1) {
+                        XPATHDATA.push([0, 'Link Text', link.trim()]);
+                    } else {
+                        let t = `//a[contains(.,'${link.trim()}')]`;
+                        let c = getNumberOfXPath(t);
+                        if (c == 1) {
+                            XPATHDATA.push([0, 'Link XPath', t]);
+                        }
+                    }
+                }
+
                 link = element.children[0].innerText;
                 if (link != undefined) {
                     let partialLink = `//a[contains(text(),'${link.trim()}')]`;
                     if (getNumberOfXPath(partialLink) == 1) {
                         XPATHDATA.push([0, 'Partial Link Text', link.trim()])
                         gotPartial = true;
+                    } else {
+                        link = element.textContent;
                     }
                 } else {
                     link = element.textContent;
