@@ -18,7 +18,7 @@ LetXPath is used to find the best XPath, CSS, and unique locators in any DOM. Mo
 ## Contributors
 
 - **Amod Mahajan** - [amodmahajan2016](https://github.com/amodmahajan2016)
-- **Gopi Srinivasan** - [igopisrinivasan](https://github.com/amodmahajan2016)
+- **Gopi Srinivasan** - [igopisrinivasan](https://github.com/igopisrinivasan)
 
 See also the list of [contributors](https://github.com/ortoniKC/LetXPath/graphs/contributors) who participated in this project.
 
