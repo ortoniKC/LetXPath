@@ -1,2 +1,4 @@
 node_modules
 .vscode/settings.json
+release
+dummy.html
