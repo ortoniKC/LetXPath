@@ -14,7 +14,7 @@ function generateAxes(req) {
   jQuery("#anchorXPath").empty();
   let ui = `
     <div class="field is-grouped">
-    <p class="control has-icons-right is-size-7 is-expanded is-fullwidth code lang-XQuery" id="anxp">${req.data.defaultXPath}</p>
+    <p class="control has-icons-right is-size-7 is-expanded is-fullwidth code lang-XQuery" value="${req.data.proOrFol}" id="anxp">${req.data.defaultXPath}</p>
       <p class="control" data-copytarget="#anxp">
         <button class="button is-primary is-small" data-copytarget="#anxp">
           <span class="icon is-small" data-copytarget="#anxp">

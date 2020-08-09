@@ -36,6 +36,23 @@ $(document).ready(function () {
         let codeValue = changed.target.selectedOptions[0].attributes.cv.value;
         let vn = changed.target.selectedOptions[0].attributes.vn.value;
         generateSnippet(type, codeType, codeValue, vn);
+    });
+
+    // --- on click evaluate axes
+    $('body',).on('click', "input[type='radio']", (ele) => {
+        let prefol = document.getElementById("anxp").attributes.value.value;
+        //  $("#anxp").val();
+        console.log(ele.target.value);
+        // find the selected source
+        let src = $("input[name='src']:checked").val();
+        // find the selected target
+        let tgt = $("input[name='tgt']:checked").val();
+        // get both values
+        console.log(src + tgt);
+        $("#anxp").empty();
+        $("#anxp").text(src + prefol + tgt);
+        // = src + tgt;
+        // combine with axes
     })
 
     // --- start debugger
