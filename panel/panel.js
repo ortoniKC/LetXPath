@@ -1,11 +1,20 @@
 chrome.runtime.onMessage.addListener((req, rec, res) => {
-  if (req.request === "send_to_dev") {
+  console.log(req);
 
-    buildUI(req);
-  }
-  if (req.request === "anchor") {
-    console.log(req);
-    generateAxes(req);
+  switch (req.request) {
+    case "send_to_dev":
+      buildUI(req);
+      return true;
+    case "anchor":
+      generateAxes(req);
+      return true;
+    case "axes":
+      $("#anxp").empty();
+      $("#anxp").text(req.data);
+      jQuery("#anxp").trigger('custom-update');
+      return true;
+    default:
+      return true;
   }
 })
 let devtools_connections = chrome.runtime.connect({ name: "ortoni_devtools_message" });
@@ -43,7 +52,6 @@ function generateAxes(req) {
   jQuery("#anchorXPath").trigger('custom-update');
 }
 function sourceElement(element) {
-  console.log(element);
   let ui = '';
   for (let i = 0; i < element.length; i++) {
     if (i == 0) {

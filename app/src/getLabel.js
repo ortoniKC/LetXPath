@@ -6,7 +6,7 @@
  */
 function findLabel(element, tagName) {
     let label, span = undefined;
-    let ele = `//*[@letXxpath='letX']`;
+    let ele = `//*[@letxxpath='letX']`;
     try {
         label = getLabelTxet(ele, tagName)
     } catch (error) { }
@@ -18,7 +18,7 @@ function findLabel(element, tagName) {
             let xp = getParentText(element, tagName)
             let temp = xp;
             xp = evaluateXPathExpression(xp);
-            if (xp != null && xp != undefined && ((xp.singleNodeValue.attributes.letXxpath) != undefined)) {
+            if (xp != null && xp != undefined && ((xp.singleNodeValue.attributes.letxxpath) != undefined)) {
                 XPATHDATA.push([6, 'Text based following XPath', temp]);
             } else {
                 temp = addIndexToXpath(temp)
@@ -92,14 +92,14 @@ function getLabel(node, tagName) {
         let newLabelXpath = labelText + '/' + 'following::' + tagName;
         if (getNumberOfXPath(newLabelXpath) == 1) {
             let newLabel = evaluateXPathExpression(newLabelXpath);
-            if (newLabel != null && newLabel != undefined && ((newLabel.singleNodeValue.attributes.letXxpath) != undefined)) {
+            if (newLabel != null && newLabel != undefined && ((newLabel.singleNodeValue.attributes.letxxpath) != undefined)) {
                 XPATHDATA.push([6, 'Text based following XPath', newLabelXpath]);
                 return newLabelXpath;
             }
         } else {
             let labelTextWithIndex = addIndexToXpath(newLabelXpath)
             let newLabel = evaluateXPathExpression(labelTextWithIndex);
-            if (!((newLabel === null) || (newLabel === undefined) || ((newLabel.singleNodeValue.attributes.letXxpath) === undefined))) {
+            if (!((newLabel === null) || (newLabel === undefined) || ((newLabel.singleNodeValue.attributes.letxxpath) === undefined))) {
                 XPATHDATA.push([6, 'Text based following XPath', labelTextWithIndex]);
                 return labelTextWithIndex;
             }

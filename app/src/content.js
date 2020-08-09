@@ -21,105 +21,56 @@ let receiver = (message, sender, sendResponse) => {
                 for (let index = 0; index < ip.length; index++) {
                     buildSelectedFileds(ip[index]);
                 }
-                break;
+                return true;
             case "dropdown":
                 let dd = document.querySelectorAll("select");
                 for (let index = 0; index < dd.length; index++) {
                     buildSelectedFileds(dd[index]);
                 }
-                break;
+                return true;
             case "labels":
                 let l = document.querySelectorAll("label");
                 for (let index = 0; index < l.length; index++) {
                     buildSelectedFileds(l[index]);
                 }
-                break;
+                return true;
             case "buttons":
                 let bt = elementOwnerDocument.querySelectorAll("button");
                 for (let index = 0; index < bt.length; index++) {
                     buildSelectedFileds(bt[index]);
                 }
-                break;
+                return true;
             default:
-                break;
+                return true;
         }
     }
     switch (message.request) {
         case "utilsSelector":
-
-            break;
-        case 'OFF':
-            enablegcx = false;
-            elementOwnerDocument.removeEventListener("mouseover", mouseOver, true);
-            elementOwnerDocument.removeEventListener("mouseout", mouseOut, true);
-            chrome.storage.local.set({
-                'gcx': 'false', 'isRecord': 'false'
-            });
-            isRecordEnabled = false;
-            stopRecord();
-            let domInfo = {
-                xpathid: undefined,
-            }
-            chrome.runtime.sendMessage(domInfo);
-            break;
-        case 'validateAnchorDetails':
-            if (_doc == elementOwnerDocument) {
-                let value = request.data;
-                let snapShot = elementOwnerDocument.evaluate(value, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                let count = snapShot.snapshotLength;
-                if (count == 0 || count == undefined) {
-                    chrome.storage.local.set({
-                        "anchorEvalXPath": 'Sorry! Please try with different XPath combination'
-                    });
-                } else if (count == 1) {
-                    chrome.storage.local.set({
-                        "anchorEvalXPath": value
-                    });
-                    addRemoveOutlineCustomeXpath(evaluateXPathExpression(value).singleNodeValue);
-                } else if (count > 1) {
-                    let ex = addIndexToXpath(value);
-                    if (ex != null) {
-                        chrome.storage.local.set({
-                            "anchorEvalXPath": ex
-                        });
-                        addRemoveOutlineCustomeXpath(evaluateXPathExpression(ex).singleNodeValue);
-                    } else
-                        chrome.storage.local.set({
-                            "anchorEvalXPath": 'Sorry! Please try with different XPath combination'
-                        });
+            // TODO
+            return true;
+        case 'parseAxes':
+            let value = message.data;
+            let snapShot = elementOwnerDocument.evaluate(value, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+            let count = snapShot.snapshotLength;
+            if (count == 0 || count == undefined) {
+                chrome.runtime.sendMessage({ request: 'axes', data: "Sorry! Please try with different XPath combination" })
+            } else if (count == 1) {
+                chrome.runtime.sendMessage({ request: 'axes', data: value });
+            } else if (count > 1) {
+                let ex = addIndexToAxesXpath(value);
+                if (ex != null) {
+                    chrome.runtime.sendMessage({ request: 'axes', data: ex });
+                } else {
+                    chrome.runtime.sendMessage({ request: 'axes', data: "Sorry! Please try with different XPath combination" })
                 }
             }
-            break;
-        case "AnchorXP":
-            parseAnchorXP();
-            atrributesArray = [];
-            webTableDetails = null;
             return true;
         // build possible xpath
         case "context_menu_click":
             parseAnchorXP(targetElemt);
+            atrributesArray = [];
+            webTableDetails = null;
             return true;
-        case 'startRecord':
-            try {
-                let domInfo = {
-                    xpathid: undefined,
-                }
-                chrome.runtime.sendMessage(domInfo);
-                isRecordEnabled = true;
-                recordArray = [];
-                recordArrayPOM = []
-                startRecording();
-            } catch (error) { }
-            break;
-        case 'stopRecord':
-            try {
-                isRecordEnabled = false;
-                stopRecord();
-            } catch (error) { }
-            break;
-        // case "on_element_change":
-        //     // parseDOM($0);
-        //     break;
         default:
             return true;
     }
@@ -140,14 +91,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
 let maxIndex = 3;
 let tempMaxIndex = 3;
 let maxId = 3;
-chrome.storage.local.get(['index', 'idNum'], function (data) {
-    if (data.index != undefined) {
-        tempMaxIndex = data.index;
-    }
-    if (data.idNum != undefined) {
-        maxId = data.idNum;
-    }
-});
 let setPreOrFol = null;
 let variableName = null;
 let methodName = null;
@@ -161,7 +104,7 @@ let XPATHDATA;
 let cssPathArray = null;
 let mulXpathArray = [];
 let letXInc = null
-let letXP = "[@letXxpath='letX']";
+let letXP = "[@letxxpath='letX']";
 let _doc = '';
 let atrributesArray = [];
 var anchroXPathData;
@@ -243,31 +186,19 @@ function buildXpath(element, boolAnchor) {
     let removeletX = `//*${letXP}`;
     let re = evaluateXPathExpression(removeletX)
     if (re.singleNodeValue != null) {
-        re.singleNodeValue.removeAttribute('letXxpath');
+        re.singleNodeValue.removeAttribute('letxxpath');
     }
     // add a attribute to locate the element
-    element.setAttribute('letXxpath', 'letX')
+    element.setAttribute('letxxpath', 'letX')
     // generate method and varible name
     try {
         let name = getMethodOrVarText(element);
         getVariableAndMethodName(name);
         methodName = methodName.length >= 2 && methodName.length < 25 ? methodName : methodName.slice(0, 12);
-        chrome.storage.local.set({
-            'methodName': methodName
-        });
         variableName = variableName.length >= 2 && variableName.length < 25 ? variableName : variableName.slice(0, 12);
-        chrome.storage.local.set({
-            'variableName': variableName
-        });
         variablename = variableName;
     } catch (error) {
         variablename = null;
-        chrome.storage.local.set({
-            'methodName': null
-        });
-        chrome.storage.local.set({
-            'variableName': null
-        });
     }
     // create an array to put available xpath - generate different type and add
     XPATHDATA = [];
@@ -307,33 +238,25 @@ function buildXpath(element, boolAnchor) {
     // To iterate all attributes xpath
     try {
         addAllXpathAttributesBbased(attributeElement, tagName, element);
-    } catch (e) {
-
-    }
+    } catch (e) { }
 
     // Following-sibling push to array
     try {
         xpathFollowingSibling(preiousSiblingElement, tagName);
-    } catch (e) {
-
-    }
+    } catch (e) { }
 
     // Text Based xpath
     try {
         if (element.innerText != '')
             xpathText(element, tagName);
-    } catch (e) {
-
-    }
+    } catch (e) { }
 
     // to find label - following xpath only if tag name name is 'input or textarea'
     try {
         if ((tagName === 'input' || tagName === 'textarea')) {
             findLabel(element, tagName)
         }
-    } catch (e) {
-
-    }
+    } catch (e) { }
 
     // get Parent node
     try {
@@ -361,13 +284,8 @@ function buildXpath(element, boolAnchor) {
     switch (boolAnchor) {
         case 0:
             try {
-                removeLetXXpath(element);
+                removeletxxpath(element);
             } catch (e) { }
-            // TODO check condition
-            if (isRecordEnabled) {
-                XPATHDATA.sort();
-                searchXPathArray.push([variableName, methodName, XPATHDATA[0][1], XPATHDATA[0][2]]);
-            }
             break;
         case 1:
             tagArrHolder.push(tagName);

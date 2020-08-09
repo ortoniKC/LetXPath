@@ -84,7 +84,7 @@ function addPreviousSibling(preSib, tagName) {
                     if (classHasSpace) {
                         temp = `//${previousSiblingTagName}[${tempvalue}]/following-sibling::${tagName}[1]`
                         if (temp.startsWith('//')) {
-                            if (getNumberOfXPath(temp) == 1 && evaluateXPathExpression(temp).singleNodeValue.attributes.letXxpath != undefined) {
+                            if (getNumberOfXPath(temp) == 1 && evaluateXPathExpression(temp).singleNodeValue.attributes.letxxpath != undefined) {
                                 XPATHDATA.push([8, 'Following sibling based XPath', temp]);
                             } else {
                                 let t = addIndexToXpath(`//${previousSiblingTagName}[${tempvalue}]/following-sibling::${tagName}`)
@@ -98,7 +98,7 @@ function addPreviousSibling(preSib, tagName) {
                     } else if (tempvalue != null) {
                         temp = `//${previousSiblingTagName}[@${item.name}='${tempvalue}']/following-sibling::${tagName}[1]`
                         if (temp.startsWith('//')) {
-                            if (getNumberOfXPath(temp) == 1 && evaluateXPathExpression(temp).singleNodeValue.attributes.letXxpath != undefined) {
+                            if (getNumberOfXPath(temp) == 1 && evaluateXPathExpression(temp).singleNodeValue.attributes.letxxpath != undefined) {
                                 XPATHDATA.push([8, 'Following sibling based XPath', temp]);
                             } else {
                                 let t = addIndexToXpath(`//${previousSiblingTagName}[@${item.name}='${tempvalue}']/following-sibling::${tagName}`)
@@ -139,7 +139,7 @@ function addPreviousSibling(preSib, tagName) {
                 if (c == 0) {
                     return null
                 }
-                if (c == 1 && evaluateXPathExpression(temp1).singleNodeValue.attributes.letXxpath != undefined) {
+                if (c == 1 && evaluateXPathExpression(temp1).singleNodeValue.attributes.letxxpath != undefined) {
                     XPATHDATA.push([8, 'Following sibling based XPath', temp1])
                 } else if ((c != undefined) || (c != null)) {
                     xp = addIndexToXpath(temp1)
@@ -208,7 +208,7 @@ function getParent(element, tagName) {
         }
         if (c == 1) {
             try {
-                if (checkTem.singleNodeValue.hasAttribute('letXxpath')) {
+                if (checkTem.singleNodeValue.hasAttribute('letxxpath')) {
                     XPATHDATA.push([9, `Parent based ${locator} XPath`, tem]);
                 } else {
                     tem = `${parent}//${tagName}`;
@@ -220,16 +220,16 @@ function getParent(element, tagName) {
                         try {
                             let te = addIndexToXpath(tem)
                             checkTem = evaluateXPathExpression(te)
-                            if (checkTem.singleNodeValue.attributes.letXxpath.value === "letX") {
+                            if (checkTem.singleNodeValue.attributes.letxxpath.value === "letX") {
                                 XPATHDATA.push([9, `Parent based ${locator} XPath`, te]);
                             }
                         } catch (e) {
-                            
+
                         }
                     }
                 }
             } catch (e) {
-                
+
             }
         } else if (c > 1) {
             tem = `${parent}//${tagName}`;

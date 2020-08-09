@@ -8,8 +8,18 @@
 
 function getAnchorXPath(getsingleXPath, tagArr, dupArray, element) {
     if (dupArray.length == 0) {
-        let r = evaluateXPathExpression("//*[@letXxpath='letX']");
-        r.singleNodeValue.removeAttribute('letXxpath');
+        let r = evaluateXPathExpression("//*[@letxxpath='letX']");
+        let a = r.singleNodeValue
+        if (a) {
+            a.removeAttribute('letxxpath');
+        }
+    }
+    if (dupArray.length == 1) {
+        let r = evaluateXPathExpression("//*[@letaxes='letX']");
+        let a = r.singleNodeValue
+        if (a) {
+            a.removeAttribute('letaxes');
+        }
     }
     dupArray.push(getsingleXPath);
     let length = dupArray.length
@@ -58,13 +68,13 @@ function getAnchorXPath(getsingleXPath, tagArr, dupArray, element) {
             dst: dstArrayXP,
             defaultXPath: defaultXP,
         }
+        element.setAttribute('letaxes', 'letX')
         chrome.runtime.sendMessage({ request: "anchor", data: dom })
 
         webTableDetails = null;
         // make xpath to 0 so it can be used again
         tagArrHolder = [];
         dupArray.length = 0
-        setStorage(1)
     }
     function extractXPathFormArray(sxp, anchorArr, tag) {
         for (const key in sxp) {

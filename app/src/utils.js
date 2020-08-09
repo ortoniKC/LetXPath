@@ -16,7 +16,33 @@ function addIndexToXpath(allXpathAttr) {
         try {
             while (next && index <= maxIndex) {
                 index++;
-                if ((next.attributes.letXxpath) != undefined) {
+                if ((next.attributes.letxxpath) != undefined) {
+                    throw 'break';
+                }
+                next = doc.iterateNext();
+            }
+        } catch (error) { }
+        let indexedXpath = `(${allXpathAttr})[${index}]`;
+        if (index <= maxIndex) {
+            let c = getNumberOfXPath(indexedXpath)
+            if (c > 0) {
+                return indexedXpath;
+            }
+        } else
+            return null;
+    } catch (error) { }
+
+}
+// Add Index to Axes XPATH
+function addIndexToAxesXpath(allXpathAttr) {
+    try {
+        let index = 0;
+        let doc = elementOwnerDocument.evaluate(allXpathAttr, elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
+        let next = doc.iterateNext();
+        try {
+            while (next && index <= maxIndex) {
+                index++;
+                if ((next.attributes.letaxes) != undefined) {
                     throw 'break';
                 }
                 next = doc.iterateNext();
@@ -45,43 +71,7 @@ function evaluateXPathExpression(element) {
         return elementOwnerDocument.evaluate(element, elementOwnerDocument, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
     } catch (error) { }
 }
-// Set XPath length in Chrome Badge
-function setStorage(c) {
-    chrome.storage.local.set({
-        'total': c
-    });
-}
 // Remove added element
-function removeLetXXpath(element) {
-    element.removeAttribute('letXxpath', 'letX');
-}
-
-function highlightSelectedDOM() {
-    targetElemt.className += ' letXPFinder';
-}
-
-function clearHighlights() {
-    let els = elementOwnerDocument.getElementsByClassName('letXPFinder');
-    while (els.length) {
-        els[0].className = els[0].className.replace(' letXPFinder', '');
-    }
-};
-function clearHighlights1() {
-    let els = elementOwnerDocument.getElementsByClassName('letXPFinder1');
-    while (els.length) {
-        els[0].className = els[0].className.replace(' letXPFinder1', '');
-    }
-};
-function clearHighlights2() {
-    let els = elementOwnerDocument.getElementsByClassName('letXPFinder2');
-    while (els.length) {
-        els[0].className = els[0].className.replace(' letXPFinder2', '');
-    }
-};
-
-function addRemoveOutlineCustomeXpath(next) {
-    next.setAttribute('style', 'outline: green solid;');
-    setTimeout(() => {
-        next.removeAttribute('style', 'outline: green solid;');
-    }, 100);
+function removeletxxpath(element) {
+    element.removeAttribute('letxxpath', 'letX');
 }

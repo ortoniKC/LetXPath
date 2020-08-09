@@ -12,6 +12,12 @@ $(document).ready(function () {
             hljs.highlightBlock(block);
         })
     });
+    $('#anxp').on('custom-update', function () {
+        hljs.configure({ useBR: false });
+        document.querySelectorAll('p.code').forEach((block) => {
+            hljs.highlightBlock(block);
+        })
+    });
     $('#tab_header ul li.item').on('click', function () {
         var number = $(this).data('option');
         $('#tab_header ul li.item').removeClass('is-active');
@@ -41,18 +47,15 @@ $(document).ready(function () {
     // --- on click evaluate axes
     $('body',).on('click', "input[type='radio']", (ele) => {
         let prefol = document.getElementById("anxp").attributes.value.value;
-        //  $("#anxp").val();
-        console.log(ele.target.value);
         // find the selected source
         let src = $("input[name='src']:checked").val();
         // find the selected target
         let tgt = $("input[name='tgt']:checked").val();
         // get both values
-        console.log(src + tgt);
-        $("#anxp").empty();
-        $("#anxp").text(src + prefol + tgt);
-        // = src + tgt;
-        // combine with axes
+        devtools_connections.postMessage({
+            data: `//${src + prefol + tgt}`,
+            request: "parseAxes", tab: chrome.devtools.inspectedWindow.tabId
+        });
     })
 
     // --- start debugger

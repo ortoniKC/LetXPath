@@ -25,7 +25,7 @@ let getXPath = (info, tab) => {
     let msg = {
         request: 'context_menu_click'
     }
-    chrome.tabs.sendMessage(tab.id, msg, () => { })
+    chrome.tabs.sendMessage(tab.id, msg)
 }
 // on context menu click send message to content script
 chrome.contextMenus.onClicked.addListener((info, tab) => {
@@ -39,12 +39,15 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 var connections = {};
 chrome.runtime.onConnect.addListener(function (port) {
     var extensionListener = function (message, sender, sendResponse) {
-
         // The original connection event doesn't include the tab ID of the
         // DevTools page, so we need to send it explicitly.
         if (message.name == "devtools_panel") {
             connections[message.tabId] = port;
-            return;
+            return true;
+        }
+        if (message.name == "init") {
+            connections[message.tabId] = port;
+            return true;
         }
         if (message.selector) {
             if (message.selector.request === "utilsSelector") {
@@ -61,6 +64,11 @@ chrome.runtime.onConnect.addListener(function (port) {
                 // send message to content script
                 sendToContentScript(message);
             }
+            return true;
+        }
+        if (message.request === "parseAxes") {
+            sendToContentScript(message);
+            return true;
         }
     }
     // Listen to messages sent from the DevTools page
@@ -74,30 +82,12 @@ chrome.runtime.onConnect.addListener(function (port) {
                 break;
             }
         }
+        return true;
     });
 });
 
 // Receive message from content script and relay to the devTools page for the
 // current tab
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-
-
-    if (request.type === "send_to_dev") {
-        // Messages from content scripts should have sender.tab set
-        if (sender.tab) {
-            var tabId = sender.tab.id;
-            if (tabId in connections) {
-                connections[tabId].postMessage(request);
-            } else {
-
-            }
-        } else {
-
-        }
-    }
-    // to avoid async problem return is used!
-    return true;
-});
 /**
  * @param {} request 
  * @description used to send the message object to the content script
@@ -105,7 +95,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 var sendToContentScript = (request) => {
     chrome.tabs.sendMessage(request.tab, request);
 }
-
 // install and update notification
 
 let installURL = chrome.runtime.getURL("install.html");
@@ -115,8 +104,6 @@ let uninstallURL = "https://www.letcode.in/products";
 // chrome.runtime.setUninstallURL(uninstallURL, () => { });
 
 let installReason = (detail) => {
-    console.log(detail);
-
     if (detail.reason === "install") {
         chrome.tabs.create({
             url: installURL
