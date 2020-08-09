@@ -4,8 +4,15 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
     buildUI(req);
   }
   if (req.request === "anchor") {
-    jQuery("#anchorXPath").empty();
-    let ui = `
+    console.log(req);
+    generateAxes(req);
+  }
+})
+let devtools_connections = chrome.runtime.connect({ name: "ortoni_devtools_message" });
+
+function generateAxes(req) {
+  jQuery("#anchorXPath").empty();
+  let ui = `
     <div class="field is-grouped">
     <p class="control has-icons-right is-size-7 is-expanded is-fullwidth code lang-XQuery" id="anxp">${req.data.defaultXPath}</p>
       <p class="control" data-copytarget="#anxp">
@@ -15,15 +22,70 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
           </span>
         </button>
       </p>
-    </div>    
-        `;
-    jQuery("#anchorXPath").append(ui);
-    jQuery("#anchorXPath").trigger('custom-update');
-    // document.getElementById("anchorXPath").textContent = JSON.stringify(req.data)
+    </div>
+    <div class="content">
+    <div class="mycolumns">
+      <div>
+        <p>Source Elements</p>
+        <div class="block">
+         ${sourceElement(req.data.src)}
+        </div>
+      </div>
+      <div>
+        <p>Target Elements</p>
+        <div class="block">
+        ${targetElement(req.data.dst)}
+        </div>
+      </div>
+    </div>
+  </div>`;
+  jQuery("#anchorXPath").append(ui);
+  jQuery("#anchorXPath").trigger('custom-update');
+}
+function sourceElement(element) {
+  console.log(element);
+  let ui = '';
+  for (let i = 0; i < element.length; i++) {
+    if (i == 0) {
+      ui += `<div class="control">
+      <label class="radio" aria-label="${element[i][1]}" data-balloon-pos="up">
+        <input type="radio" value="${element[i][1]}" name="src" checked>
+        ${element[i][2]}
+      </label>
+    </div>`;
+    } else {
+      ui += `<div class="control">
+      <label class="radio" aria-label="${element[i][1]}" data-balloon-pos="up">
+        <input type="radio" value="${element[i][1]}" name="src">
+        ${element[i][2]}
+      </label>
+    </div>`;
+    }
   }
-})
-let devtools_connections = chrome.runtime.connect({ name: "ortoni_devtools_message" });
-// devtools_connections.postMessage({ req: "some thing", tab: chrome.devtools.inspectedWindow.tabId });
+  return ui;
+}
+function targetElement(element) {
+  let ui = '';
+  for (let i = 0; i < element.length; i++) {
+    if (i == 0) {
+      ui += `<div class="control">
+      <label class="radio" aria-label="${element[i][1]}" data-balloon-pos="up">
+        <input type="radio" value="${element[i][1]}" name="tgt" checked>
+        ${element[i][2]}
+      </label>
+    </div>`;
+    } else {
+      ui += `<div class="control">
+      <label class="radio" aria-label="${element[i][1]}" data-balloon-pos="up">
+        <input type="radio" value="${element[i][1]}" name="tgt">
+        ${element[i][2]}
+      </label>
+    </div>`;
+    }
+  }
+  return ui;
+}
+
 
 // -------- based on the snippet type show the code ----------
 function buildUI(data) {
@@ -66,7 +128,6 @@ function buildUI(data) {
   </div>
   </div>`;
     jQuery("#addXPath").append(table);
-    // return table;
   }
   jQuery("#addXPath").append(snippets);
   let len = data.xpathid;

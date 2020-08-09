@@ -1,4 +1,3 @@
-
 $(document).ready(function () {
     // ------ highlight XPath & Code Snippets -----------
     $('#addXPath').on('custom-update', function () {

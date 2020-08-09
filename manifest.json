@@ -1,8 +1,9 @@
 {
   "name": "LetXPath",
-  "description": "Open-source project - XPath Finder",
+  "short_name": "XPath finder",
+  "description": "XPath Finder, simple and useful, open-source project",
   "author": "Koushik Chatterjee",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "manifest_version": 2,
   "icons": {
     "128": "assets/32.png"
@@ -20,7 +21,9 @@
       "run_at": "document_start",
       "match_about_blank": true,
       "all_frames": true,
-      "matches": ["<all_urls>"],
+      "matches": [
+        "<all_urls>"
+      ],
       "js": [
         "app/src/content.js",
         "app/src/anchorXPath.js",
@@ -38,7 +41,9 @@
   ],
   "background": {
     "persistent": true,
-    "scripts": ["eventPage.js"]
+    "scripts": [
+      "eventPage.js"
+    ]
   },
   "devtools_page": "devtools.html",
   "content_security_policy": "script-src 'self'; object-src 'self'",
@@ -51,7 +56,7 @@
         "linux": "Alt+L",
         "default": "Alt+L"
       },
-      "description": "Open pop up page"
+      "description": "LetCode"
     }
   },
   "browser_action": {

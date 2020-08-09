@@ -13,15 +13,6 @@ function getAnchorXPath(getsingleXPath, tagArr, dupArray, element) {
     }
     dupArray.push(getsingleXPath);
     let length = dupArray.length
-    // if (length == 1) {
-    //     targetElemt.className += ' letXPFinder1';
-    //     setStorage('+1')
-    //     try {
-    //         removeLetXXpath(element);
-    //     } catch (e) {
-    //         
-    //     }
-    // }
     if (length == 2) {
         let srcArrayXP = [];
         let dstArrayXP = [];
@@ -53,7 +44,7 @@ function getAnchorXPath(getsingleXPath, tagArr, dupArray, element) {
         let defaultXP = `//${srcArrayXP[0][1]}${setPreOrFol}${dstArrayXP[0][1]}`;
         let defaultCount = getNumberOfXPath(defaultXP);
         if (defaultCount == 0 || defaultCount == undefined) {
-            defaultXP = "Pattern not matched, Please try other option by click on 'Advance'";
+            defaultXP = "Pattern not matched, Please try other combinations";
         } else if (defaultCount == 1) {
             defaultXP = defaultXP;
         } else if (defaultCount > 1) {
@@ -68,7 +59,7 @@ function getAnchorXPath(getsingleXPath, tagArr, dupArray, element) {
             defaultXPath: defaultXP,
         }
         chrome.runtime.sendMessage({ request: "anchor", data: dom })
-        
+
         webTableDetails = null;
         // make xpath to 0 so it can be used again
         tagArrHolder = [];
