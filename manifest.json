@@ -13,8 +13,7 @@
     "contextMenus",
     "tabs",
     "storage",
-    "notifications",
-    "debugger"
+    "notifications"
   ],
   "content_scripts": [
     {
