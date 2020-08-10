@@ -8,8 +8,8 @@
 let targetElemt = null;
 let enablegcx = false;
 let isRecordEnabled = false;
-let attachedTabs = {};
-let version = "1.3";
+// let attachedTabs = {};
+// let version = "1.3";
 
 // used to send/receive message with in extension
 let receiver = (message, sender, sendResponse) => {
@@ -121,8 +121,6 @@ function buildSelectedFileds(targetElement) {
         try {
             maxIndex = tempMaxIndex != null ? tempMaxIndex : 5;
             buildXpath(targetElement, 0);
-
-
         } catch (error) {
             if (error.message === 'shadow dom not yet supported')
                 XPATHDATA = undefined

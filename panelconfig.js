@@ -59,20 +59,18 @@ $(document).ready(function () {
     })
 
     // --- start debugger
-    $("#setdebugger").click(() => {
-        chrome.debugger.onEvent.addListener(onEvent);
-        chrome.debugger.onDetach.addListener(onDetach);
-        var tabId = chrome.devtools.inspectedWindow.tabId;
-        var debuggeeId = { tabId: tabId };
-
-        if (attachedTabs[tabId] == "pausing")
-            return;
-
-        if (!attachedTabs[tabId])
-            chrome.debugger.attach(debuggeeId, version, onAttach.bind(null, debuggeeId));
-        else if (attachedTabs[tabId])
-            chrome.debugger.detach(debuggeeId, onDetach.bind(null, debuggeeId));
-    });
+    // $("#setdebugger").click(() => {
+    //     chrome.debugger.onEvent.addListener(onEvent);
+    //     chrome.debugger.onDetach.addListener(onDetach);
+    //     var tabId = chrome.devtools.inspectedWindow.tabId;
+    //     var debuggeeId = { tabId: tabId };
+    //     if (attachedTabs[tabId] == "pausing")
+    //         return;
+    //     if (!attachedTabs[tabId])
+    //         chrome.debugger.attach(debuggeeId, version, onAttach.bind(null, debuggeeId));
+    //     else if (attachedTabs[tabId])
+    //         chrome.debugger.detach(debuggeeId, onDetach.bind(null, debuggeeId));
+    // });
     // --- open option page
     $('body').on('click', '#openSetting', () => {
         chrome.runtime.openOptionsPage(() => { });
@@ -97,42 +95,46 @@ $(document).ready(function () {
         } catch (error) { }
     })
 
+    /**
+     * @description - Feature is disabled as of now, as it is not working as expected
+     */
+
     // debugger
-    var attachedTabs = {};
-    var version = "1.3";
+    // var attachedTabs = {};
+    // var version = "1.3";
 
-    var onAttach = (debuggeeId) => {
-        if (chrome.runtime.lastError) {
-            // alert(chrome.runtime.lastError.message);
-            return;
-        }
-        var tabId = debuggeeId.tabId;
-        attachedTabs[tabId] = "pausing";
-        chrome.debugger.sendCommand(
-            debuggeeId, "Debugger.enable", {},
-            onDebuggerEnabled.bind(null, debuggeeId)
-        );
-    }
+    // var onAttach = (debuggeeId) => {
+    //     if (chrome.runtime.lastError) {
+    //         // alert(chrome.runtime.lastError.message);
+    //         return;
+    //     }
+    //     var tabId = debuggeeId.tabId;
+    //     attachedTabs[tabId] = "pausing";
+    //     chrome.debugger.sendCommand(
+    //         debuggeeId, "Debugger.enable", {},
+    //         onDebuggerEnabled.bind(null, debuggeeId)
+    //     );
+    // }
 
-    var onDebuggerEnabled = (debuggeeId) => {
-        chrome.debugger.sendCommand(debuggeeId, "Debugger.pause");
-        document.querySelector("#setdebugger").textContent = "Paused";
+    // var onDebuggerEnabled = (debuggeeId) => {
+    //     chrome.debugger.sendCommand(debuggeeId, "Debugger.pause");
+    //     document.querySelector("#setdebugger").textContent = "Paused";
 
-    }
+    // }
 
-    var onEvent = (debuggeeId, method, setdebugger) => {
-        var tabId = debuggeeId.tabId;
-        if (method == "Debugger.paused") {
-            attachedTabs[tabId] = "paused";
-            document.querySelector("#setdebugger").textContent = "Resume";
-        }
-    }
+    // var onEvent = (debuggeeId, method, setdebugger) => {
+    //     var tabId = debuggeeId.tabId;
+    //     if (method == "Debugger.paused") {
+    //         attachedTabs[tabId] = "paused";
+    //         document.querySelector("#setdebugger").textContent = "Resume";
+    //     }
+    // }
 
-    var onDetach = (debuggeeId) => {
-        var tabId = debuggeeId.tabId;
-        delete attachedTabs[tabId];
-        document.querySelector("#setdebugger").textContent = "Start!";
-    }
+    // var onDetach = (debuggeeId) => {
+    //     var tabId = debuggeeId.tabId;
+    //     delete attachedTabs[tabId];
+    //     document.querySelector("#setdebugger").textContent = "Start!";
+    // }
 });
 function copyToClipBoard(range, node) {
     try {

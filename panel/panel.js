@@ -1,6 +1,4 @@
 chrome.runtime.onMessage.addListener((req, rec, res) => {
-  console.log(req);
-
   switch (req.request) {
     case "send_to_dev":
       buildUI(req);
@@ -18,7 +16,7 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
   }
 })
 let devtools_connections = chrome.runtime.connect({ name: "ortoni_devtools_message" });
-
+// generate axes based on user inputs
 function generateAxes(req) {
   jQuery("#anchorXPath").empty();
   let ui = `
@@ -51,6 +49,7 @@ function generateAxes(req) {
   jQuery("#anchorXPath").append(ui);
   jQuery("#anchorXPath").trigger('custom-update');
 }
+// Build the source element
 function sourceElement(element) {
   let ui = '';
   for (let i = 0; i < element.length; i++) {
@@ -72,6 +71,7 @@ function sourceElement(element) {
   }
   return ui;
 }
+// Build the target element
 function targetElement(element) {
   let ui = '';
   for (let i = 0; i < element.length; i++) {
@@ -93,8 +93,6 @@ function targetElement(element) {
   }
   return ui;
 }
-
-
 // -------- based on the snippet type show the code ----------
 function buildUI(data) {
   jQuery("#addXPath").empty();
