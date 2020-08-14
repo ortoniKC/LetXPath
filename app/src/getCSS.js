@@ -31,21 +31,21 @@ function getLongCssPath(ele) {
 
 // css locatrs -- basics--
 function getCSS(element, tagName) {
-    cssPathArray = [];
+    CSSPATHDATA = [];
     Array.prototype.slice.call(element.attributes).forEach(function (item) {
         if (!filterAttributesFromElement(item)) {
             switch (item.name) {
                 case 'id':
                     let id = `${tagName}#${item.value}`
-                    cssPathArray.push([0, 'Css', id])
+                    CSSPATHDATA.push([0, 'Css', id])
                     break;
                 case 'class':
                     let classN = `${tagName}.${item.value}`;
-                    cssPathArray.push([0, 'Css', classN])
+                    CSSPATHDATA.push([0, 'Css', classN])
                     break;
                 default:
                     let attribuitesBased = `${tagName}[${item.name}='${item.value}']`
-                    cssPathArray.push([0, 'Css', attribuitesBased])
+                    CSSPATHDATA.push([0, 'Css', attribuitesBased])
                     break;
             }
         }
