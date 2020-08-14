@@ -79,13 +79,19 @@
 <body>
   <div class="tabs is-small is-right is-toggle is-toggle-rounded" id="tab_header">
     <ul>
-      <li class="item is-active" data-option="1"><a>
-          <img src="../assets/icons/panel/mission.svg" alt="xpath" class="icon custom-svg is-small">XPath</a>
+      <li class="item is-active" data-option="1">
+        <a>
+          <span class="tag is-rounded is-info is-light is-hidden" id="xc"></span>
+          <img src="../assets/icons/panel/mission.svg" alt="xpath" class="icon custom-svg is-small">XPath
+        </a>
       </li>
       <li class="item" data-option="2"><a>
           <img src="../assets/icons/panel/axe.svg" alt="xpath" class="icon custom-svg is-small">Axes</a>
       </li>
-      <li class="item is-hidden" data-option="3"><a>
+      <li class="item" data-option="6"><a>
+          <img src="../assets/icons/panel/axe.svg" alt="xpath" class="icon custom-svg is-small">CSS</a>
+      </li>
+      <li class="item" data-option="3"><a>
           <img src="../assets/icons/panel/tool-belt.svg" alt="xpath" class="icon custom-svg is-small">Utils</a>
       </li>
       <li class="item is-hidden" data-option="4"><a>
@@ -104,61 +110,47 @@
   </div>
   <div class="block" id="tab_container">
     <!-- xpath -->
-    <div class="container_item is-active box" id="addXPath" data-item="1">
+    <div class="container_item box is-active" id="addXPath" data-item="1">
     </div>
     <!-- xpath -->
     <!-- utils -->
     <div class="container_item" data-item="3">
-      <div class="columns is-vcentered">
-        <div class="column is-half">
-          <section class="section">
-            <div class="container">
-              <h1 class="subtitle">Get multiple elements</h1>
-              <h2 class="is-small">
-                Select any of the value in drop-down & get the
-                <strong>locator</strong> or<strong> XPath</strong>
-              </h2>
-              <div class="select is-small">
-                <select name="selector" id="selector">
-                  <option value="Selector">Select</option>
-                  <option value="inputs">Input fields</option>
-                  <option value="dropdown">Dropdowns</option>
-                  <option value="buttons">Buttons</option>
-                  <option value="labels">Label</option>
-                </select>
+      <section class="section">
+        <h1 class="subtitle has-text-white">Get multiple elements</h1>
+        <h2 class="has-text-white is-small">
+          Select any of the value in drop-down & get the
+          <b>locator</b> or<b> XPath</b>
+        </h2>
+        <div class="mycolumns">
+          <div class="select is-small">
+            <select name="selector" id="selector">
+              <option value="Selector">Select</option>
+              <option value="inputs">Input fields</option>
+              <option value="dropdown">Dropdowns</option>
+              <option value="buttons">Buttons</option>
+            </select>
+          </div>
+          <div class="field is-grouped is-grouped-multiline">
+            <div class="control">
+              <div class="tags has-addons">
+                <span class="tag is-dark">Elements found</span>
+                <span class="tag is-info"></span>
               </div>
             </div>
-          </section>
+          </div>
         </div>
-        <div class="column is-half">
-          <section class="section">
-            <div class="container">
-              <h1 class="subtitle">Inspect with break-point</h1>
-              <p class="text is-small">
-                Get <strong>Locator</strong> or <strong>XPath</strong> of a <strong>Toast message</strong>
-              </p>
-              <p class="is-small">Set timeout</p>
-              <div class="block">
-                <div class="field has-addons has-addons-centered">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="default timeout is 5 sec">
-                  </p>
-                  <p class="control">
-                    <a class="button is-primary" id="setdebugger">
-                      Generate
-                    </a>
-                  </p>
-                </div>
-              </div>
-          </section>
+        <div class="content">
+          <div id="show">
+          </div>
         </div>
-      </div>
+      </section>
     </div>
     <!-- utils -->
     <!-- Test Data -->
     <div class="container_item block" data-item="4">
       <h1 class="subtitle has-text-info">Select the check box to get the <strong
-          class="has-text-primary">Random</strong> test data</h1>
+          class="has-text-primary">Random</strong>
+        test data</h1>
       <div class="block"> <label class="checkbox">
           <input type="checkbox">
           Name:
@@ -257,6 +249,12 @@
       </div>
     </div>
     <!-- About -->
+    <!-- CSS -->
+    <div class="container_item block" data-item="6">
+      <p class="title is-info">CSS</p>
+    </div>
+    <!-- CSS -->
+
   </div>
 </body>
 

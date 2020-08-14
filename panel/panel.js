@@ -11,11 +11,42 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
       $("#anxp").text(req.data);
       jQuery("#anxp").trigger('custom-update');
       return true;
+    case "fromUtilsSelector":
+      utilsLocatorUI(req.data);
+      return true;
     default:
       return true;
   }
 })
 let devtools_connections = chrome.runtime.connect({ name: "ortoni_devtools_message" });
+
+function utilsLocatorUI(data) {
+  let len = data.length;
+  if (len > 0) {
+    let ui = `
+    <table class="table">
+      <thead>
+        <th>Select</th>
+        <th>Name</th>
+        <th>XPath</th>
+      </thead>
+      <tbody>
+        ${getTR()}
+      </tbody>
+    </table>`;
+    $("#show").append(ui);
+  }
+  function getTR() {
+    let tr = '';
+    for (let i = 0; i < data.length; i++) {
+      tr += `<tr><td><input class="checkbox" type="checkbox" name="locator" id="loc${i}"></td>
+          <td>${data[i][1]}</td>
+          <td>${data[i][2][0][2]}</td></tr>`;
+    }
+    return tr;
+  }
+}
+
 // generate axes based on user inputs
 function generateAxes(req) {
   jQuery("#anchorXPath").empty();
@@ -140,6 +171,8 @@ function buildUI(data) {
   for (let i = 0; i < len.length; i++) {
     generateXPathUI(data, i);
   }
+  jQuery("#xc").text(len.length);
+  jQuery("#xc").removeClass("is-hidden");
   jQuery("#addXPath").trigger('custom-update');
 }
 // -------- Build XPath UI ---------

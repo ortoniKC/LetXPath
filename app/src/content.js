@@ -10,61 +10,72 @@ let enablegcx = false;
 let isRecordEnabled = false;
 // let attachedTabs = {};
 // let version = "1.3";
-
+/**
+ * 
+ * @param {*} data 
+ * @description send the data to the panel.js
+ */
+function sendToDev(data) {
+    chrome.runtime.sendMessage({ request: "fromUtilsSelector", data: data });
+}
 // used to send/receive message with in extension
 let receiver = (message, sender, sendResponse) => {
     if (message.selector) {
         let selected = message.selector.selectedValue;
+        utilsSelectorXPathData = [];
         switch (selected) {
             case "inputs":
                 let ip = document.querySelectorAll("input");
                 for (let index = 0; index < ip.length; index++) {
                     buildSelectedFileds(ip[index]);
                 }
+                sendToDev(utilsSelectorXPathData.sort());
                 return true;
             case "dropdown":
                 let dd = document.querySelectorAll("select");
                 for (let index = 0; index < dd.length; index++) {
                     buildSelectedFileds(dd[index]);
                 }
+                sendToDev(utilsSelectorXPathData.sort());
                 return true;
-            case "labels":
-                let l = document.querySelectorAll("label");
-                for (let index = 0; index < l.length; index++) {
-                    buildSelectedFileds(l[index]);
-                }
-                return true;
+            // case "labels":
+            //     let l = document.querySelectorAll("label");
+            //     for (let index = 0; index < l.length; index++) {
+            //         buildSelectedFileds(l[index]);
+            //     }
+            //     sendToDev(utilsSelectorXPathData.sort());
+            //     return true;
             case "buttons":
-                let bt = elementOwnerDocument.querySelectorAll("button");
+                let bt = document.querySelectorAll("button");
                 for (let index = 0; index < bt.length; index++) {
                     buildSelectedFileds(bt[index]);
                 }
+                sendToDev(utilsSelectorXPathData);
                 return true;
             default:
                 return true;
         }
     }
     switch (message.request) {
-        case "utilsSelector":
-            // TODO
-            return true;
         case 'parseAxes':
-            let value = message.data;
-            let snapShot = elementOwnerDocument.evaluate(value, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-            let count = snapShot.snapshotLength;
-            if (count == 0 || count == undefined) {
-                chrome.runtime.sendMessage({ request: 'axes', data: "Sorry! Please try with different XPath combination" })
-            } else if (count == 1) {
-                chrome.runtime.sendMessage({ request: 'axes', data: value });
-            } else if (count > 1) {
-                let ex = addIndexToAxesXpath(value);
-                if (ex != null) {
-                    chrome.runtime.sendMessage({ request: 'axes', data: ex });
-                } else {
+            try {
+                let value = message.data;
+                let snapShot = elementOwnerDocument.evaluate(value, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                let count = snapShot.snapshotLength;
+                if (count == 0 || count == undefined) {
                     chrome.runtime.sendMessage({ request: 'axes', data: "Sorry! Please try with different XPath combination" })
+                } else if (count == 1) {
+                    chrome.runtime.sendMessage({ request: 'axes', data: value });
+                } else if (count > 1) {
+                    let ex = addIndexToAxesXpath(value);
+                    if (ex != null) {
+                        chrome.runtime.sendMessage({ request: 'axes', data: ex });
+                    } else {
+                        chrome.runtime.sendMessage({ request: 'axes', data: "Sorry! Please try with different XPath combination" })
+                    }
                 }
-            }
-            return true;
+                return true;
+            } catch (error) { }
         // build possible xpath
         case "context_menu_click":
             parseAnchorXP(targetElemt);
@@ -101,8 +112,8 @@ let tag = null;
 let tagArrHolder = [];
 let dupArray = [];
 let XPATHDATA;
-let cssPathArray = null;
-let mulXpathArray = [];
+let CSSPATHDATA = null;
+let utilsSelectorXPathData = [];
 let letXInc = null
 let letXP = "[@letxxpath='letX']";
 let _doc = '';
@@ -120,7 +131,8 @@ function buildSelectedFileds(targetElement) {
     if (targetElement != null) {
         try {
             maxIndex = tempMaxIndex != null ? tempMaxIndex : 5;
-            buildXpath(targetElement, 0);
+            if (targetElement.type != 'hidden')
+                buildXpath(targetElement, 0, true);
         } catch (error) {
             if (error.message === 'shadow dom not yet supported')
                 XPATHDATA = undefined
@@ -134,7 +146,7 @@ function parseDOM(targetElement) {
             elementOwnerDocument = targetElement.ownerDocument;
             try {
                 maxIndex = tempMaxIndex != null ? tempMaxIndex : 5;
-                buildXpath(targetElement, 0);
+                buildXpath(targetElement, 0, false);
             } catch (error) {
                 if (error.message === 'shadow dom not yet supported')
                     XPATHDATA = undefined
@@ -142,7 +154,7 @@ function parseDOM(targetElement) {
             let domInfo = {
                 request: "send_to_dev",
                 angXP: angularArray,
-                cssPath: cssPathArray,
+                cssPath: CSSPATHDATA,
                 webtabledetails: webTableDetails,
                 xpathid: XPATHDATA.sort(),
                 tag: tag,
@@ -166,14 +178,14 @@ function parseAnchorXP(targetElement) {
     if (targetElemt != null) {
         try {
             maxIndex = 20;
-            buildXpath(targetElemt, 1);
+            buildXpath(targetElemt, 1, false);
         } catch (error) {
 
         }
     }
 }
 
-function buildXpath(element, boolAnchor) {
+function buildXpath(element, boolAnchor, utils) {
     if (element.shadowRoot != null) {
         chrome.runtime.sendMessage({
             shadowRoot: true,
@@ -272,13 +284,19 @@ function buildXpath(element, boolAnchor) {
         XPATHDATA.push([90, 'Id XPath', getXPathWithPosition(element)])
     } catch (error) { }
     try {
-        cssPathArray = [];
+        CSSPATHDATA = [];
         let css = getLongCssPath(element)
         if (elementOwnerDocument.querySelectorAll(css).length == 1)
-            cssPathArray.push([11, 'CSS', css]);
+            CSSPATHDATA.push([11, 'CSS', css]);
     } catch (error) { }
 
-    // ANCHOR BASED XPATH
+    try {
+        if (utils) {
+            utilsSelectorXPathData.push([methodName, variableName, XPATHDATA.sort()]);
+        }
+    } catch (error) { alert(error) }
+
+    // AXES BASED XPATH
     switch (boolAnchor) {
         case 0:
             try {
