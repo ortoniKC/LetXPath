@@ -281,7 +281,8 @@ function buildXpath(element, boolAnchor, utils) {
     } catch (error) { }
     // Based on parent XPath
     try {
-        XPATHDATA.push([90, 'Id XPath', getXPathWithPosition(element)])
+        if (XPATHDATA.length < 3)
+            XPATHDATA.push([90, 'Id XPath', getXPathWithPosition(element)])
     } catch (error) { }
     try {
         CSSPATHDATA = [];

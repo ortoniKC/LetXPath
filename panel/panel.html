@@ -2,45 +2,46 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LetXPath</title>
-  <script src="../app/utils/jquery.js"></script>
-  <link rel="stylesheet" href="../app/styles/bulma.min.css" />
-  <link rel="stylesheet" href="../app/styles/ballon.css">
-  <script src="../panelconfig.js"></script>
+  <link rel="stylesheet" href="../app/styles/main.css">
+  <script defer src="../app/utils/jquery.js"></script>
+  <script defer src="../panelconfig.js"></script>
   <script defer src="../panel/panel.js"></script>
-  <link rel="stylesheet" href="../app/styles/agate.css" />
-  <script defer src="../app/utils/highlight.pack.js"></script>
   <style>
     body {
-      height: 100vh;
-      margin: 0;
-      padding: 0;
+      zoom: 80%;
     }
 
-    .mycolumns {
-      display: flex;
-      justify-content: space-around;
-    }
-
-    .column {
-      display: flex;
-      justify-content: space-evenly;
+    span.label {
+      font-size: small;
     }
 
     #tab_container .container_item {
       display: none;
     }
 
-    #tab_container .container_item.is-active {
+    #tab_container .container_item.active {
       display: block;
+    }
+
+    li img {
+      width: 25px;
+    }
+
+    button img {
+      width: 20px;
+    }
+
+    .form-label {
+      padding: .1rem 0;
     }
 
     .copied::after {
       font-family: 'Oxygen Mono', monospace;
       position: absolute;
-      top: 25%;
+      /* top: 50%; */
       display: block;
       content: "Copied";
       font-size: 0.75em;
@@ -77,170 +78,114 @@
 </head>
 
 <body>
-  <div class="tabs is-small is-right is-toggle is-toggle-rounded" id="tab_header">
-    <ul>
-      <li class="item is-active" data-option="1">
-        <a>
-          <span class="tag is-rounded is-info is-light is-hidden" id="xc"></span>
-          <img src="../assets/icons/panel/mission.svg" alt="xpath" class="icon custom-svg is-small">XPath
-        </a>
+  <div class="container">
+    <ul class="tab tab-block" id="tab_header">
+      <li class="tab-item c-hand active" data-option="1">
+        <a class="badge" id="xpbadge" data-badge="0">XPath</a>
       </li>
-      <li class="item" data-option="2"><a>
-          <img src="../assets/icons/panel/axe.svg" alt="xpath" class="icon custom-svg is-small">Axes</a>
+      <li class="tab-item c-hand" data-option="2">
+        <a class="badge" data-badge="0">CSS</a>
       </li>
-      <li class="item" data-option="6"><a>
-          <img src="../assets/icons/panel/axe.svg" alt="xpath" class="icon custom-svg is-small">CSS</a>
+      <li class="tab-item c-hand" data-option="3">
+        <a>Axes</a>
       </li>
-      <li class="item" data-option="3"><a>
-          <img src="../assets/icons/panel/tool-belt.svg" alt="xpath" class="icon custom-svg is-small">Utils</a>
+      <li class="c-hand" id="openSetting">
+        <img src="../assets/icons/panel/settings.svg" alt="settings">
       </li>
-      <li class="item is-hidden" data-option="4"><a>
-          <img src="../assets/icons/panel/search.svg" alt="xpath" class="icon custom-svg is-small">Test-Data</a>
-      </li>
-      <li id="openSetting"><a>
-          <img src="../assets/icons/panel/settings.svg" alt="xpath" class="icon custom-svg is-small">Config</a>
-      </li>
-      <li class="item" data-option="5"><a>&nbsp;
-          <figure class="image is-24x24px">
-            <img src="../assets/16.png">
-          </figure>
-        </a>
+      <li class="tab-item c-hand" data-option="4">
+        <img src="../assets/32.png" alt="letxpath">
       </li>
     </ul>
   </div>
-  <div class="block" id="tab_container">
-    <!-- xpath -->
-    <div class="container_item box is-active" id="addXPath" data-item="1">
+  <div class="container grid-lg" id="tab_container">
+    <div class="container_item card active" data-item="1">
+      <div class="toast toast-success d-hide">
+      </div>
+      <div class="card-body" id="addXPath"></div>
     </div>
-    <!-- xpath -->
-    <!-- utils -->
-    <div class="container_item" data-item="3">
-      <section class="section">
-        <h1 class="subtitle has-text-white">Get multiple elements</h1>
-        <h2 class="has-text-white is-small">
-          Select any of the value in drop-down & get the
-          <b>locator</b> or<b> XPath</b>
-        </h2>
-        <div class="mycolumns">
-          <div class="select is-small">
-            <select name="selector" id="selector">
-              <option value="Selector">Select</option>
-              <option value="inputs">Input fields</option>
-              <option value="dropdown">Dropdowns</option>
-              <option value="buttons">Buttons</option>
-            </select>
+    <div class="container_item card" data-item="2">
+      <div class="card-body">
+        CSS
+      </div>
+    </div>
+    <div class="container_item card active" data-item="3">
+      <div class="card-body" id="anchorXPath">
+        <p>Please use the context menu (Right click on page) to select parent & child element</p>
+        <div class="columns text-center">
+          <div class="column col-xs-6">
+            <p>Parent Element</p>
+            <div class="form-group">
+              <label class="form-switch">
+                <input type="checkbox">
+                <i class="form-icon"></i> Send me emails with news and tips
+              </label>
+            </div>
           </div>
-          <div class="field is-grouped is-grouped-multiline">
-            <div class="control">
-              <div class="tags has-addons">
-                <span class="tag is-dark">Elements found</span>
-                <span class="tag is-info"></span>
-              </div>
+
+
+          <div class="column col-xs-6">
+            <p>Child Element</p>
+            <div class="form-group">
+              <label class="form-switch">
+                <input type="radio" name="">
+                <i class="form-icon"></i> Send me emails with news and tips
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="form-switch">
+                <input type="checkbox">
+                <i class="form-icon"></i> Send me emails with news and tips
+              </label>
             </div>
           </div>
         </div>
-        <div class="content">
-          <div id="show">
-          </div>
-        </div>
-      </section>
-    </div>
-    <!-- utils -->
-    <!-- Test Data -->
-    <div class="container_item block" data-item="4">
-      <h1 class="subtitle has-text-info">Select the check box to get the <strong
-          class="has-text-primary">Random</strong>
-        test data</h1>
-      <div class="block"> <label class="checkbox">
-          <input type="checkbox">
-          Name:
-        </label>
-        <label class="checkbox">
-          <input type="checkbox">
-          Email:
-        </label>
-        <label class="checkbox">
-          <input type="checkbox">
-          Lorem - Lines:
-        </label>
-        <label class="checkbox">
-          <input type="checkbox">
-          Lorem - Sentences:
-        </label></div>
-      <div class="block">
-        <div class="field has-addons has-addons-centered">
-          <p class="control">
-            <input class="input" type="text" placeholder="Number of Data?">
-          </p>
-          <p class="control">
-            <a class="button is-primary" id="genData">
-              Generate
-            </a>
-          </p>
-        </div>
       </div>
     </div>
-    <!-- axes -->
-    <div class="container_item box" data-item="2">
-      <div id="anchorXPath">
-        <div class="notification is-primary">
-          <p>Please use the context menu to select parent & child element <strong>Update in 1.0.1 - Customize as per
-              your requirement</strong></p>
-        </div>
-      </div>
-    </div>
-    <!-- axes -->
-    <!-- About -->
-    <div class="container_item block" data-item="5">
-      <div class="box">
-        <p class="subtitle is-5 has-text-white">LetXPath v1.0.1</p>
-        <div class="field has-addons has-addons-centered">
-          <div class="column">
-            <a href="https://twitter.com/intent/tweet?text=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk"
-              target="_blank">
-              <button class="button is-primary">
-                <span class="icon">
-                  <img src="../assets/icons/panel/twitter.svg" alt="tweet">
-                </span>
-                <span>Tweet</span>
-              </button>
-            </a>
+    <div class="container_item card" data-item="4">
+      <div class="card-body">
+        <div class="container text-center">
+          <div class="columns">
+            <div class="column">
+              <div class="s-rounded">
+                <a href="https://twitter.com/intent/tweet?text=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk"
+                  target="_blank">
+                  <img src="../assets/icons/panel/twitter.svg" alt="tweet" width="40px">
+                </a>
+
+              </div>
+            </div>
+            <div class="column">
+              <div class="s-rounded">
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
+                  target="_blank">
+                  <img src="../assets/icons/panel/linkedin.svg" alt="tweet" width="40px"></a>
+              </div>
+            </div>
+            <div class="column">
+              <div class="s-rounded">
+                <a href="https://www.facebook.com/sharer/sharer.php?u=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
+                  target="_blank">
+                  <img src="../assets/icons/panel/facebook.svg" alt="tweet" width="40px"></a>
+
+              </div>
+            </div>
           </div>
-          <div class="column">
-            <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
-              target="_blank">
-              <button class="button is-primary">
-                <span class="icon">
-                  <img src="../assets/icons/panel/linkedin.svg" alt="linkedin">
-                </span>
-                <span>Share</span>
-              </button>
-            </a>
+          <div class="columns text-center">
+            <div class="cloumn p-centered">
+              <a href="https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/reviews"
+                target="_blank">
+                <button class="btn btn-primary">💓 Your review is very important, help me to improve
+                  💓</button>
+              </a>
+            </div>
           </div>
-          <div class="column">
-            <a href="https://www.facebook.com/sharer/sharer.php?u=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
-              target="_blank">
-              <button class="button is-primary">
-                <span class="icon">
-                  <img src="../assets/icons/panel/facebook.svg" alt="facebook">
-                </span>
-                <span>Share</span>
-              </button>
-            </a>
-          </div>
-        </div>
-        <div class="field has-addons has-addons-centered">
-          <a href="https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/reviews"
-            target="_blank">
-            <button class="button is-link is-light">💓 Your review is very important, help me to improve
-              💓</button>
-          </a>
-        </div>
-        <div class="content">
-          <div class="container has-text-centered">
-            <div class="box has-text-centered has-text-white">
-              <p>Thank you for your time! Please take a minute to leave your feedback. Your Review helps me not only
-                to improve the product but also to let others know about the product and its usage.
+          <div class="columns text-center">
+            <div class="column">
+              <p>Thank you for your time! Please take a minute to leave your feedback. Your Review
+                helps
+                me not only to improve the product but also to let others know about the product and
+                its
+                usage.
                 I will be forever grateful. Thank you in advance for helping me out!
               </p>
             </div>
@@ -248,13 +193,6 @@
         </div>
       </div>
     </div>
-    <!-- About -->
-    <!-- CSS -->
-    <div class="container_item block" data-item="6">
-      <p class="title is-info">CSS</p>
-    </div>
-    <!-- CSS -->
-
   </div>
 </body>
 

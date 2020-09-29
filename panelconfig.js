@@ -1,29 +1,11 @@
 $(document).ready(function () {
     // ------ highlight XPath & Code Snippets -----------
-    $('#addXPath').on('custom-update', function () {
-        hljs.configure({ useBR: false });
-        document.querySelectorAll('p.code').forEach((block) => {
-            hljs.highlightBlock(block);
-        })
-    });
-    $('#anchorXPath').on('custom-update', function () {
-        hljs.configure({ useBR: false });
-        document.querySelectorAll('p.code').forEach((block) => {
-            hljs.highlightBlock(block);
-        })
-    });
-    $('#anxp').on('custom-update', function () {
-        hljs.configure({ useBR: false });
-        document.querySelectorAll('p.code').forEach((block) => {
-            hljs.highlightBlock(block);
-        })
-    });
-    $('#tab_header ul li.item').on('click', function () {
-        var number = $(this).data('option');
-        $('#tab_header ul li.item').removeClass('is-active');
-        $(this).addClass('is-active');
-        $('#tab_container .container_item').removeClass('is-active');
-        $('div[data-item="' + number + '"]').addClass('is-active');
+    $('#tab_header li.tab-item').on('click', function () {
+        let number = $(this).data('option');
+        $('#tab_header li.tab-item').removeClass('active');
+        $(this).addClass('active');
+        $('#tab_container .container_item').removeClass('active');
+        $('div[data-item="' + number + '"]').addClass('active');
     });
 
     // ------ get selected values
@@ -42,6 +24,12 @@ $(document).ready(function () {
         let codeValue = changed.target.selectedOptions[0].attributes.cv.value;
         let vn = changed.target.selectedOptions[0].attributes.vn.value;
         generateSnippet(type, codeType, codeValue, vn);
+        // let t = changed.target.id;
+        setTimeout(() => {
+            let from = document.getElementsByClassName('toast')[0]
+            let range = document.createRange();
+            copyToClipBoard(range, from);
+        }, 100);
     });
 
     // --- on click evaluate axes
@@ -76,15 +64,15 @@ $(document).ready(function () {
         chrome.runtime.openOptionsPage(() => { });
     })
     // --- click to copy code
-    $('body').on('click', '#copyCode', (t) => {
-        try {
-            var from = document.getElementById("sniplang");
-            var range = document.createRange();
-            copyToClipBoard(range, from);
-        } catch (error) { }
-    })
+    // $('body').on('click', '#copyCode', (t) => {
+    //     try {
+    //         var from = document.getElementById("sniplang");
+    //         var range = document.createRange();
+    //         copyToClipBoard(range, from);
+    //     } catch (error) { }
+    // })
     // To copy Xpath
-    $('body').on('click', 'button.is-primary.is-small', (e) => {
+    $('body').on('click', 'button.btn.btn-sm', (e) => {
         try {
             let t = e.target;
             let c = t.dataset.copytarget;
@@ -174,12 +162,11 @@ function generateSnippet(type, codeType, codeValue, vn) {
                 break;
         }
         if (code === 'hide') {
-            document.querySelector('#codeviewer').classList.add('is-hidden');
+            document.querySelector('.toast').classList.add('d-hide');
         } else {
-            // document.querySelector('#tablecodeviewer').classList.add('is-hidden');
-            document.querySelector('#codeviewer').classList.remove('is-hidden');
-            document.querySelector("#sniplang").textContent = code;
-            $("#sniplang").trigger('custom-update');
+            document.querySelector(".toast").textContent = '';
+            document.querySelector('.toast').classList.remove('d-hide');
+            document.querySelector(".toast").textContent = code;
         }
     });
 }
