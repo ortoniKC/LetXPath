@@ -1,4 +1,10 @@
 $(document).ready(function () {
+    // trying dark mode
+    if (window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('bg-dark');
+    }
+
     // ------ highlight XPath & Code Snippets -----------
     $('#tab_header li.tab-item').on('click', function () {
         let number = $(this).data('option');

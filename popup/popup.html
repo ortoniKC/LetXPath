@@ -5,77 +5,77 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LetXPath</title>
-  <link rel="stylesheet" href="../app/styles/bulma.min.css" />
-  <link rel="stylesheet" href="../app/styles/ballon.css" />
+  <link rel="stylesheet" href="../app/styles/main.css" />
 
   <style>
     body {
-      background-image: url("../assets/bg-pop.svg");
       margin: 0;
-      /* padding: 2px; */
+      width: 350px;
     }
 
     .my-content {
       display: flex;
       justify-content: space-between;
-      /* align-items: center; */
     }
 
-    .box {
-      background-color: transparent;
+    .myimg {
+      width: 100px;
     }
   </style>
 </head>
 
 <body>
-  <div class="box has-text-centered has-text-black">
-    <figure class="image is-128x128 is-inline-block">
-      <span data-tilt>
-        <a href="https://www.letcode.in" target="_blank"">
-          <img class=" is-rounded" src="../assets/logo.png">
-        </a>
-      </span>
-    </figure>
-    <div class="box card-content my-content">
-      <a href="https://www.youtube.com/playlist?list=PL699Xf-_ilW76WC_FIcE8TqqkzpB9dhy3" target="_blank"
-        aria-label="How to use?" data-balloon-pos="up">
-        <img src="../assets/icons/popup/youtube.svg" alt="code" width="40%"></img>
-      </a>
-      <a href="https://github.com/ortoniKC/LetXPath/issues" target="_blank" aria-label="Log issues!"
-        data-balloon-pos="up">
-        <img src="../assets/icons/popup/github.svg" alt="code" width="40%"></img>
-      </a>
-      <a href="https://www.youtube.com/playlist?list=PL699Xf-_ilW7aQ6lBWXjaIheZsduOpcR5" target="_blank"
-        aria-label="How to develop?" data-balloon-pos="up">
-        <img src="../assets/icons/popup/youtube.svg" alt="code" width="40%"></img>
-      </a>
-    </div>
-    <div class="content">
-      <div class="box has-text-black is-small">
-        <p>LetXPath is an open-source project.
-          It can help you to find the best XPath & CSS and also generate the code snippet.
-        </p>
-        <div class="field has-addons has-addons-centered">
-          <a href="https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/reviews"
-            target="_blank">
-            <button class="button is-link is-light">Your Review Matters!</button>
+  <div class="container text-center bg-dark">
+    <a href="https://www.letcode.in" target="_blank">
+      <img class="myimg s-circle " src=" ../assets/logo.png">
+    </a>
+  </div>
+  <div class="card">
+    <div class=" card-body">
+      <div class="columns text-center">
+        <div class="column">
+          <a href="https://www.youtube.com/playlist?list=PL699Xf-_ilW76WC_FIcE8TqqkzpB9dhy3" target="_blank"
+            class="tooltip tooltip-top" data-tooltip="How to use?">
+            <img src="../assets/icons/popup/youtube.svg" alt="code" width="40%"></img>
           </a>
         </div>
-        <!-- <p><a href="https://github.com/ortoniKC/LetXPath/graphs/contributors" target="_blank">✡ Our Contributors ✡</a> -->
-        </p>
+        <div class="column">
+          <a href="https://github.com/ortoniKC/LetXPath/issues" target="_blank" class="tooltip tooltip-top"
+            data-tooltip="Log issues!">
+            <img src="../assets/icons/popup/github.svg" alt="code" width="40%"></img>
+          </a>
+        </div>
+        <div class="column">
+          <a href="https://www.youtube.com/playlist?list=PL699Xf-_ilW7aQ6lBWXjaIheZsduOpcR5" target="_blank"
+            class="tooltip tooltip-top" data-tooltip="How to develop?">
+            <img src="../assets/icons/popup/youtube.svg" alt="code" width="40%"></img>
+          </a>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column text-center">
+          <p>LetXPath is an open-source project.
+            It can help you to find the best XPath & CSS and also generate the code snippet.
+          </p>
+          <a href="https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/reviews"
+            target="_blank">
+            <button class="btn btn-primary">Your Review Matters!</button>
+          </a>
+        </div>
       </div>
     </div>
-    <footer>
-      <div class="content my-content is-small">
+    <div class="card-footer bg-dark">
+      <div class="my-content">
         <p><a href="https://github.com/ortoniKC/LetXPath/blob/master/LICENSE" target="_blank">Licensed</a></p>
         <p><a href="https://github.com/ortoniKC/LetXPath/blob/dev/privacy.md" target="_blank">Privacy Policy</a></p>
       </div>
-    </footer>
+      <div class="text-center">
+        <p>Copyright © 2020 <a href="https://www.linkedin.com/in/ortoni/" target="_blank">Koushik Chatterjee</a>
+        </p>
+      </div>
+    </div>
   </div>
-  <div class="content has-text-centered is-small has-text-link">
-    <p>Copyright © 2020 <a href="https://www.linkedin.com/in/ortoni/" target="_blank">Koushik Chatterjee</a>
-    </p>
-  </div>
+
 </body>
 
 </html>
