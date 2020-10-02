@@ -50,7 +50,18 @@ function utilsLocatorUI(data) {
 // generate axes based on user inputs
 function generateAxes(req) {
   jQuery("#anchorXPath").empty();
-  let ui = `<code value="${req.data.proOrFol}" id="anxp">${req.data.defaultXPath}></code>
+  let ui = `<div class="form-horizontal">
+  <div class="form-group">
+  <div class="col-8">
+    <code class="form-label" id="anxp" value="${req.data.proOrFol}">${req.data.defaultXPath}</code>
+  </div>
+  <div class="col-1 p-centered text-center">
+    <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" data-copytarget="anxp">
+      <img src="../assets/icons/copy.svg" alt="copy" data-copytarget="anxp">
+    </button>
+  </div>
+  </div>
+</div>
   <div class="columns">
   <div class="column col-xs-6">
     <p class="chip">Parent Element</p>
@@ -171,7 +182,7 @@ function getSelectionValues(data, i) {
   let tag = data.tag;
   switch (tag) {
     case "input":
-      if (type === "submit") {
+      if (type === "submit" || type === "radio" || type === "checkbox") {
         finalOP = `<option value="snippet" ct="snip" cv="snip" vn="snip">Snippet</option>
         <option value="click" ct="${data.xpathid[i][1]}" cv="${data.xpathid[i][2]}" vn="${data.variablename}">click</option>
         <option value="getAttribute" ct="${data.xpathid[i][1]}" cv="${data.xpathid[i][2]}" vn="${data.variablename}">getAttribute</option>`
