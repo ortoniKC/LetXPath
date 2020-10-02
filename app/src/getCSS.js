@@ -29,7 +29,7 @@ function getLongCssPath(ele) {
     return cssPath.join(">");
 }
 
-// css locatrs -- basics--
+// css locators -- basics--
 function getCSS(element, tagName) {
     CSSPATHDATA = [];
     Array.prototype.slice.call(element.attributes).forEach(function (item) {

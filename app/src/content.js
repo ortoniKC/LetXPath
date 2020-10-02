@@ -282,13 +282,15 @@ function buildXpath(element, boolAnchor, utils) {
     // Based on parent XPath
     try {
         if (XPATHDATA.length < 3)
-            XPATHDATA.push([90, 'Id XPath', getXPathWithPosition(element)])
+            XPATHDATA.push([90, 'Closest ID XPath', getXPathWithPosition(element)])
     } catch (error) { }
+
     try {
         CSSPATHDATA = [];
         let css = getLongCssPath(element)
         if (elementOwnerDocument.querySelectorAll(css).length == 1)
             CSSPATHDATA.push([11, 'CSS', css]);
+        console.log(CSSPATHDATA);
     } catch (error) { }
 
     // try {
