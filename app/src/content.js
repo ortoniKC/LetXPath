@@ -291,11 +291,11 @@ function buildXpath(element, boolAnchor, utils) {
             CSSPATHDATA.push([11, 'CSS', css]);
     } catch (error) { }
 
-    try {
-        if (utils) {
-            utilsSelectorXPathData.push([methodName, variableName, XPATHDATA.sort()]);
-        }
-    } catch (error) { alert(error) }
+    // try {
+    //     if (utils) {
+    //         utilsSelectorXPathData.push([methodName, variableName, XPATHDATA.sort()]);
+    //     }
+    // } catch (error) { alert(error) }
 
     // AXES BASED XPATH
     switch (boolAnchor) {

@@ -1,10 +1,5 @@
 $(document).ready(function () {
     // trying dark mode
-    if (window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.body.classList.add('bg-dark');
-    }
-
     // ------ highlight XPath & Code Snippets -----------
     $('#tab_header li.tab-item').on('click', function () {
         let number = $(this).data('option');
@@ -52,31 +47,18 @@ $(document).ready(function () {
         });
     })
 
-    // --- start debugger
-    // $("#setdebugger").click(() => {
-    //     chrome.debugger.onEvent.addListener(onEvent);
-    //     chrome.debugger.onDetach.addListener(onDetach);
-    //     var tabId = chrome.devtools.inspectedWindow.tabId;
-    //     var debuggeeId = { tabId: tabId };
-    //     if (attachedTabs[tabId] == "pausing")
-    //         return;
-    //     if (!attachedTabs[tabId])
-    //         chrome.debugger.attach(debuggeeId, version, onAttach.bind(null, debuggeeId));
-    //     else if (attachedTabs[tabId])
-    //         chrome.debugger.detach(debuggeeId, onDetach.bind(null, debuggeeId));
-    // });
     // --- open option page
     $('body').on('click', '#openSetting', () => {
         chrome.runtime.openOptionsPage(() => { });
     })
     // --- click to copy code
-    // $('body').on('click', '#copyCode', (t) => {
-    //     try {
-    //         var from = document.getElementById("sniplang");
-    //         var range = document.createRange();
-    //         copyToClipBoard(range, from);
-    //     } catch (error) { }
-    // })
+    $('body').on('click', '#copyCode', (t) => {
+        try {
+            var from = document.getElementById("sniplang");
+            var range = document.createRange();
+            copyToClipBoard(range, from);
+        } catch (error) { }
+    })
     // To copy Xpath
     $('body').on('click', 'button.btn.btn-sm', (e) => {
         try {
@@ -88,47 +70,6 @@ $(document).ready(function () {
             copyToClipBoard(range, from);
         } catch (error) { }
     })
-
-    /**
-     * @description - Feature is disabled as of now, as it is not working as expected
-     */
-
-    // debugger
-    // var attachedTabs = {};
-    // var version = "1.3";
-
-    // var onAttach = (debuggeeId) => {
-    //     if (chrome.runtime.lastError) {
-    //         // alert(chrome.runtime.lastError.message);
-    //         return;
-    //     }
-    //     var tabId = debuggeeId.tabId;
-    //     attachedTabs[tabId] = "pausing";
-    //     chrome.debugger.sendCommand(
-    //         debuggeeId, "Debugger.enable", {},
-    //         onDebuggerEnabled.bind(null, debuggeeId)
-    //     );
-    // }
-
-    // var onDebuggerEnabled = (debuggeeId) => {
-    //     chrome.debugger.sendCommand(debuggeeId, "Debugger.pause");
-    //     document.querySelector("#setdebugger").textContent = "Paused";
-
-    // }
-
-    // var onEvent = (debuggeeId, method, setdebugger) => {
-    //     var tabId = debuggeeId.tabId;
-    //     if (method == "Debugger.paused") {
-    //         attachedTabs[tabId] = "paused";
-    //         document.querySelector("#setdebugger").textContent = "Resume";
-    //     }
-    // }
-
-    // var onDetach = (debuggeeId) => {
-    //     var tabId = debuggeeId.tabId;
-    //     delete attachedTabs[tabId];
-    //     document.querySelector("#setdebugger").textContent = "Start!";
-    // }
 });
 function copyToClipBoard(range, node) {
     try {

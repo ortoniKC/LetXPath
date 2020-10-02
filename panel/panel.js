@@ -53,11 +53,11 @@ function generateAxes(req) {
   let ui = `<code value="${req.data.proOrFol}" id="anxp">${req.data.defaultXPath}></code>
   <div class="columns">
   <div class="column col-xs-6">
-    <p>Parent Element</p>
+    <p class="chip">Parent Element</p>
     ${sourceElement(req.data.src)}
   </div>
   <div class="column col-xs-6">
-    <p>Child Element</p>
+    <p class="chip">Child Element</p>
     ${targetElement(req.data.dst)}
   </div>
 </div>`
@@ -151,7 +151,7 @@ function generateXPathUI(data, i) {
       <code class="form-label" id="xpath${i}">${data.xpathid[i][2]}</code>
     </div>
     <div class="col-1 p-centered text-center">
-      <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy XPath" data-copytarget="#xpath${i}">
+      <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" data-copytarget="#xpath${i}">
         <img src="../assets/icons/copy.svg" alt="copy" data-copytarget="#xpath${i}">
       </button>
     </div>
