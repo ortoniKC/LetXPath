@@ -72,7 +72,7 @@ function getXPathWithPosition(ele) {
             break;
         } else {
             let prevSib = ele, position = 1;
-            while (prevSib = prevSib.previousElementSibling) {
+            while (prevSib = prevSib.previousElementSibling && position < 5) {
                 if (prevSib.tagName.toLowerCase() == tag) position++;
             }
             tag += `[${position}]`
