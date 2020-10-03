@@ -107,7 +107,15 @@ let installReason = (detail) => {
     if (detail.reason === "install") {
         chrome.tabs.create({
             url: installURL
-        })
+        });
+        chrome.notifications.create(
+            {
+                title: 'LetXPath',
+                message: 'Please restart your browser to use LetXPath',
+                iconUrl: 'assets/32.png',
+                type: 'basic'
+            }
+        )
     }
     // else if (detail.reason === "update") {
     //     notification();
@@ -125,7 +133,7 @@ function notification() {
     chrome.notifications.create(
         {
             title: 'LetXPath',
-            message: 'Hurray!!!!! I have a update for you',
+            message: 'Hurray!!!!! I have an update for you',
             iconUrl: 'assets/32.png',
             type: 'basic'
         }

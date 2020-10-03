@@ -221,7 +221,7 @@ function buildXpath(element, boolAnchor, utils) {
     }
     // create an array to put available xpath - generate different type and add
     XPATHDATA = [];
-
+    CSSPATHDATA = [];
     // Handle SVG
     if ((element.farthestViewportElement != undefined) || (element.tagName === 'SVG') || (element.tagName === 'svg')) {
         try {
@@ -295,11 +295,13 @@ function buildXpath(element, boolAnchor, utils) {
     } catch (error) { }
 
     try {
-        CSSPATHDATA = [];
         let css = getLongCssPath(element)
-        if (elementOwnerDocument.querySelectorAll(css).length == 1)
-            CSSPATHDATA.push([11, 'CSS', css]);
-        console.log(CSSPATHDATA);
+        console.log(css);
+        let csslen = css.split('>');
+        if (csslen.length < 5)
+            CSSPATHDATA.push([11, 'ID with tag', css]);
+        // if (elementOwnerDocument.querySelectorAll(css).length == 1)
+        // console.log(CSSPATHDATA);
     } catch (error) { }
 
     // try {
@@ -348,6 +350,7 @@ function getNameXPath(element, tagName) {
         let count = getNumberOfXPath(tem)
         if (count == 1) {
             XPATHDATA.push([102, 'Unique Name', clickedItemName])
+            CSSPATHDATA.push([3, 'Unique Name', `${tagName}[name='${clickedItemName}']`]);
         } else if (count > 1) {
             tem = `//${tagName}${tempName}`;
             nameBasedXpath = addIndexToXpath(tem)
@@ -378,6 +381,7 @@ function getClassXPath(element, tagName) {
         let spl = clickedItemClass.trim().split(" ")
         if (count == 1 && spl.length == 1) {
             XPATHDATA.push([3, 'Unique Class Atrribute', clickedItemClass]);
+            CSSPATHDATA.push([3, 'Unique Class Atrribute', '.' + clickedItemClass]);
             return null;
         } else {
             classBasedXpath = `//${tagName}[@class='${clickedItemClass}']`;
@@ -434,6 +438,7 @@ function addAllXpathAttributesBbased(attribute, tagName, element) {
                     let id = getIDXPath(element, tagName)
                     if (id != null) {
                         XPATHDATA.push([1, 'Unique ID', id])
+                        CSSPATHDATA.push([1, 'Unique ID', '#' + id])
                     }
                     ; break;
                 case 'class':

@@ -7,8 +7,11 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
         buildCSSUI(req)
       } else {
         jQuery("#cssbody").empty();
-        let ui = '<h3>Please inspect any element to get CSS</h1>';
-        jQuery("#cssbody").append(ui)
+        let ui = `<div class="empty">
+        <p class="empty-title h5">Please select any element to get XPath/CSS</p>
+        <p class="empty-subtitle">more new patterns coming soon :)</p>
+      </div>`;
+        jQuery("#cssbody").append(ui);
       }
       return true;
     case "anchor":
@@ -174,9 +177,7 @@ function generateXPathUI(data, i) {
       </button>
     </div>
     <div class="col-3 tooltip tooltip-top" data-tooltip="Copy Snippet">
-      <select class="form-select select-sm" id="snippetsSelector">
-              ${getSelectionValues(data, i)}
-      </select>
+      <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(data, i)}</select>
     </div>
   </div>
 </div>`;
@@ -214,19 +215,22 @@ function getSelectionValues(data, i) {
 }
 function buildCSSUI(data) {
   document.getElementById("cssbadge").attributes.getNamedItem('data-badge').value = data.cssPath.length
-  jQuery("#cssbody").empty()
-  let ui = `<div class="form-horizontal">
+  jQuery("#cssbody").empty();
+  let ui = '';
+  for (let i = 0; i < data.cssPath.length; i++) {
+    ui += `<div class="form-horizontal">
+    <span class="label label-rounded sm">${i + 1}. ${data.cssPath[i][1]}</span>
       <div class="form-group">
         <div class="col-8">
-          <code class="form-label" id="css0">${data.cssPath[0][2]}</code>
+          <code class="form-label" id="css${i}">${data.cssPath[i][2]}</code>
         </div>
         <div class="col-1 p-centered text-center">
-          <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" data-copytarget="#css0">
-            <img src="../assets/icons/copy.svg" alt="copy" data-copytarget="#css0">
+          <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" data-copytarget="#css${i}">
+            <img src="../assets/icons/copy.svg" alt="copy" data-copytarget="#css${i}">
       </button>
     </div>
     </div>
     </div>`;
+  }
   jQuery("#cssbody").append(ui)
-
 }
