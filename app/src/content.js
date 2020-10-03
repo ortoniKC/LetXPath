@@ -194,10 +194,19 @@ function buildXpath(element, boolAnchor, utils) {
         throw new TypeError('shadow dom not yet supported')
     }
     let removeletX = `//*${letXP}`;
-    let re = evaluateXPathExpression(removeletX)
-    if (re.singleNodeValue != null) {
-        re.singleNodeValue.removeAttribute('letxxpath');
-    }
+    try {
+        let re = evaluateXPathExpression(removeletX)
+        if (re.singleNodeValue != null) {
+            re.singleNodeValue.removeAttribute('letxxpath');
+            // removeAxes.removeAttribute('letaxes');
+        }
+        // let removeAxes = `//*[@letaxes='letX']`
+        // let rea = evaluateXPathExpression(removeAxes)
+        // if (rea.singleNodeValue != null) {
+        //     rea.singleNodeValue.removeAttribute('letaxes');
+        // }
+    } catch (error) { }
+
     // add a attribute to locate the element
     element.setAttribute('letxxpath', 'letX')
     // generate method and varible name
