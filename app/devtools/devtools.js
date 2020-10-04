@@ -23,29 +23,36 @@ let isActive = false;
 /**
  * Performance issue is fixed with onshow & onhide listener
  */
-chrome.devtools.panels.elements.createSidebarPane(name, (sideBar) => {
-    function updatePanel() {
-        if (isActive) {
-            // send the selected element to the content script to build the XPath
-            chrome.devtools.inspectedWindow.eval("parseDOM($0)", {
-                useContentScriptContext: true
-            }, (result, exceptionInfo) => { });
-        }
+function updatePanel() {
+    if (isActive) {
+        // send the selected element to the content script to build the XPath
+        chrome.devtools.inspectedWindow.eval("parseDOM($0)", {
+            useContentScriptContext: true
+        }, (result, exceptionInfo) => { });
     }
-    chrome.devtools.panels.elements.onSelectionChanged.addListener(updatePanel);
+}
+chrome.devtools.panels.elements.createSidebarPane(name, (sideBar) => {
+    // set the HTML page only once, and listen to the changes & update the UI using message passing
+    sideBar.setPage(html);
     // executes only once -> when user open the panel UI gets rendered
+    chrome.devtools.panels.elements.onSelectionChanged.addListener(() => {
+        return updatePanel();
+    });
     // On visible find XPath
-    sideBar.onShown.addListener(function () {
+    sideBar.onShown.addListener(() => {
         isActive = true;
         updatePanel();
     })
     // On hidden don't find XPath
-    sideBar.onHidden.addListener(function () {
-        isActive = false;
-        chrome.devtools.panels.elements
-            .onSelectionChanged
-            .removeListener(updatePanel);
+    sideBar.onHidden.addListener(() => {
+        return onHidden(updatePanel);
     });
-    // set the HTML page only once, and listen to the changes & update the UI using message passing
-    sideBar.setPage(html);
+
 });
+function onHidden(updatePanel) {
+    isActive = false;
+    chrome.devtools.panels.elements
+        .onSelectionChanged
+        .removeListener(updatePanel);
+}
+
