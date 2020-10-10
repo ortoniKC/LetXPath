@@ -41,7 +41,7 @@ chrome.devtools.panels.elements.createSidebarPane(name, (sideBar) => {
     // On visible find XPath
     sideBar.onShown.addListener(() => {
         isActive = true;
-        updatePanel();
+        return updatePanel();
     })
     // On hidden don't find XPath
     sideBar.onHidden.addListener(() => {

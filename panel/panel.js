@@ -8,10 +8,20 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
       } else {
         jQuery("#cssbody").empty();
         let ui = `<div class="empty">
+        <p class="empty-title h5">Please select any element to get CSS/XPath</p>
+        <p class="empty-subtitle">more new patterns coming soon :)</p>
+        <p class="empty-subtitle">Did you know LetXPath is an open-source, if you found something wrong fix it :)</p>
+        </div>`;
+        jQuery("#cssbody").append(ui);
+      }
+      if (req.xpathid.length == 0) {
+        jQuery("#addXPath").empty();
+        let ui = `<div class="empty">
         <p class="empty-title h5">Please select any element to get XPath/CSS</p>
         <p class="empty-subtitle">more new patterns coming soon :)</p>
-      </div>`;
-        jQuery("#cssbody").append(ui);
+        <p class="empty-subtitle">Did you know LetXPath is an open-source, if you found something wrong fix it :)</p>
+        </div>`;
+        jQuery("#addXPath").append(ui);
       }
       return true;
     case "anchor":

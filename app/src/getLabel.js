@@ -8,7 +8,7 @@ function findLabel(element, tagName) {
     let label, span = undefined;
     let ele = `//*[@letxxpath='letX']`;
     try {
-        label = getLabelTxet(ele, tagName)
+        label = getLabelText(ele, tagName)
     } catch (error) { }
     try {
         span = getSpanText(ele, tagName)
@@ -47,7 +47,7 @@ function getParentText(element, tagName) {
         if (setBool)
             break;
     }
-    let text = getgetTextXPath(ep, tagN.toLowerCase())
+    let text = getTextBasedXPath(ep, tagN.toLowerCase())
     let temp = `${text}/following::${tagName}`;
     let count = getNumberOfXPath(temp);
     if (count == 1) {
@@ -60,7 +60,7 @@ function getParentText(element, tagName) {
     } else
         return null;
 }
-function getLabelTxet(ele, tagName) {
+function getLabelText(ele, tagName) {
     let labelNode = `${ele}/preceding::label[1]`;
     let checkLabelType = evaluateXPathExpression(labelNode);
     try {
@@ -88,7 +88,7 @@ function getLabel(node, tagName) {
         let label = evaluateXPathExpression(node);
         let newEle = label.singleNodeValue;
         let labelTag = newEle.tagName.toLowerCase();
-        let labelText = getgetTextXPath(newEle, labelTag);
+        let labelText = getTextBasedXPath(newEle, labelTag);
         let newLabelXpath = labelText + '/' + 'following::' + tagName;
         if (getNumberOfXPath(newLabelXpath) == 1) {
             let newLabel = evaluateXPathExpression(newLabelXpath);
