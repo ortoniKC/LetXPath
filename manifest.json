@@ -11,7 +11,7 @@
   "permissions": [
     "<all_urls>",
     "contextMenus",
-    "tabs",
+    "activeTab",
     "storage",
     "notifications"
   ],
@@ -41,7 +41,7 @@
   "background": {
     "persistent": true,
     "scripts": [
-      "eventPage.js"
+      "background.js"
     ]
   },
   "devtools_page": "devtools.html",

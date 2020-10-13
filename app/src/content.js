@@ -296,7 +296,7 @@ function buildXpath(element, boolAnchor, utils) {
 
     try {
         let css = getLongCssPath(element)
-        console.log(css);
+        // console.log(css);
         let csslen = css.split('>');
         if (csslen.length < 5)
             CSSPATHDATA.push([11, 'ID with tag', css]);

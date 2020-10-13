@@ -4,7 +4,7 @@
  */
 // --------------------------------------------------------------------------------------------------
 /**
- * @author Koushik Chatterjee <koushik@letcode.in>
+ * @author Koushik Chatterjee <koushik350@gmail.com>
  */
 
 // Create a connection to the background page

@@ -55,12 +55,8 @@ chrome.runtime.onConnect.addListener(function (port) {
                     var tabId = sender.tab.id;
                     if (tabId in connections) {
                         connections[tabId].postMessage(request);
-                    } else {
-
-                    }
-                } else {
-
-                }
+                    } else { }
+                } else { }
                 // send message to content script
                 sendToContentScript(message);
             }
@@ -117,10 +113,10 @@ let installReason = (detail) => {
             }
         )
     }
-    // else if (detail.reason === "update") {
-    //     notification();
-    //     chrome.notifications.onClicked.addListener(onClickNotification);
-    // }
+    else if (detail.reason === "update") {
+        updateNotification();
+        chrome.notifications.onClicked.addListener(onClickNotification);
+    }
 }
 
 function onClickNotification() {
@@ -129,11 +125,11 @@ function onClickNotification() {
     });
 }
 
-function notification() {
+function updateNotification() {
     chrome.notifications.create(
         {
             title: 'LetXPath',
-            message: 'Hurray!!!!! I have an update for you',
+            message: 'LetXPath has been updated. Please click to read the changelog.',
             iconUrl: 'assets/32.png',
             type: 'basic'
         }
