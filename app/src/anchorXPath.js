@@ -99,19 +99,19 @@ function getAnchorXPath(getsingleXPath, tagArr, dupArray, element) {
                         // let temp = xpathData.substring(0, xpathData.lastIndexOf(')'));
                         if (xpathData.startsWith('//')) {
                             xpathData = xpathData.substring(2, xpathData.length);
-                            anchorArr.push([0, xpathData, xpathValue.split(' ')[0]]);
+                            anchorArr.push([0, xpathData, xpathValue]);
                         } else if (xpathData.startsWith('(//')) {
                             xpathData = xpathData.substring(3, xpathData.lastIndexOf(')'));
-                            anchorArr.push([0, xpathData, xpathValue.split(' ')[0]]);
+                            anchorArr.push([0, xpathData, xpathValue]);
                         }
                     } else {
                         let temp = `${tag}[text()[normalize-space()='${xpathData}']]`;
-                        anchorArr.push([0, temp, xpathValue.split(' ')[0]]);
+                        anchorArr.push([0, temp, xpathValue]);
                     }
                     break;
                 case 10:
                     // TAG
-                    anchorArr.push([10, tag, xpathValue.split(' ')[0]]);
+                    anchorArr.push([10, tag, xpathValue]);
                     break;
                 default:
                     // Others
@@ -119,10 +119,10 @@ function getAnchorXPath(getsingleXPath, tagArr, dupArray, element) {
                         // let temp = xpathData.substring(0, xpathData.lastIndexOf(')'));
                         if (xpathData.startsWith('//')) {
                             xpathData = xpathData.substring(2, xpathData.length);
-                            anchorArr.push([2, xpathData, xpathValue.split(' ')[0]]);
+                            anchorArr.push([2, xpathData, xpathValue]);
                         } else if (xpathData.startsWith('(//')) {
                             xpathData = xpathData.substring(3, xpathData.lastIndexOf(')'));
-                            anchorArr.push([-1, xpathData, xpathValue.split(' ')[0]]);
+                            anchorArr.push([-1, xpathData, xpathValue]);
                         }
                     }
                     break;
@@ -134,14 +134,14 @@ function getAnchorXPath(getsingleXPath, tagArr, dupArray, element) {
             // let temp = xpathData.substring(0, xpathData.lastIndexOf(')'));
             if (xpathData.startsWith('//')) {
                 xpathData = xpathData.substring(2, xpathData.length);
-                anchorArr.push([number, xpathData, xpathValue.split(' ')[0]]);
+                anchorArr.push([number, xpathData, xpathValue]);
             } else if (xpathData.startsWith('(//')) {
                 xpathData = xpathData.substring(3, xpathData.lastIndexOf(')'));
-                anchorArr.push([number, xpathData, xpathValue.split(' ')[0]]);
+                anchorArr.push([number, xpathData, xpathValue]);
             }
         } else {
             let temp = `${tag}[@${attr}='${xpathData}']`;
-            anchorArr.push([number, temp, xpathValue.split(' ')[0]]);
+            anchorArr.push([number, temp, xpathValue]);
         }
     }
 }

@@ -24,7 +24,7 @@ function filterAttributesFromElement(item) {
         (item.name === 'ng-model-update-on-enter') || (item.name === 'magellan-navigation-filter') ||
         (item.name === 'ng-blur') || (item.name === 'ng-focus') || (item.name === 'ng-trim') ||
         (item.name === 'spellcheck') || (item.name === 'target') || (item.name === 'rel') ||
-        (item.name === 'maxlength') || (item.name === 'routerlinkactive');
+        (item.name === 'maxlength') || (item.name === 'routerlinkactive') || (item.name === 'src');
 }
 // Add Index to All XPATH
 function addIndexToXpath(allXpathAttr) {
