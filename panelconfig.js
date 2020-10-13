@@ -30,6 +30,7 @@ $(document).ready(function () {
             let from = document.getElementsByClassName('toast')[0]
             let range = document.createRange();
             copyToClipBoard(range, from);
+            setTimeout(() => { from.classList.add('d-hide') }, 3000)
         }, 100);
     });
 

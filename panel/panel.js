@@ -102,14 +102,14 @@ function sourceElement(element) {
       ui += `<div class="form-group">
       <label class="form-switch">
         <input type="radio" name="src" value="${element[i][1]}" checked>
-        <i class="form-icon"></i>${element[i][2]}
+        <i class="form-icon"></i>${i + 1}. ${element[i][2]}
       </label>
     </div>`
     } else {
       ui += `<div class="form-group">
       <label class="form-switch">
         <input type="radio" name="src" value="${element[i][1]}">
-        <i class="form-icon"></i>${element[i][2]}
+        <i class="form-icon"></i>${i + 1}. ${element[i][2]}
       </label>
     </div>`;
     }
@@ -124,14 +124,14 @@ function targetElement(element) {
       ui += `<div class="form-group">
       <label class="form-switch">
         <input type="radio" name="tgt" value="${element[i][1]}" checked>
-        <i class="form-icon"></i>${element[i][2]}
+        <i class="form-icon"></i>${i + 1}. ${element[i][2]}
       </label>
     </div>`
     } else {
       ui += `<div class="form-group">
       <label class="form-switch">
         <input type="radio" name="tgt" value="${element[i][1]}">
-        <i class="form-icon"></i>${element[i][2]}
+        <i class="form-icon"></i>${i + 1}. ${element[i][2]}
       </label>
     </div>`;
     }

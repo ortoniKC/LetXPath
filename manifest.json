@@ -62,6 +62,9 @@
     "default_title": "LetXPath",
     "default_popup": "popup/popup.html"
   },
-  "options_page": "option/option.html",
+  "options_ui": {
+    "chrome_style": true,
+    "page": "option/option.html"
+  },
   "offline_enabled": true
 }

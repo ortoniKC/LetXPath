@@ -85,11 +85,11 @@ function addPreviousSibling(preSib, tagName) {
                         temp = `//${previousSiblingTagName}[${tempvalue}]/following-sibling::${tagName}[1]`
                         if (temp.startsWith('//')) {
                             if (getNumberOfXPath(temp) == 1 && evaluateXPathExpression(temp).singleNodeValue.attributes.letxxpath != undefined) {
-                                XPATHDATA.push([8, 'Following sibling based XPath', temp]);
+                                XPATHDATA.push([8, 'Following sibling XPath', temp]);
                             } else {
                                 let t = addIndexToXpath(`//${previousSiblingTagName}[${tempvalue}]/following-sibling::${tagName}`)
                                 if (t != undefined) {
-                                    XPATHDATA.push([8, 'Following sibling based XPath', t])
+                                    XPATHDATA.push([8, 'Following sibling XPath', t])
                                 } else
                                     temp = null;
                             }
@@ -99,11 +99,11 @@ function addPreviousSibling(preSib, tagName) {
                         temp = `//${previousSiblingTagName}[@${item.name}='${tempvalue}']/following-sibling::${tagName}[1]`
                         if (temp.startsWith('//')) {
                             if (getNumberOfXPath(temp) == 1 && evaluateXPathExpression(temp).singleNodeValue.attributes.letxxpath != undefined) {
-                                XPATHDATA.push([8, 'Following sibling based XPath', temp]);
+                                XPATHDATA.push([8, 'Following sibling XPath', temp]);
                             } else {
                                 let t = addIndexToXpath(`//${previousSiblingTagName}[@${item.name}='${tempvalue}']/following-sibling::${tagName}`)
                                 if (t != undefined) {
-                                    XPATHDATA.push([8, 'Following sibling based XPath', t])
+                                    XPATHDATA.push([8, 'Following sibling XPath', t])
                                 } else
                                     temp = null;
                             }
@@ -140,11 +140,11 @@ function addPreviousSibling(preSib, tagName) {
                     return null
                 }
                 if (c == 1 && evaluateXPathExpression(temp1).singleNodeValue.attributes.letxxpath != undefined) {
-                    XPATHDATA.push([8, 'Following sibling based XPath', temp1])
+                    XPATHDATA.push([8, 'Following sibling XPath', temp1])
                 } else if ((c != undefined) || (c != null)) {
                     xp = addIndexToXpath(temp1)
                     if (xp != undefined) {
-                        XPATHDATA.push([8, 'Following sibling based XPath', xp])
+                        XPATHDATA.push([8, 'Following sibling XPath', xp])
                     }
                 }
             }
@@ -209,7 +209,7 @@ function getParent(element, tagName) {
         if (c == 1) {
             try {
                 if (checkTem.singleNodeValue.hasAttribute('letxxpath')) {
-                    XPATHDATA.push([9, `Parent based ${locator} XPath`, tem]);
+                    XPATHDATA.push([9, `Parent ${locator} XPath`, tem]);
                 } else {
                     tem = `${parent}//${tagName}`;
                     c = getNumberOfXPath(tem);
@@ -221,7 +221,7 @@ function getParent(element, tagName) {
                             let te = addIndexToXpath(tem)
                             checkTem = evaluateXPathExpression(te)
                             if (checkTem.singleNodeValue.attributes.letxxpath.value === "letX") {
-                                XPATHDATA.push([9, `Parent based ${locator} XPath`, te]);
+                                XPATHDATA.push([9, `Parent ${locator} XPath`, te]);
                             }
                         } catch (e) {
 
@@ -235,7 +235,7 @@ function getParent(element, tagName) {
             tem = `${parent}//${tagName}`;
             let t = addIndexToXpath(tem);
             if (t != undefined && t != null) {
-                XPATHDATA.push([9, `Parent based ${locator} XPath`, t]);
+                XPATHDATA.push([9, `Parent ${locator} XPath`, t]);
             }
         }
     }

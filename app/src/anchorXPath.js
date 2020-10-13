@@ -70,7 +70,6 @@ function getAnchorXPath(getsingleXPath, tagArr, dupArray, element) {
         }
         element.setAttribute('letaxes', 'letX')
         chrome.runtime.sendMessage({ request: "anchor", data: dom })
-
         webTableDetails = null;
         // make xpath to 0 so it can be used again
         tagArrHolder = [];

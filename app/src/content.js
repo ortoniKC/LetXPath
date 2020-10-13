@@ -299,7 +299,7 @@ function buildXpath(element, boolAnchor, utils) {
         // console.log(css);
         let csslen = css.split('>');
         if (csslen.length < 5)
-            CSSPATHDATA.push([11, 'ID with tag', css]);
+            CSSPATHDATA.push([11, 'Closest ID CSS', css]);
         // if (elementOwnerDocument.querySelectorAll(css).length == 1)
         // console.log(CSSPATHDATA);
     } catch (error) { }
@@ -460,11 +460,11 @@ function addAllXpathAttributesBbased(attribute, tagName, element) {
                         allXpathAttr = `//${tagName}[@${item.name}='${temp}']`
                     }
                     if (getNumberOfXPath(allXpathAttr) == 1) {
-                        XPATHDATA.push([4, 'Collection based XPath', allXpathAttr]);
+                        XPATHDATA.push([4, `${item.name}`, allXpathAttr]);
                     } else {
                         let temp = addIndexToXpath(allXpathAttr);
                         if (temp != undefined) {
-                            XPATHDATA.push([4, 'Collection based XPath', temp]);
+                            XPATHDATA.push([4, `${item.name}`, temp]);
                         }
                     }
                     break;
