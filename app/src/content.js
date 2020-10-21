@@ -123,9 +123,10 @@ let webTableDetails = null;
 // Angular
 let angularArray = null;
 // find different patterns of XPath 
-var isframeDoc = false;
-var ownerDoc;
-var elementOwnerDocument;
+let isframeDoc = false;
+let ownerDoc;
+let elementOwnerDocument;
+let frameXPATH = null
 function buildSelectedFileds(targetElement) {
     elementOwnerDocument = targetElement.ownerDocument;
     if (targetElement != null) {
@@ -159,7 +160,7 @@ function parseDOM(targetElement) {
                 xpathid: XPATHDATA.sort(),
                 tag: tag,
                 type: type,
-                hasFrame: hasFrame,
+                hasFrame: frameXPATH,
                 variablename: variablename,
                 anchor: false,
                 atrributesArray: atrributesArray
@@ -240,13 +241,16 @@ function buildXpath(element, boolAnchor, utils) {
     if (elementOwnerDocument.getElementsByTagName(tag).length == 1) {
         XPATHDATA.push([10, 'Unique TagName', tag])
     }
-    // to find whether element is in frame
-    hasFrame = frameElement != null ? frameElement : null;
 
-    // TODO:
     // Find no.of frames available, then generate XPath or index for that
-
-    // let frameLength = window.frames.length;
+    try {
+        // to find whether element is in frame
+        let fr = document.querySelectorAll('iframe');
+        if (fr.length > 0) {
+            frameXPATH = frameXPath(fr[0]);
+            console.log(frameXPATH);
+        }
+    } catch (error) { }
 
     // To get all attribuites
     let attributeElement = element.attributes;
@@ -360,6 +364,7 @@ function getNameXPath(element, tagName) {
 }
 // To get class based xpath - //tagName[@class='classValue'] - differs based on no.of classes
 function getClassXPath(element, tagName) {
+    getClassCSS(element);
     let classBasedXpath = null;
     let clickedItemClass = element.className;
     let splitClass = clickedItemClass.trim().split(" ");
@@ -369,7 +374,11 @@ function getClassXPath(element, tagName) {
         let count = getNumberOfXPath(temp)
         if (count == 0) {
             return null;
-        } else if (count > 1) {
+        }
+        if (count == 1) {
+            CSSPATHDATA.push([3, 'Unique class css', `${tagName}.${splitClass[0]}.${splitClass[1]}`])
+        }
+        else if (count > 1) {
             temp = addIndexToXpath(temp)
         }
         return temp;
@@ -461,7 +470,9 @@ function addAllXpathAttributesBbased(attribute, tagName, element) {
                     }
                     if (getNumberOfXPath(allXpathAttr) == 1) {
                         XPATHDATA.push([4, `${item.name}`, allXpathAttr]);
+                        CSSPATHDATA.push([4, `${item.name}`, `${tagName}[${item.name}='${temp}']`])
                     } else {
+                        // TODO: can be even better
                         let temp = addIndexToXpath(allXpathAttr);
                         if (temp != undefined) {
                             XPATHDATA.push([4, `${item.name}`, temp]);

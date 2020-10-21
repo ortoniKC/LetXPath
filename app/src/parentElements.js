@@ -210,6 +210,7 @@ function getParent(element, tagName) {
             try {
                 if (checkTem.singleNodeValue.hasAttribute('letxxpath')) {
                     XPATHDATA.push([9, `Parent ${locator} XPath`, tem]);
+                    
                 } else {
                     tem = `${parent}//${tagName}`;
                     c = getNumberOfXPath(tem);

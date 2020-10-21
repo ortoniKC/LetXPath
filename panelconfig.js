@@ -87,7 +87,6 @@ function generateSnippet(type, codeType, codeValue, vn) {
     let isPOM = false;
     chrome.storage.local.get(['langID'], function (result) {
         let code;
-
         let lang = result.langID;
         switch (lang) {
             case "javas":
@@ -111,7 +110,8 @@ function generateSnippet(type, codeType, codeValue, vn) {
         }
         if (code === 'hide') {
             document.querySelector('.toast').classList.add('d-hide');
-        } else {
+        }
+        else {
             document.querySelector(".toast").textContent = '';
             document.querySelector('.toast').classList.remove('d-hide');
             document.querySelector(".toast").textContent = code;
@@ -168,6 +168,7 @@ function javaSnippet(type, codeType, codeValue, variable, isPOM) {
     }
     return str;
 }
+// TODO: test snippets values
 function jsSnippet(type, codeType, codeValue, variable) {
 
     let str;
@@ -200,12 +201,13 @@ function jsSnippet(type, codeType, codeValue, variable) {
     }
     switch (type) {
         case "click":
-            str += `.click();`
+            str = 'this.click(' + str + ');';
+            // str += `.click();`
             // str = `private ${variable} = ${str}`
             break;
         case "sendKeys":
             // str = `private ${variable} = ${str}`
-            str += `.sendKeys();`
+            str = `this.clearAndType(${str});`
             break;
         case "getAttribute":
             str += `.getAttribute();`

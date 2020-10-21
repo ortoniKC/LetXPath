@@ -1,5 +1,22 @@
 chrome.runtime.onMessage.addListener((req, rec, res) => {
   switch (req.request) {
+    // case "pageInfo":
+    //   try {
+    //     let ui = `<table class="table table-striped"><tbody>
+    //     <tr>
+    //     <td>Page Title</td>
+    //     <td>${req.tab.title}</td>
+    //     </tr>
+    //     <tr>
+    //     <td>Page URL</td>
+    //     <td>${req.tab.url}</td>
+    //     </tr>
+    //     </tbody></table>`;
+    //     jQuery('#eleInfo').empty();
+    //     jQuery('#eleInfo').append(ui);
+    //   } catch (error) { }
+    //   return true;
+    // 
     case "send_to_dev":
       buildUI(req);
       document.getElementById("cssbadge").attributes.getNamedItem('data-badge').value = '0'
@@ -187,38 +204,50 @@ function generateXPathUI(data, i) {
       </button>
     </div>
     <div class="col-3 tooltip tooltip-top" data-tooltip="Copy Snippet">
-      <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(data, i)}</select>
+      <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(data, i, data.xpathid, false)}</select>
     </div>
   </div>
 </div>`;
   jQuery("#addXPath").append(ui);
 }
 // ------- build drop-down for snippet based on element type -------
-function getSelectionValues(data, i) {
+function getSelectionValues(data, i, xp, isCSS) {
+  // let xp = data.xpathid;
   let finalOP;
+  let t = '';
+  if (isCSS) {
+    t = 'CSS';
+  } else {
+    t = xp[i][1]
+  }
   let type = data.type;
   let tag = data.tag;
   switch (tag) {
+    case "textarea":
+      finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
+      <option value="sendKeys" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">sendKeys</option>
+      <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">getAttribute</option>`
+      break;
     case "input":
       if (type === "submit" || type === "radio" || type === "checkbox") {
-        finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option >
-        <option value="click" ct="${data.xpathid[i][1]}" cv="${data.xpathid[i][2]}" vn="${data.variablename}">click</option>
-        <option value="getAttribute" ct="${data.xpathid[i][1]}" cv="${data.xpathid[i][2]}" vn="${data.variablename}">getAttribute</option>`
+        finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
+        <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">click</option>
+        <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">getAttribute</option>`
       } else {
-        finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option >
-        <option value="sendKeys" ct="${data.xpathid[i][1]}" cv="${data.xpathid[i][2]}" vn="${data.variablename}">sendKeys</option>
-        <option value="getAttribute" ct="${data.xpathid[i][1]}" cv="${data.xpathid[i][2]}" vn="${data.variablename}">getAttribute</option>`
+        finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
+        <option value="sendKeys" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">sendKeys</option>
+        <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">getAttribute</option>`
       }
       break;
     case "img":
-      finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option >
-      <option value="click" ct="${data.xpathid[i][1]}" cv="${data.xpathid[i][2]}" vn="${data.variablename}">click</option>
-      <option value="getAttribute" ct="${data.xpathid[i][1]}" cv="${data.xpathid[i][2]}" vn="${data.variablename}">getAttribute</option>`
+      finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
+      <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">click</option>
+      <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">getAttribute</option>`
       break;
     default:
-      finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option >
-      <option value="click" ct="${data.xpathid[i][1]}" cv="${data.xpathid[i][2]}" vn="${data.variablename}">click</option>
-      <option value="getText" ct="${data.xpathid[i][1]}" cv="${data.xpathid[i][2]}" vn="${data.variablename}">getText</option>`
+      finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
+      <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">click</option>
+      <option value="getText" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">getText</option>`
       break;
   }
   return finalOP;
@@ -237,9 +266,12 @@ function buildCSSUI(data) {
         <div class="col-1 p-centered text-center">
           <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" data-copytarget="#css${i}">
             <img src="../assets/icons/copy.svg" alt="copy" data-copytarget="#css${i}">
-      </button>
-    </div>
-    </div>
+          </button>
+         </div>
+        <div class="col-3 tooltip tooltip-top" data-tooltip="Copy Snippet">
+          <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(data, i, data.cssPath, true)}</select>
+        </div>
+      </div>
     </div>`;
   }
   jQuery("#cssbody").append(ui)

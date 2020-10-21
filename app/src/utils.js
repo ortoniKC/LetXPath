@@ -24,7 +24,8 @@ function filterAttributesFromElement(item) {
         (item.name === 'ng-model-update-on-enter') || (item.name === 'magellan-navigation-filter') ||
         (item.name === 'ng-blur') || (item.name === 'ng-focus') || (item.name === 'ng-trim') ||
         (item.name === 'spellcheck') || (item.name === 'target') || (item.name === 'rel') ||
-        (item.name === 'maxlength') || (item.name === 'routerlinkactive') || (item.name === 'src');
+        (item.name === 'maxlength') || (item.name === 'routerlinkactive') || (item.name === 'src') ||
+        (item.name === 'xpath') || (item.name === 'xpathtest') || (item.name === 'css');
 }
 // Add Index to All XPATH
 function addIndexToXpath(allXpathAttr) {
@@ -93,4 +94,36 @@ function evaluateXPathExpression(element) {
 // Remove added element
 function removeletxxpath(element) {
     element.removeAttribute('letxxpath', 'letX');
+}
+
+function frameXPath(hasFrame) {
+    if (hasFrame != undefined) {
+        let id, src, name;
+        let attr = hasFrame.attributes;
+        for (let i = 0; i < attr.length; i++) {
+            switch (attr[i].name) {
+                case "id":
+                    id = attr.id.nodeValue;
+                    break;
+                case "name":
+                    name = attr.name.nodeValue;
+                    break;
+                case "src":
+                    src = attr.src.nodeValue;
+                    break;
+                default:
+                    break;
+            }
+        }
+        let frametag = hasFrame.tagName.toLocaleLowerCase();
+        if (id != undefined) {
+            return `//${frametag}[@id='${id}']`;
+        }
+        else if (name != undefined) {
+            return `//${frametag}[@name='${name}']`;
+        }
+        else if (src != undefined) {
+            return `//${frametag}[@src='${src}']`;
+        }
+    }
 }

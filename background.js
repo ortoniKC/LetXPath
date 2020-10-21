@@ -139,3 +139,17 @@ function updateNotification() {
 chrome.runtime.onInstalled.addListener((details) => {
     installReason(details)
 })
+
+// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+//     if (changeInfo.status === "complete") {
+//         chrome.runtime.sendMessage({ request: 'pageInfo', tab: tab })
+//     }
+// })
+// chrome.tabs.onCreated.addListener(tab => {
+//     // chrome.runtime.sendMessage({ request: 'pageInfo', tab: tab })
+//     chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+//         if (changeInfo.status === "complete") {
+//             chrome.runtime.sendMessage({ request: 'pageInfo', tab: tab })
+//         }
+//     })
+// })
