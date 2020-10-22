@@ -2,7 +2,7 @@
  * @author Kousshik Chatterjee <koushik@letcode.in>
  * @param {*} element 
  * @param {*} tagName 
- * @description The following methods are purely writtent on Guessing algorithm :P :P trust me it will work
+ * @description The following methods are purely written on Guessing algorithm :P :P trust me it will work
  */
 function findLabel(element, tagName) {
     let label, span = undefined;

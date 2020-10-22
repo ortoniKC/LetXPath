@@ -51,7 +51,6 @@ function addIndexToXpath(allXpathAttr) {
         } else
             return null;
     } catch (error) { }
-
 }
 // Add Index to Axes XPATH
 function addIndexToAxesXpath(allXpathAttr) {
