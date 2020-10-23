@@ -94,7 +94,7 @@ var sendToContentScript = (request) => {
 // install and update notification
 
 let installURL = chrome.runtime.getURL("install.html");
-let updateURL = "https://github.com/ortoniKC/LetXPath";
+let updateURL = "https://github.com/ortoniKC/LetXPath/releases";
 let uninstallURL = "https://letcode.in/uninstall";
 
 chrome.runtime.setUninstallURL(uninstallURL, () => {
