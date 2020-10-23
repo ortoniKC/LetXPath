@@ -248,7 +248,7 @@ function buildXpath(element, boolAnchor, utils) {
         let fr = document.querySelectorAll('iframe');
         if (fr.length > 0) {
             frameXPATH = frameXPath(fr[0]);
-            console.log(frameXPATH);
+            // console.log(frameXPATH);
         }
     } catch (error) { }
 

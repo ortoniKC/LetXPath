@@ -95,9 +95,11 @@ var sendToContentScript = (request) => {
 
 let installURL = chrome.runtime.getURL("install.html");
 let updateURL = "https://github.com/ortoniKC/LetXPath";
-let uninstallURL = "https://www.letcode.in/products";
+let uninstallURL = "https://letcode.in/uninstall";
 
-// chrome.runtime.setUninstallURL(uninstallURL, () => { });
+chrome.runtime.setUninstallURL(uninstallURL, () => {
+    console.log('Uninstalled');
+});
 
 let installReason = (detail) => {
     if (detail.reason === "install") {

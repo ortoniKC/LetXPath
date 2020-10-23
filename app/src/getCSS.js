@@ -35,7 +35,6 @@ function getClassCSS(ele) {
     if (!(spl.length > 3)) {
         clscss = `${ele.tagName.toLowerCase()}.${clscss}`
         ele.ownerDocument.querySelectorAll(clscss).length == 1 ? CSSPATHDATA.push([3, 'Unique class', clscss]) : '';
-        // alert(clscss)
     }
 
 }
