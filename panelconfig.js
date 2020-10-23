@@ -125,7 +125,7 @@ function javaSnippet(type, codeType, codeValue, variable, isPOM) {
     // getAttribute Collection based XPath //input[@placeholder='first name & last name'] firstName" false
     switch (codeType) {
         case "CSS":
-            str = `driver.findElement(By.css("${codeValue}"))`;
+            str = `driver.findElement(By.cssSelector("${codeValue}"))`;
             break;
         case "Unique Class Atrribute":
             str = `driver.findElement(By.className("${codeValue}"))`;
@@ -201,13 +201,12 @@ function jsSnippet(type, codeType, codeValue, variable) {
     }
     switch (type) {
         case "click":
-            str = 'this.click(' + str + ');';
-            // str += `.click();`
+            str += `.click();`
             // str = `private ${variable} = ${str}`
             break;
         case "sendKeys":
             // str = `private ${variable} = ${str}`
-            str = `this.clearAndType(${str});`
+            str += `.sendKeys()`
             break;
         case "getAttribute":
             str += `.getAttribute();`
