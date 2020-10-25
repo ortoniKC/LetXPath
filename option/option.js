@@ -16,11 +16,7 @@ $(document).ready(function () {
         let toast = document.querySelector('.toast')
         toast.textContent = "Default Snippet has been changed to " + radioValue
         toast.classList.remove('d-hide')
-        // $("#snippetnotification").append(notification);
     })
-    // document.getElementsByClassName("delete")[0].addEventListener("click", () => {
-    //     $("#snippetnotification").empty();
-    // })
 });
 
 function setStorage(obj) {
