@@ -1,6 +1,7 @@
 chrome.runtime.onMessage.addListener((req, rec, res) => {
   switch (req.request) {
     // case "pageInfo":
+    //   console.log(req.request);
     //   try {
     //     let ui = `<table class="table table-striped"><tbody>
     //     <tr>
@@ -16,7 +17,7 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
     //     jQuery('#eleInfo').append(ui);
     //   } catch (error) { }
     //   return true;
-    // 
+
     case "send_to_dev":
       buildUI(req);
       document.getElementById("cssbadge").attributes.getNamedItem('data-badge').value = '0'
