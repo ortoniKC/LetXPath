@@ -61,7 +61,17 @@ $(document).ready(function () {
         } catch (error) { }
     })
     // To copy Xpath
-    $('body').on('click', 'button.btn.btn-sm', (e) => {
+    $('body').on('click', '#xpathVal', (e) => {
+        try {
+            let t = e.target;
+            let c = t.dataset.copytarget;
+            c = c.replace("#", "");
+            var from = document.getElementById(c);
+            var range = document.createRange();
+            copyToClipBoard(range, from);
+        } catch (error) { }
+    })
+    $('body').on('click', '#anxp', (e) => {
         try {
             let t = e.target;
             let c = t.dataset.copytarget;

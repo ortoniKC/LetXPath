@@ -47,7 +47,6 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
     case "axes":
       $("#anxp").empty();
       $("#anxp").text(req.data);
-      jQuery("#anxp").trigger('custom-update');
       return true;
     case "fromUtilsSelector":
       utilsLocatorUI(req.data);
@@ -89,13 +88,8 @@ function generateAxes(req) {
   jQuery("#anchorXPath").empty();
   let ui = `<div class="form-horizontal">
   <div class="form-group">
-  <div class="col-8">
-    <code class="form-label" id="anxp" value="${req.data.proOrFol}">${req.data.defaultXPath}</code>
-  </div>
-  <div class="col-1 p-centered text-center">
-    <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" data-copytarget="anxp">
-      <img src="../assets/icons/copy.svg" alt="copy" data-copytarget="anxp">
-    </button>
+  <div class="col-12">
+    <code class="form-label tooltip tooltip-bottom" id="anxp" data-copytarget="#anxp" data-tooltip="Click to copy" value="${req.data.proOrFol}">${req.data.defaultXPath}</code>
   </div>
   </div>
 </div>
@@ -195,15 +189,10 @@ function generateXPathUI(data, i) {
   let ui = `<div class="form-horizontal">
   <span class="label label-rounded sm">${i + 1}. ${data.xpathid[i][1]}</span>
   <div class="form-group">
-    <div class="col-8">
-      <code class="form-label" id="xpath${i}">${data.xpathid[i][2]}</code>
+    <div class="col-10 c-hand" id="xpathVal" data-copytarget="#xpath${i}">
+      <code class="form-label tooltip tooltip-top" id="xpath${i}" data-copytarget="#xpath${i}" data-tooltip="Click to copy">${data.xpathid[i][2]}</code>
     </div>
-    <div class="col-1 p-centered text-center">
-      <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" data-copytarget="#xpath${i}">
-        <img src="../assets/icons/copy.svg" alt="copy" data-copytarget="#xpath${i}">
-      </button>
-    </div>
-    <div class="col-3 tooltip tooltip-top" data-tooltip="Copy Snippet">
+    <div class="col-2 tooltip tooltip-top" data-tooltip="Copy Snippet">
       <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(data, i, data.xpathid, false)}</select>
     </div>
   </div>
@@ -260,15 +249,10 @@ function buildCSSUI(data) {
     ui += `<div class="form-horizontal">
     <span class="label label-rounded sm">${i + 1}. ${data.cssPath[i][1]}</span>
       <div class="form-group">
-        <div class="col-8">
-          <code class="form-label" id="css${i}">${data.cssPath[i][2]}</code>
+        <div class="col-10 tooltip tooltip-top" id="xpathVal" data-tooltip="Click to copy" data-copytarget="#css${i}">
+          <code class="form-label" id="css${i}" data-copytarget="#css${i}">${data.cssPath[i][2]}</code>
         </div>
-        <div class="col-1 p-centered text-center">
-          <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" data-copytarget="#css${i}">
-            <img src="../assets/icons/copy.svg" alt="copy" data-copytarget="#css${i}">
-          </button>
-         </div>
-        <div class="col-3 tooltip tooltip-top" data-tooltip="Copy Snippet">
+        <div class="col-2 tooltip tooltip-top" data-tooltip="Copy Snippet">
           <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(data, i, data.cssPath, true)}</select>
         </div>
       </div>

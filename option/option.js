@@ -14,7 +14,7 @@ $(document).ready(function () {
         let radioID = ip.attr("id");
         setStorage({ lang: radioValue, langID: radioID });
         let toast = document.querySelector('.toast')
-        toast.textContent = "Defalt Snippet has been changed to " + radioValue
+        toast.textContent = "Default Snippet has been changed to " + radioValue
         toast.classList.remove('d-hide')
         // $("#snippetnotification").append(notification);
     })
