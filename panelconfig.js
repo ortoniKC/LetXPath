@@ -71,7 +71,19 @@ $(document).ready(function () {
             copyToClipBoard(range, from);
         } catch (error) { }
     })
+    // click to copy axes xpath
     $('body').on('click', '#anxp', (e) => {
+        try {
+            let t = e.target;
+            let c = t.dataset.copytarget;
+            c = c.replace("#", "");
+            var from = document.getElementById(c);
+            var range = document.createRange();
+            copyToClipBoard(range, from);
+        } catch (error) { }
+    })
+    // click to copy table values
+    $('body').on('click', '.btn.btn-link.btn-sm', (e) => {
         try {
             let t = e.target;
             let c = t.dataset.copytarget;

@@ -43,6 +43,14 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
       }
       return true;
     case "anchor":
+      document.getElementById("xpbadge").attributes.getNamedItem('data-badge').value = 0;
+      jQuery("#addXPath").empty();
+      let ui = `<div class="empty">
+        <p class="empty-title h5">Please select any element to get XPath/CSS</p>
+        <p class="empty-subtitle">more new patterns coming soon :)</p>
+        <p class="empty-subtitle">Did you know LetXPath is an open-source, if you found something wrong fix it :)</p>
+        </div>`;
+      jQuery("#addXPath").append(ui);
       generateAxes(req);
       return true;
     case "axes":
@@ -99,6 +107,7 @@ function generateAxes(req) {
     <p class="chip bg-success">Parent Element</p>
     ${sourceElement(req.data.src)}
   </div>
+  <div class="divider-vert" data-content="Axes"></div>
   <div class="column col-xs-6">
     <p class="chip bg-success">Child Element</p>
     ${targetElement(req.data.dst)}
@@ -154,10 +163,10 @@ function targetElement(element) {
 function buildUI(data) {
   jQuery("#addXPath").empty();
   if (data.webtabledetails != null) {
-    let table = `<div class="form-horizontal bg-secondary">
+    let table = `<div class="form-horizontal bg-gray">
     <span class="label label-rounded sm">Table Info - Total no.of table ${data.webtabledetails.totalTables}</span>
     <div class="form-group">
-      <div class="col-8">
+      <div class="col-11">
         <code class="form-label" id="tablelocator">${data.webtabledetails.tableLocator}</code>
       </div>
       <div class="col-1 p-centered text-center">
@@ -167,7 +176,7 @@ function buildUI(data) {
       </div>
     </div>
     <div class="form-group">
-      <div class="col-8">
+      <div class="col-11">
         <code class="form-label" id="tabledata">${data.webtabledetails.tableData}</code>
       </div>
       <div class="col-1 p-centered text-center">
