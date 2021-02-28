@@ -66,6 +66,10 @@ chrome.runtime.onConnect.addListener(function (port) {
             sendToContentScript(message);
             return true;
         }
+        if (message.request === "userSearchXP") {
+            sendToContentScript(message);
+            return true;
+        }
     }
     // Listen to messages sent from the DevTools page
     port.onMessage.addListener(extensionListener);
@@ -116,8 +120,9 @@ let installReason = (detail) => {
         )
     }
     else if (detail.reason === "update") {
-        updateNotification();
-        chrome.notifications.onClicked.addListener(onClickNotification);
+        // TODO:
+        // updateNotification();
+        // chrome.notifications.onClicked.addListener(onClickNotification);
     }
 }
 

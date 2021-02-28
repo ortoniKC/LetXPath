@@ -36,7 +36,7 @@ $(document).ready(function () {
     });
 
     // --- on click evaluate axes
-    $('body',).on('click', "input[type='radio']", (ele) => {
+    $('body').on('click', "input[type='radio']", (ele) => {
         let prefol = document.getElementById("anxp").attributes.value.value;
         // find the selected source
         let src = $("input[name='src']:checked").val();
@@ -94,6 +94,15 @@ $(document).ready(function () {
             copyToClipBoard(range, from);
         } catch (error) { }
     })
+
+    // ----- custom search
+    $('body').on('change', '#usxp', (e) => {
+        // send the value to content script and evaluate
+        devtools_connections.postMessage({
+            data: e.target.value,
+            request: "userSearchXP", tab: chrome.devtools.inspectedWindow.tabId
+        });
+    });
 });
 function copyToClipBoard(range, node) {
     try {

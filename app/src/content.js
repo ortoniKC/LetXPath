@@ -82,6 +82,17 @@ let receiver = (message, sender, sendResponse) => {
             atrributesArray = [];
             webTableDetails = null;
             return true;
+        case "userSearchXP":
+            elementOwnerDocument = document;
+            let xp = evaluateXPathExpression(message.data);
+            let numberOfXPath = getNumberOfXPath(message.data);
+            chrome.runtime.sendMessage({
+                request: 'customSearchResult', data: {
+                    xpath: xp,
+                    occurance: numberOfXPath
+                }
+            });
+            return true;
         default:
             return true;
     }
