@@ -6,15 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LetXPath</title>
   <link rel="stylesheet" href="../app/styles/main.css">
-  <!-- <link rel="stylesheet" href="../app/styles/icon.css"> -->
   <script defer src="../app/utils/jquery.js"></script>
   <script defer src="../panelconfig.js"></script>
   <script defer src="../panel/panel.js"></script>
   <style>
-    body {
-      zoom: 80%;
-    }
-
     span.label {
       font-size: small;
     }
@@ -28,7 +23,7 @@
     }
 
     li img {
-      width: 25px;
+      width: 1rem;
     }
 
     button img {
@@ -78,8 +73,8 @@
   </style>
 </head>
 
-<body>
-  <div class="container">
+<body class="bg-dark text-dark">
+  <div class="container bg-dark">
     <ul class="tab tab-block" id="tab_header">
       <li class="tab-item c-hand active" data-option="1">
         <a class="badge" id="xpbadge" data-badge="0">XPath</a>
@@ -115,7 +110,7 @@
       </li>
     </ul>
   </div>
-  <div class="toast toast-success d-hide mx-2 my-2">
+  <div class="toast toast-success d-hide">
   </div>
   <div class="container grid-lg" id="tab_container">
     <div class="container_item card active" data-item="1">
@@ -140,8 +135,8 @@
         </div>
       </div>
     </div>
-    <div class="container_item card" data-item="4">
-      <div class="card-body">
+    <div class="container_item card bg-dark" data-item="4">
+      <div class="card-body bg-dark">
         <div class="container text-center">
           <div class="columns">
             <div class="column">

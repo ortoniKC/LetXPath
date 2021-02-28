@@ -45,12 +45,15 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
     case "anchor":
       document.getElementById("xpbadge").attributes.getNamedItem('data-badge').value = 0;
       jQuery("#addXPath").empty();
+      document.getElementById("cssbadge").attributes.getNamedItem('data-badge').value = 0;
+      jQuery("#cssbody").empty();
       let ui = `<div class="empty">
         <p class="empty-title h5">Please select any element to get XPath/CSS</p>
         <p class="empty-subtitle">more new patterns coming soon :)</p>
         <p class="empty-subtitle">Did you know LetXPath is an open-source, if you found something wrong fix it :)</p>
         </div>`;
       jQuery("#addXPath").append(ui);
+      jQuery("#cssbody").append(ui);
       generateAxes(req);
       return true;
     case "axes":
@@ -120,7 +123,7 @@ function sourceElement(element) {
   let ui = '';
   for (let i = 0; i < element.length; i++) {
     if (i == 0) {
-      ui += `<div class="form-group">
+      ui += `<div class="form-group has-info">
       <label class="form-switch">
         <input type="radio" name="src" value="${element[i][1]}" checked>
         <i class="form-icon"></i>${i + 1}. ${element[i][2]}
@@ -224,29 +227,29 @@ function getSelectionValues(data, i, xp, isCSS) {
   switch (tag) {
     case "textarea":
       finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
-      <option value="sendKeys" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">sendKeys</option>
-      <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">getAttribute</option>`
+      <option value="sendKeys" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">sendKeys</option>
+      <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">getAttribute</option>`
       break;
     case "input":
       if (type === "submit" || type === "radio" || type === "checkbox") {
         finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
-        <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">click</option>
-        <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">getAttribute</option>`
+        <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">click</option>
+        <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">getAttribute</option>`
       } else {
         finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
-        <option value="sendKeys" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">sendKeys</option>
-        <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">getAttribute</option>`
+        <option value="sendKeys" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">sendKeys</option>
+        <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">getAttribute</option>`
       }
       break;
     case "img":
       finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
-      <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">click</option>
-      <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">getAttribute</option>`
+      <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">click</option>
+      <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">getAttribute</option>`
       break;
     default:
       finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
-      <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">click</option>
-      <option value="getText" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}">getText</option>`
+      <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">click</option>
+      <option value="getText" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">getText</option>`
       break;
   }
   return finalOP;

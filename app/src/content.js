@@ -162,6 +162,7 @@ function parseDOM(targetElement) {
                 type: type,
                 hasFrame: frameXPATH,
                 variablename: variablename,
+                methodname: methodName,
                 anchor: false,
                 atrributesArray: atrributesArray
             };
@@ -216,7 +217,9 @@ function buildXpath(element, boolAnchor, utils) {
         getVariableAndMethodName(name);
         methodName = methodName.length >= 2 && methodName.length < 25 ? methodName : methodName.slice(0, 12);
         variableName = variableName.length >= 2 && variableName.length < 25 ? variableName : variableName.slice(0, 12);
-        variablename = variableName;
+        variablename = variableName != null && variableName.length > 1 ? variableName : 'ele'
+        methodName = methodName != null && methodName.length > 1 ? methodName : 'ele'
+        // console.log(variableName, methodName);
     } catch (error) {
         variablename = null;
     }

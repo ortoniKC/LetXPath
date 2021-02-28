@@ -24,7 +24,8 @@ $(document).ready(function () {
         let codeType = changed.target.selectedOptions[0].attributes.ct.value;
         let codeValue = changed.target.selectedOptions[0].attributes.cv.value;
         let vn = changed.target.selectedOptions[0].attributes.vn.value;
-        generateSnippet(type, codeType, codeValue, vn);
+        let mn = changed.target.selectedOptions[0].attributes.mn.value;
+        generateSnippet(type, codeType, codeValue, vn, mn);
         // let t = changed.target.id;
         setTimeout(() => {
             let from = document.getElementsByClassName('toast')[0]
@@ -105,14 +106,13 @@ function copyToClipBoard(range, node) {
         setTimeout(function () { node.classList.remove('copied'); }, 1500);
     } catch (error) { }
 }
-function generateSnippet(type, codeType, codeValue, vn) {
-    let isPOM = false;
-    chrome.storage.local.get(['langID'], function (result) {
+function generateSnippet(type, codeType, codeValue, vn, mn) {
+    chrome.storage.local.get(['langID', 'clickvalue', 'sendvalue', 'textvalue', 'attrvalue', 'customLang'], function (result) {
         let code;
         let lang = result.langID;
         switch (lang) {
             case "javas":
-                code = javaSnippet(type, codeType, codeValue, vn, isPOM);
+                code = javaSnippet(type, codeType, codeValue, vn);
                 break;
             case "protractorjs":
                 code = jsSnippet(type, codeType, codeValue, vn)
@@ -124,10 +124,14 @@ function generateSnippet(type, codeType, codeValue, vn) {
                 code = javaSnippet(type, codeType, codeValue, vn)
                 break;
             case "custom":
+                code = customSnippets(type, codeType, codeValue, vn, result, mn)
                 // alert('Not yet implemented')
+                // chrome.storage.local.get(['click-value'], (result) => {
+                //     console.log(result);
+                // })
                 break;
             default:
-                code = javaSnippet(type, codeType, codeValue, vn, isPOM);
+                code = javaSnippet(type, codeType, codeValue, vn);
                 break;
         }
         if (code === 'hide') {
@@ -136,15 +140,14 @@ function generateSnippet(type, codeType, codeValue, vn) {
         else {
             document.querySelector(".toast").textContent = '';
             document.querySelector('.toast').classList.remove('d-hide');
-            document.querySelector(".toast").textContent = code;
+            // let to = document.querySelector(".toast");
+            let t = `<pre>${code}</pre>`
+            $('.toast').append(t);
         }
     });
 }
-let pom = false
-function javaSnippet(type, codeType, codeValue, variable, isPOM) {
-
+function javaSnippet(type, codeType, codeValue, variable) {
     let str;
-    // getAttribute Collection based XPath //input[@placeholder='first name & last name'] firstName" false
     switch (codeType) {
         case "CSS":
             str = `driver.findElement(By.cssSelector("${codeValue}"))`;
@@ -291,3 +294,91 @@ function pySnippet(type, codeType, codeValue, variable) {
     }
     return str;
 }
+function customSnippets(type, codeType, codeValue, vn, result, mn) {
+    let locatorValue;
+    if (result.customLang === 'jscs') {
+        switch (codeType) {
+            case "CSS":
+                locatorValue = `element(by.css("${codeValue}"))`;
+                break;
+            case "Unique Class Atrribute":
+                locatorValue = `element(by.className("${codeValue}"))`;
+                break;
+            case "Unique TagName":
+                locatorValue = `element(by.tagName("${codeValue}"))`;
+                break;
+            case "Link Text":
+                locatorValue = `element(by.linkText("${codeValue}"))`;
+                break;
+            case "Unique ID":
+                locatorValue = `element(by.id("${codeValue}"))`;
+                break;
+            case "Unique Name":
+                locatorValue = `element(by.name("${codeValue}"))`;
+                break;
+            case "Unique PartialLinkText":
+                locatorValue = `element(by.partialLinkText("${codeValue}"))`;
+                break;
+            default:
+                locatorValue = `element(by.xpath("${codeValue}"))`;
+                break;
+        }
+    } else {
+        switch (codeType) {
+            case "CSS":
+                locatorValue = `@FindBy(css = "${codeValue}")\r\n`;
+                break;
+            case "Unique Class Atrribute":
+                locatorValue = `@FindBy(className = "${codeValue}")\r\n`;
+                break;
+            case "Unique TagName":
+                locatorValue = `@FindBy(tagName = "${codeValue}")\r\n`;
+                break;
+            case "Link Text":
+                locatorValue = `@FindBy(linkText = "${codeValue}")\r\n`;
+                break;
+            case "Unique ID":
+                locatorValue = `@FindBy(id= "${codeValue}")\r\n`;
+                break;
+            case "Unique Name":
+                locatorValue = `@FindBy(name = "${codeValue}")\r\n`;
+                break;
+            case "Unique PartialLinkText":
+                locatorValue = `@FindBy(partialLinkText = "${codeValue}")\r\n`;
+                break;
+            default:
+                locatorValue = `@FindBy(xpath = "${codeValue}")\r\n`;
+                break;
+        }
+    }
+    let str = '';
+    switch (type) {
+        case "click":
+            str = result.clickvalue;
+            str = custSnip(str, locatorValue, vn, mn);
+            return str;
+        case "sendKeys":
+            str = result.sendvalue;
+            return custSnip(str, locatorValue, vn, mn);
+        case "getAttribute":
+            str = result.attrvalue;
+            return custSnip(str, locatorValue, vn, mn);
+        case "getText":
+            str = result.textvalue;
+            return custSnip(str, locatorValue, vn, mn);
+        default:
+            return 'hide';
+    }
+}
+
+function custSnip(str, locatorValue, vn, mn) {
+    if (str.includes('${lc}')) {
+        str = str.replaceAll('${lc}', locatorValue) + '\r\n';
+    } if (str.includes('${vn}')) {
+        str = str.replaceAll('${vn}', vn);
+    } if (str.includes('${mn}')) {
+        str = str.replaceAll('${mn}', mn) + '\r\n';
+    }
+    return str.trim();
+}
+
