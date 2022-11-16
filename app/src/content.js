@@ -20,42 +20,42 @@ function sendToDev(data) {
 }
 // used to send/receive message with in extension
 let receiver = (message, sender, sendResponse) => {
-    if (message.selector) {
-        let selected = message.selector.selectedValue;
-        utilsSelectorXPathData = [];
-        switch (selected) {
-            case "inputs":
-                let ip = document.querySelectorAll("input");
-                for (let index = 0; index < ip.length; index++) {
-                    buildSelectedFileds(ip[index]);
-                }
-                sendToDev(utilsSelectorXPathData.sort());
-                return true;
-            case "dropdown":
-                let dd = document.querySelectorAll("select");
-                for (let index = 0; index < dd.length; index++) {
-                    buildSelectedFileds(dd[index]);
-                }
-                sendToDev(utilsSelectorXPathData.sort());
-                return true;
-            // case "labels":
-            //     let l = document.querySelectorAll("label");
-            //     for (let index = 0; index < l.length; index++) {
-            //         buildSelectedFileds(l[index]);
-            //     }
-            //     sendToDev(utilsSelectorXPathData.sort());
-            //     return true;
-            case "buttons":
-                let bt = document.querySelectorAll("button");
-                for (let index = 0; index < bt.length; index++) {
-                    buildSelectedFileds(bt[index]);
-                }
-                sendToDev(utilsSelectorXPathData);
-                return true;
-            default:
-                return true;
-        }
-    }
+    // if (message.selector) {
+    //     let selected = message.selector.selectedValue;
+    //     utilsSelectorXPathData = [];
+    //     switch (selected) {
+    //         case "inputs":
+    //             let ip = document.querySelectorAll("input");
+    //             for (let index = 0; index < ip.length; index++) {
+    //                 buildSelectedFileds(ip[index]);
+    //             }
+    //             sendToDev(utilsSelectorXPathData.sort());
+    //             return true;
+    //         case "dropdown":
+    //             let dd = document.querySelectorAll("select");
+    //             for (let index = 0; index < dd.length; index++) {
+    //                 buildSelectedFileds(dd[index]);
+    //             }
+    //             sendToDev(utilsSelectorXPathData.sort());
+    //             return true;
+    //         // case "labels":
+    //         //     let l = document.querySelectorAll("label");
+    //         //     for (let index = 0; index < l.length; index++) {
+    //         //         buildSelectedFileds(l[index]);
+    //         //     }
+    //         //     sendToDev(utilsSelectorXPathData.sort());
+    //         //     return true;
+    //         case "buttons":
+    //             let bt = document.querySelectorAll("button");
+    //             for (let index = 0; index < bt.length; index++) {
+    //                 buildSelectedFileds(bt[index]);
+    //             }
+    //             sendToDev(utilsSelectorXPathData);
+    //             return true;
+    //         default:
+    //             return true;
+    //     }
+    // }
     switch (message.request) {
         case 'parseAxes':
             try {
@@ -84,14 +84,17 @@ let receiver = (message, sender, sendResponse) => {
             return true;
         case "userSearchXP":
             elementOwnerDocument = document;
-            let xp = evaluateXPathExpression(message.data);
-            let numberOfXPath = getNumberOfXPath(message.data);
-            chrome.runtime.sendMessage({
-                request: 'customSearchResult', data: {
-                    xpath: xp,
-                    occurance: numberOfXPath
-                }
-            });
+            if (document == elementOwnerDocument) {
+                // let xp = evaluateXPathExpression(message.data);
+                let numberOfXPath = getNumberOfXPath(message.data);
+                let xp = (numberOfXPath > 0) ? 'XPath found' : 'Wrong XPath';
+                chrome.runtime.sendMessage({
+                    request: 'customSearchResult', data: {
+                        xpath: xp,
+                        count: numberOfXPath
+                    }
+                });
+            }
             return true;
         default:
             return true;
@@ -188,7 +191,7 @@ function parseDOM(targetElement) {
 }
 
 function parseAnchorXP(targetElement) {
-    if (targetElemt != null) {
+    if (targetElement != null) {
         try {
             maxIndex = 20;
             buildXpath(targetElemt, 1, false);

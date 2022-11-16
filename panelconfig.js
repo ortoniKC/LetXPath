@@ -31,7 +31,8 @@ $(document).ready(function () {
             let from = document.getElementsByClassName('toast')[0]
             let range = document.createRange();
             copyToClipBoard(range, from);
-            setTimeout(() => { from.classList.add('d-hide') }, 3000)
+            $('select').prop('selectedIndex', 0);
+            // setTimeout(() => { from.classList.add('d-hide') }, 3000)
         }, 100);
     });
 
@@ -96,13 +97,20 @@ $(document).ready(function () {
     })
 
     // ----- custom search
-    $('body').on('change', '#usxp', (e) => {
+    $('body').on('click', '#usxp', (e) => {
         // send the value to content script and evaluate
-        devtools_connections.postMessage({
-            data: e.target.value,
-            request: "userSearchXP", tab: chrome.devtools.inspectedWindow.tabId
-        });
+        const val = document.getElementById("searchVal");
+        if (val.value.length > 0) {
+            devtools_connections.postMessage({
+                data: val.value,
+                request: "userSearchXP", tab: chrome.devtools.inspectedWindow.tabId
+            });
+        }
     });
+    $('body').on('click', '.btn,btn-clear', (e) => {
+        document.querySelector('.toast').classList.add('d-hide');
+    });
+
 });
 function copyToClipBoard(range, node) {
     try {
@@ -150,7 +158,8 @@ function generateSnippet(type, codeType, codeValue, vn, mn) {
             document.querySelector(".toast").textContent = '';
             document.querySelector('.toast').classList.remove('d-hide');
             // let to = document.querySelector(".toast");
-            let t = `<pre>${code}</pre>`
+            let t = `<button class="btn btn-clear float-right"></button>
+            <div class="text-ellipsis text-center">${code}</div>`
             $('.toast').append(t);
         }
     });

@@ -88,19 +88,9 @@
       <li class="tab-item c-hand" data-option="5">
         <a>Search</a>
       </li>
-      <!-- <div class="popover popover-bottom">
-        <button class="btn btn-link">
-          <i class="icon icon-flag"></i>
-        </button>
-        <div class="popover-container">
-          <div class="card">
-            <div class="card-header">
-              <p class="h6">Page Info</p>
-            </div>
-            <div class="card-body" id="eleInfo"></div>
-          </div>
-        </div>
-      </div> -->
+      <li class="tab-item c-hand" data-option="6">
+        <a>Record</a>
+      </li>
       <li class="tab-item tooltip tooltip-bottom c-hand" data-tooltip="About LetXPath" data-option="4">
         <a>
           <img src="../assets/32.png" alt="letxpath">
@@ -113,7 +103,9 @@
       </li>
     </ul>
   </div>
-  <div class="toast toast-success d-hide">
+  <div class="container">
+    <div class="toast toast-success d-hide">
+    </div>
   </div>
   <div class="container grid-lg" id="tab_container">
     <div class="container_item card active" data-item="1">
@@ -124,11 +116,13 @@
         </div>
       </div>
     </div>
+    <!-- CSS -->
     <div class="container_item card" data-item="2">
       <div class="card-body" id="cssbody">
         CSS
       </div>
     </div>
+    <!-- Axes -->
     <div class="container_item card" data-item="3">
       <div class="card-body" id="anchorXPath">
         <div class="empty">
@@ -138,6 +132,7 @@
         </div>
       </div>
     </div>
+    <!-- About -->
     <div class="container_item card bg-dark" data-item="4">
       <div class="card-body bg-dark">
         <div class="container text-center">
@@ -191,13 +186,25 @@
         </div>
       </div>
     </div>
+    <!-- Custom Search -->
     <div class="container_item card bg-dark active" data-item="5">
       <div class="empty container bg-dark">
         <div class="title">
           <h3 class="text-secondary">Custom Search</h3>
         </div>
         <div class="form-group">
-          <input class="form-input" type="text" id="usxp" placeholder="Type your XPath">
+          <input class="form-input" type="text" id="searchVal" placeholder="Type your XPath">
+          <button id="usxp" class="btn btn-primary">Search</button>
+        </div>
+        <div class="form-group" id="insertsearch">
+        </div>
+      </div>
+    </div>
+    <!-- Record -->
+    <div class="container_item card bg-dark active" data-item="6">
+      <div class="empty container bg-dark">
+        <div class="title">
+          <h3 class="text-secondary">TODO</h3>
         </div>
       </div>
     </div>

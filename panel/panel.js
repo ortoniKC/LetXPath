@@ -1,4 +1,5 @@
 chrome.runtime.onMessage.addListener((req, rec, res) => {
+  document.querySelector('.toast').classList.add('d-hide');
   switch (req.request) {
     // case "pageInfo":
     //   console.log(req.request);
@@ -63,11 +64,20 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
     case "fromUtilsSelector":
       utilsLocatorUI(req.data);
       return true;
+    case "customSearchResult":
+      builtSearchUI(req.data);
     default:
       return true;
   }
 })
 let devtools_connections = chrome.runtime.connect({ name: "ortoni_devtools_message" });
+
+function builtSearchUI(data) {
+  jQuery("#insertsearch").empty();
+  let ui = `<label for="count">${data.count}</label>
+  <label for="xpath">${data.xpath}</label>`;
+  $("#insertsearch").append(ui);
+}
 
 function utilsLocatorUI(data) {
   let len = data.length;
