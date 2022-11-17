@@ -1,5 +1,5 @@
 /**
- * @author Kousshik Chatterjee <koushik@letcode.in>
+ * @author Koushik Chatterjee <koushik350@gmail.com>
  * @param {*} element 
  * @param {*} tagName 
  * @description get all the parent elements attribues, to write more precise xpath 
@@ -210,7 +210,7 @@ function getParent(element, tagName) {
             try {
                 if (checkTem.singleNodeValue.hasAttribute('letxxpath')) {
                     XPATHDATA.push([9, `Parent ${locator} XPath`, tem]);
-                    
+
                 } else {
                     tem = `${parent}//${tagName}`;
                     c = getNumberOfXPath(tem);

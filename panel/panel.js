@@ -65,14 +65,14 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
       utilsLocatorUI(req.data);
       return true;
     case "customSearchResult":
-      builtSearchUI(req.data);
+      buildSearchUI(req.data);
     default:
       return true;
   }
 })
 let devtools_connections = chrome.runtime.connect({ name: "ortoni_devtools_message" });
 
-function builtSearchUI(data) {
+function buildSearchUI(data) {
   jQuery("#insertsearch").empty();
   let ui = `<label for="count">${data.count}</label>
   <label for="xpath">${data.xpath}</label>`;

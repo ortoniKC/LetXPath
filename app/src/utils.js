@@ -1,5 +1,5 @@
 /**
- * @author Kousshik Chatterjee <koushik@letcode.in>
+ * @author Koushik Chatterjee <koushik350@gmail.com>
  * @description evaluates the xpath
  */
 // Filter values not to push
@@ -125,4 +125,30 @@ function frameXPath(hasFrame) {
             return `//${frametag}[@src='${src}']`;
         }
     }
+}
+
+// add highlighter to all matching XPath
+
+function addHighlighter(result) {
+    try {
+        for (let i = 0; i < result.snapshotLength; i++) {
+            node = result.snapshotItem(i);
+            node.setAttribute("letcss", "1");
+        }
+    } catch (error) {
+        // console.debug(error);
+    }
+
+}
+
+function clearHighlighter(result) {
+    try {
+        for (let i = 0; i < result.snapshotLength; i++) {
+            node = result.snapshotItem(i);
+            node.removeAttribute("letcss");
+        }
+    } catch (error) {
+        // console.debug(error);
+    }
+
 }

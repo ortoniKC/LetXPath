@@ -91,11 +91,13 @@
       <li class="tab-item c-hand" data-option="6">
         <a>Record</a>
       </li>
+      <!-- about -->
       <li class="tab-item tooltip tooltip-bottom c-hand" data-tooltip="About LetXPath" data-option="4">
         <a>
           <img src="../assets/32.png" alt="letxpath">
         </a>
       </li>
+      <!-- settings -->
       <li id="openSetting" class="tooltip tooltip-left c-hand my-2" data-tooltip="Setting">
         <a>
           <img src="../assets/icons/panel/settings.svg" alt="settings">
@@ -187,21 +189,22 @@
       </div>
     </div>
     <!-- Custom Search -->
-    <div class="container_item card bg-dark active" data-item="5">
+    <div class="container_item card bg-dark" data-item="5">
       <div class="empty container bg-dark">
         <div class="title">
           <h3 class="text-secondary">Custom Search</h3>
         </div>
-        <div class="form-group">
-          <input class="form-input" type="text" id="searchVal" placeholder="Type your XPath">
-          <button id="usxp" class="btn btn-primary">Search</button>
+        <div class="input-group">
+          <input type="text" class="form-input" id="searchVal" placeholder="Type your XPath">
+          <button id="usxp" class="btn btn-primary input-group-btn">Find</button>
+          <button id="cleanhighlight" class="btn btn-link input-group-btn">Clear</button>
         </div>
         <div class="form-group" id="insertsearch">
         </div>
       </div>
     </div>
     <!-- Record -->
-    <div class="container_item card bg-dark active" data-item="6">
+    <div class="container_item card bg-dark" data-item="6">
       <div class="empty container bg-dark">
         <div class="title">
           <h3 class="text-secondary">TODO</h3>

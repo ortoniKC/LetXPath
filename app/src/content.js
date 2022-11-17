@@ -1,5 +1,5 @@
 /**
- * @author Kousshik Chatterjee <koushik@letcode.in>
+ * @author Koushik Chatterjee <koushik350@gmail.com>
  * @description heart - core engine of extension
  */
 
@@ -59,19 +59,22 @@ let receiver = (message, sender, sendResponse) => {
     switch (message.request) {
         case 'parseAxes':
             try {
-                let value = message.data;
-                let snapShot = elementOwnerDocument.evaluate(value, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                let count = snapShot.snapshotLength;
-                if (count == 0 || count == undefined) {
-                    chrome.runtime.sendMessage({ request: 'axes', data: "Sorry! Please try with different XPath combination" })
-                } else if (count == 1) {
-                    chrome.runtime.sendMessage({ request: 'axes', data: value });
-                } else if (count > 1) {
-                    let ex = addIndexToAxesXpath(value);
-                    if (ex != null) {
-                        chrome.runtime.sendMessage({ request: 'axes', data: ex });
-                    } else {
+                elementOwnerDocument = document;
+                if (elementOwnerDocument.URL != 'about:blank') {
+                    let value = message.data;
+                    let snapShot = elementOwnerDocument.evaluate(value, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                    let count = snapShot.snapshotLength;
+                    if (count == 0 || count == undefined) {
                         chrome.runtime.sendMessage({ request: 'axes', data: "Sorry! Please try with different XPath combination" })
+                    } else if (count == 1) {
+                        chrome.runtime.sendMessage({ request: 'axes', data: value });
+                    } else if (count > 1) {
+                        let ex = addIndexToAxesXpath(value);
+                        if (ex != null) {
+                            chrome.runtime.sendMessage({ request: 'axes', data: ex });
+                        } else {
+                            chrome.runtime.sendMessage({ request: 'axes', data: "Sorry! Please try with different XPath combination" })
+                        }
                     }
                 }
                 return true;
@@ -83,19 +86,34 @@ let receiver = (message, sender, sendResponse) => {
             webTableDetails = null;
             return true;
         case "userSearchXP":
+            let value = message.data;
             elementOwnerDocument = document;
-            if (document == elementOwnerDocument) {
-                // let xp = evaluateXPathExpression(message.data);
-                let numberOfXPath = getNumberOfXPath(message.data);
-                let xp = (numberOfXPath > 0) ? 'XPath found' : 'Wrong XPath';
+            if (elementOwnerDocument.URL != 'about:blank') {
+                let snapShot = elementOwnerDocument.evaluate(value, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                let count = snapShot.snapshotLength;
+                let isXPathCorrect = (count > 0) ? 'XPath found' : 'Wrong XPath';
+                if (count > 0) {
+                    addHighlighter(snapShot);
+                }
                 chrome.runtime.sendMessage({
                     request: 'customSearchResult', data: {
-                        xpath: xp,
-                        count: numberOfXPath
+                        xpath: isXPathCorrect,
+                        count: count
                     }
                 });
             }
             return true;
+        case "cleanhighlight":
+            let removeCSS = "//*[@letcss='1']";
+            elementOwnerDocument = document;
+            if (elementOwnerDocument.URL != 'about:blank') {
+                let snapShot = elementOwnerDocument.evaluate(removeCSS, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                let count = snapShot.snapshotLength;
+                if (count > 0) {
+                    clearHighlighter(snapShot);
+                }
+            }
+            return;
         default:
             return true;
     }

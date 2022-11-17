@@ -7,6 +7,9 @@ $(document).ready(function () {
         $(this).addClass('active');
         $('#tab_container .container_item').removeClass('active');
         $('div[data-item="' + number + '"]').addClass('active');
+        devtools_connections.postMessage({
+            request: "cleanhighlight", tab: chrome.devtools.inspectedWindow.tabId
+        });
     });
 
     // ------ get selected values
@@ -102,13 +105,25 @@ $(document).ready(function () {
         const val = document.getElementById("searchVal");
         if (val.value.length > 0) {
             devtools_connections.postMessage({
+                request: "cleanhighlight", tab: chrome.devtools.inspectedWindow.tabId
+            });
+            devtools_connections.postMessage({
                 data: val.value,
                 request: "userSearchXP", tab: chrome.devtools.inspectedWindow.tabId
             });
         }
     });
-    $('body').on('click', '.btn,btn-clear', (e) => {
+    // hide toast message - hide sinppet
+    $('body').on('click', 'button.btn.btn-clear', (e) => {
         document.querySelector('.toast').classList.add('d-hide');
+    });
+
+    $('body').on('click', '#cleanhighlight', () => {
+        document.getElementById("searchVal").value = ''
+        jQuery("#insertsearch").empty();
+        devtools_connections.postMessage({
+            request: "cleanhighlight", tab: chrome.devtools.inspectedWindow.tabId
+        });
     });
 
 });

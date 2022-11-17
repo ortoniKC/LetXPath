@@ -1,5 +1,5 @@
 /**
- * @author Koushik Chatterjee <koushik@letcode.in>
+ * @author Koushik Chatterjee <koushik350@gmail.com>
  * @param {*} element 
  * @param {*} tagName 
  * @description The following methods are purely written on Guessing algorithm :P :P trust me it will work

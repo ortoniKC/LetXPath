@@ -1,5 +1,5 @@
 /**
- * @author Kousshik Chatterjee <koushik@letcode.in>
+ * @author Koushik Chatterjee <koushik350@gmail.com>
  * @param {*} element 
  * @param {*} tagName 
  * @description Core of text based XPath - supports almost text based xpath pattern

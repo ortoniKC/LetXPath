@@ -37,6 +37,9 @@
         "app/src/utils.js",
         "app/src/parentElements.js",
         "app/src/handleTable.js"
+      ],
+      "css": [
+        "app/styles/highlight.css"
       ]
     }
   ],

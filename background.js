@@ -70,6 +70,10 @@ chrome.runtime.onConnect.addListener(function (port) {
             sendToContentScript(message);
             return true;
         }
+        if (message.request === "cleanhighlight") {
+            sendToContentScript(message);
+            return true;
+        }
     }
     // Listen to messages sent from the DevTools page
     port.onMessage.addListener(extensionListener);
@@ -99,11 +103,10 @@ var sendToContentScript = (request) => {
 
 let installURL = chrome.runtime.getURL("install.html");
 let updateURL = "https://github.com/ortoniKC/LetXPath/releases";
-let uninstallURL = "https://letcode.in/uninstall";
+// let uninstallURL = "https://letcode.in/uninstall";
 
-chrome.runtime.setUninstallURL(uninstallURL, () => {
-    console.log('Uninstalled');
-});
+// chrome.runtime.setUninstallURL(uninstallURL, () => {
+// });
 
 let installReason = (detail) => {
     if (detail.reason === "install") {
