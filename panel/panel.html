@@ -2,14 +2,216 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="panel.js"></script>
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LetXPath</title>
+  <link rel="stylesheet" href="../app/styles/main.css">
+  <script defer src="../app/utils/jquery.js"></script>
+  <script defer src="../panelconfig.js"></script>
+  <script defer src="../panel/panel.js"></script>
+  <style>
+    span.label {
+      font-size: small;
+    }
+
+    #tab_container .container_item {
+      display: none;
+    }
+
+    #tab_container .container_item.active {
+      display: block;
+    }
+
+    li img {
+      width: 1rem;
+    }
+
+    button img {
+      width: 20px;
+    }
+
+    .form-label {
+      padding: .1rem 0;
+    }
+
+    .copied::after {
+      font-family: 'Oxygen Mono', monospace;
+      position: absolute;
+      /* top: 50%; */
+      display: block;
+      content: "Copied";
+      font-size: 0.75em;
+      padding: 2px 3px;
+      color: #fff;
+      background-color: rgb(243, 149, 26);
+      border-radius: 3px;
+      opacity: 0;
+      will-change: opacity, transform;
+      animation: showcopied 1.5s cubic-bezier(0, 1.14, 0, 1.14);
+    }
+
+    ::-moz-focus-inner {
+      padding: 0;
+      border: 0;
+    }
+
+    @keyframes showcopied {
+      0% {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+
+      70% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 
-<body>
-    <h1 id="display">Welcome</h1>
+<body class="bg-dark text-dark">
+  <div class="container bg-dark">
+    <ul class="tab tab-block" id="tab_header">
+      <li class="tab-item c-hand" data-option="1">
+        <a class="badge" id="xpbadge" data-badge="0">XPath</a>
+      </li>
+      <li class="tab-item c-hand" data-option="2">
+        <a class="badge" id="cssbadge" data-badge="0">CSS</a>
+      </li>
+      <li class="tab-item c-hand" data-option="3">
+        <a>Axes</a>
+      </li>
+      <li class="tab-item c-hand" data-option="5">
+        <a>Search</a>
+      </li>
+      <!-- <li class="tab-item c-hand" data-option="6">
+        <a>Record</a>
+      </li> -->
+      <!-- about -->
+      <li class="tab-item tooltip tooltip-bottom c-hand" data-tooltip="About LetXPath" data-option="4">
+        <a>
+          <img src="../assets/32.png" alt="letxpath">
+        </a>
+      </li>
+      <!-- settings -->
+      <li id="openSetting" class="tooltip tooltip-left c-hand my-2" data-tooltip="Setting">
+        <a>
+          <img src="../assets/icons/panel/settings.svg" alt="settings">
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="toast toast-success d-hide">
+    </div>
+  </div>
+  <div class="container grid-lg" id="tab_container">
+    <div class="container_item card active" data-item="1">
+      <div class="card-body" id="addXPath">
+        <div class="empty">
+          <p class="empty-title h5">Please select any element to get XPath/CSS</p>
+          <p class="empty-subtitle">more new patterns coming soon :)</p>
+        </div>
+      </div>
+    </div>
+    <!-- CSS -->
+    <div class="container_item card" data-item="2">
+      <div class="card-body" id="cssbody">
+        CSS
+      </div>
+    </div>
+    <!-- Axes -->
+    <div class="container_item card" data-item="3">
+      <div class="card-body" id="anchorXPath">
+        <div class="empty">
+          <p class="empty-title h5">Please use the context menu (Right click on page) to select parent & child element
+          </p>
+          <p class="empty-subtitle">You can switch between XPath, CSS & Axes any time :)</p>
+        </div>
+      </div>
+    </div>
+    <!-- About -->
+    <div class="container_item card bg-dark" data-item="4">
+      <div class="card-body bg-dark">
+        <div class="container text-center">
+          <div class="columns">
+            <div class="column">
+              <div class="s-rounded">
+                <a href="https://twitter.com/intent/tweet?text=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk"
+                  target="_blank" class="tooltip tooltip-bottom" data-tooltip="Tweet LetXPath">
+                  <img src="../assets/icons/panel/twitter.svg" alt="tweet" width="40px">
+                </a>
+              </div>
+            </div>
+            <div class="column">
+              <div class="s-rounded">
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
+                  target="_blank" class="tooltip tooltip-bottom" data-tooltip="Post LetXPath">
+                  <img src="../assets/icons/panel/linkedin.svg" alt="tweet" width="40px"></a>
+              </div>
+            </div>
+            <div class="column">
+              <div class="s-rounded">
+                <a href="https://www.facebook.com/sharer/sharer.php?u=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
+                  target="_blank" class="tooltip tooltip-bottom" data-tooltip="Share LetXPath">
+                  <img src="../assets/icons/panel/facebook.svg" alt="tweet" width="40px"></img>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="columns text-center">
+            <div class="cloumn p-centered">
+              <a href="https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/reviews"
+                target="_blank">
+                <button class="btn btn-primary">💓 Your review is very important, help me to improve
+                  💓</button>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="columns text-center">
+          <div class="column">
+            <p>Thank you for your time! Please take a minute to leave your feedback. Your Review
+              helps
+              me not only to improve the product but also to let others know about the product and
+              its
+              usage.
+              I will be forever grateful. Thank you in advance for helping me out!
+            </p>
+            <p>Send me a PR, if you like to <a href="https://github.com/ortoniKC/LetXPath/pulls"
+                target="_blank">contribute</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Custom Search -->
+    <div class="container_item card bg-dark" data-item="5">
+      <div class="empty container bg-dark">
+        <div class="title">
+          <h3 class="text-secondary">Custom Search</h3>
+        </div>
+        <div class="input-group">
+          <input type="text" class="form-input" id="searchVal" placeholder="Type your XPath">
+          <button id="usxp" class="btn btn-primary input-group-btn">Find</button>
+          <button id="cleanhighlight" class="btn btn-link input-group-btn">Clear</button>
+        </div>
+        <div class="form-group" id="insertsearch">
+        </div>
+      </div>
+    </div>
+    <!-- Record -->
+    <div class="container_item card bg-dark" data-item="6">
+      <div class="empty container bg-dark">
+        <div class="title">
+          <h3 class="text-secondary">TODO</h3>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>

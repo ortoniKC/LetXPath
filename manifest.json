@@ -1,36 +1,71 @@
 {
-  "name": "LetXPath - Tutorial",
-  "description": "Open-source project - XPath Finder",
+  "name": "LetXPath",
+  "short_name": "XPath finder",
+  "description": "XPath Finder, simple and useful, open-source project",
   "author": "Koushik Chatterjee",
-  "version": "1.1",
+  "version": "2.0.0",
   "manifest_version": 2,
   "icons": {
+    "16": "assets/16.png",
+    "32": "assets/32.png",
     "128": "assets/32.png"
   },
   "permissions": [
     "<all_urls>",
     "contextMenus",
-    "tabs",
-    "notifications",
-    "storage"
+    "activeTab",
+    "storage",
+    "notifications"
   ],
   "content_scripts": [
     {
       "run_at": "document_start",
+      "all_frames": false,
       "matches": [
         "<all_urls>"
       ],
       "js": [
         "app/src/content.js",
-        "app/src/textXPath.js"
+        "app/src/anchorXPath.js",
+        "app/src/getCSS.js",
+        "app/src/getLabel.js",
+        "app/src/methodName.js",
+        "app/src/record.js",
+        "app/src/search.js",
+        "app/src/textXPath.js",
+        "app/src/utils.js",
+        "app/src/parentElements.js",
+        "app/src/handleTable.js"
+      ],
+      "css": [
+        "app/styles/highlight.css"
       ]
     }
   ],
   "background": {
-    "persistent": false,
+    "persistent": true,
     "scripts": [
-      "eventPage.js"
+      "background.js"
     ]
   },
-  "devtools_page": "devtools.html"
+  "devtools_page": "devtools.html",
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "homepage_url": "https://www.letcode.in",
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "windows": "Alt+L",
+        "mac": "Alt+L",
+        "linux": "Alt+L",
+        "default": "Alt+L"
+      },
+      "description": "LetCode"
+    }
+  },
+  "browser_action": {
+    "default_title": "LetXPath",
+    "default_popup": "popup/popup.html"
+  },
+  "options_page": "option/option.html",
+  "offline_enabled": true
 }
