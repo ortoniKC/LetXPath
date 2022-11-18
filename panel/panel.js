@@ -107,6 +107,11 @@ function utilsLocatorUI(data) {
 }
 // generate axes based on user inputs
 function generateAxes(req) {
+  // Bring the panel to active
+  $('#tab_header li.tab-item').removeClass('active');
+  $("#tab_header li.tab-item[data-option='3']").addClass('active');
+  $('#tab_container .container_item').removeClass('active');
+  $('div[data-item="3"]').addClass('active');
   jQuery("#anchorXPath").empty();
   let ui = `<div class="form-horizontal">
   <div class="form-group">

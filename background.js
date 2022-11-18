@@ -122,11 +122,10 @@ let installReason = (detail) => {
             }
         )
     }
-    else if (detail.reason === "update") {
-        // TODO:
-        // updateNotification();
-        // chrome.notifications.onClicked.addListener(onClickNotification);
-    }
+    // else if (detail.reason === "update") {
+    //     updateNotification();
+    //     chrome.notifications.onClicked.addListener(onClickNotification);
+    // }
 }
 
 function onClickNotification() {

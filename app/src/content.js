@@ -59,24 +59,22 @@ let receiver = (message, sender, sendResponse) => {
     switch (message.request) {
         case 'parseAxes':
             try {
-                elementOwnerDocument = document;
-                if (elementOwnerDocument.URL != 'about:blank') {
-                    let value = message.data;
-                    let snapShot = elementOwnerDocument.evaluate(value, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                    let count = snapShot.snapshotLength;
-                    if (count == 0 || count == undefined) {
+                let value = message.data;
+                let axesSnapshot = elementOwnerDocument.evaluate(value, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                let axesCount = axesSnapshot.snapshotLength;
+                if (axesCount == 0 || axesCount == undefined) {
+                    chrome.runtime.sendMessage({ request: 'axes', data: "Sorry! Please try with different XPath combination" })
+                } else if (axesCount == 1) {
+                    chrome.runtime.sendMessage({ request: 'axes', data: value });
+                } else if (axesCount > 1) {
+                    let ex = addIndexToAxesXpath(value);
+                    if (ex != null) {
+                        chrome.runtime.sendMessage({ request: 'axes', data: ex });
+                    } else {
                         chrome.runtime.sendMessage({ request: 'axes', data: "Sorry! Please try with different XPath combination" })
-                    } else if (count == 1) {
-                        chrome.runtime.sendMessage({ request: 'axes', data: value });
-                    } else if (count > 1) {
-                        let ex = addIndexToAxesXpath(value);
-                        if (ex != null) {
-                            chrome.runtime.sendMessage({ request: 'axes', data: ex });
-                        } else {
-                            chrome.runtime.sendMessage({ request: 'axes', data: "Sorry! Please try with different XPath combination" })
-                        }
                     }
                 }
+                // }
                 return true;
             } catch (error) { }
         // build possible xpath
@@ -85,34 +83,48 @@ let receiver = (message, sender, sendResponse) => {
             atrributesArray = [];
             webTableDetails = null;
             return true;
+
         case "userSearchXP":
             let value = message.data;
-            elementOwnerDocument = document;
-            if (elementOwnerDocument.URL != 'about:blank') {
-                let snapShot = elementOwnerDocument.evaluate(value, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                let count = snapShot.snapshotLength;
-                let isXPathCorrect = (count > 0) ? 'XPath found' : 'Wrong XPath';
-                if (count > 0) {
-                    addHighlighter(snapShot);
-                }
-                chrome.runtime.sendMessage({
-                    request: 'customSearchResult', data: {
-                        xpath: isXPathCorrect,
-                        count: count
-                    }
-                });
+            // elementOwnerDocument = document;
+            // if (elementOwnerDocument.URL != 'about:blank') {
+            // if (window.document == elementOwnerDocument) {
+            let customSnapshot;
+            let customCount;
+            try {
+                customSnapshot = elementOwnerDocument.evaluate(value, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                customCount = customSnapshot.snapshotLength;
+            } catch (error) {
+                customCount = 0;
             }
+            let isXPathCorrect = (customCount > 0) ? 'XPath found' : 'Wrong XPath';
+            if (customCount > 0) {
+                addHighlighter(customSnapshot);
+            }
+            chrome.runtime.sendMessage({
+                request: 'customSearchResult', data: {
+                    xpath: isXPathCorrect,
+                    count: customCount
+                }
+            });
+            // }
             return true;
         case "cleanhighlight":
             let removeCSS = "//*[@letcss='1']";
-            elementOwnerDocument = document;
-            if (elementOwnerDocument.URL != 'about:blank') {
-                let snapShot = elementOwnerDocument.evaluate(removeCSS, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                let count = snapShot.snapshotLength;
-                if (count > 0) {
-                    clearHighlighter(snapShot);
-                }
+            // elementOwnerDocument = document;
+            // if (window.document == elementOwnerDocument) {
+            let cleanSnapshot;
+            let cleanCount;
+            try {
+                cleanSnapshot = elementOwnerDocument.evaluate(removeCSS, elementOwnerDocument, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                cleanCount = cleanSnapshot.snapshotLength;
+            } catch (error) {
+                cleanCount = 0;
             }
+            if (cleanCount > 0) {
+                clearHighlighter(cleanSnapshot);
+            }
+            // }
             return;
         default:
             return true;
