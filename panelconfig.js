@@ -143,6 +143,9 @@ function generateSnippet(type, codeType, codeValue, vn, mn) {
         let code;
         let lang = result.langID;
         switch (lang) {
+            case "playwright":
+                code = playwrightSnippet(type, codeType, codeValue, vn);
+                break;
             case "javas":
                 code = javaSnippet(type, codeType, codeValue, vn);
                 break;
@@ -226,6 +229,55 @@ function javaSnippet(type, codeType, codeValue, variable) {
     }
     return str;
 }
+
+function playwrightSnippet(type, codeType, codeValue, variable) {
+    let str;
+    switch (codeType) {
+        case "CSS":
+            str = `driver.findElement(By.cssSelector("${codeValue}"))`;
+            break;
+        case "Unique Class Atrribute":
+            str = `driver.findElement(By.className("${codeValue}"))`;
+            break;
+        case "Unique TagName":
+            str = `driver.findElement(By.tagName("${codeValue}"))`;
+            break;
+        case "Link Text":
+            str = `driver.findElement(By.linkText("${codeValue}"))`;
+            break;
+        case "Unique ID":
+            str = `driver.findElement(By.id("${codeValue}"))`;
+            break;
+        case "Unique Name":
+            str = `driver.findElement(By.name("${codeValue}"))`;
+            break;
+        case "Unique PartialLinkText":
+            str = `driver.findElement(By.partialLinkText("${codeValue}"))`;
+            break;
+        default:
+            str = `await page.locator("${codeValue}"))`;
+            break;
+    }
+    switch (type) {
+        case "click":
+            str += `.click();`
+            break;
+        case "sendKeys":
+            str += `.type();`
+            break;
+        case "getAttribute":
+            str += `.getAttribute();`
+            break;
+        case "getText":
+            str += `.textContent();`
+            break;
+        default:
+            str = 'hide';
+            break;
+    }
+    return str;
+}
+
 // TODO: test snippets values
 function jsSnippet(type, codeType, codeValue, variable) {
 

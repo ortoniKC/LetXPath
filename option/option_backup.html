@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LetXPath Setting</title>
+  <script src="../app/utils/jquery.js"></script>
+  <script src="option.js"></script>
+  <link rel="stylesheet" href="../app/styles/main.css">
+  <style>
+  </style>
+</head>
+
+<body class="bg-dark">
+  <main>
+    <div class="container">
+      <div class="card bg-dark">
+        <div class="card-header">
+          <div class="card-title h5">Snippet Configuration</div>
+          <div class="card-subtitle text-gray">Please select the default snippet to generate</div>
+        </div>
+        <div class="card-body">
+          <div class="input-group">
+            <div class="form-group">
+              <label class="form-switch">
+                <input type="radio" name="snippetLanguage" value="Selenium - Java" id="javas">
+                <i class="form-icon"></i>Selenium Java
+              </label>
+              <label class="form-switch">
+                <input type="radio" name="snippetLanguage" value="Python" id="py">
+                <i class="form-icon"></i>Selenium Python
+              </label>
+              <label class="form-switch">
+                <input type="radio" name="snippetLanguage" value="C#" id="csharp">
+                <i class="form-icon"></i>Selenium C#
+              </label>
+              <label class="form-switch">
+                <input type="radio" name="snippetLanguage" value="Protractor - JS" id="protractorjs">
+                <i class="form-icon"></i>Protractor
+              </label>
+              <label class="form-switch">
+                <input type="radio" name="snippetLanguage" value="WebDriver IO" id="io" disabled>
+                <i class="form-icon"></i>WebDriver IO
+              </label>
+              <label class="form-switch">
+                <input type="radio" name="snippetLanguage" value="custom" id="custom">
+                <i class=" form-icon"></i>Custom Framework
+              </label>
+            </div>
+          </div>
+          <div class="toast toast-success d-hide">Default Snippet has been changed to </div>
+        </div>
+      </div>
+      <div class="columns csfw">
+        <div class="column col">
+          <div class="card bg-dark">
+            <div class="card-header">Custom framework configuration</div>
+            <div class="card-body">
+              <form>
+                <div class="form-group">
+                  <label class="form-label" for="lang">Select the framework type</label>
+                  <div class="input-group">
+                    <div class="form-group">
+                      <label class="form-switch">
+                        <input type="radio" name="cssnippetLanguage" value="JavaScript Custom Framework" id="jscs"
+                          required>
+                        <i class="form-icon"></i>Protractor JS/TS
+                      </label>
+                      <label class="form-switch">
+                        <input type="radio" name="cssnippetLanguage" value="Java Custom Framework" id="javacs" required>
+                        <i class="form-icon"></i>Selenium Java/POM
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="click">Click</label>
+                  <textarea class="form-input" type="text" id="click-s" required
+                    placeholder="Enter snippet template for click action"></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="click">sendKeys</label>
+                  <textarea class="form-input" type="text" id="send-s" required
+                    placeholder="Enter snippet template for sendKeys action"></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="click">getText</label>
+                  <textarea class="form-input" type="text" id="text-s" required
+                    placeholder="Enter snippet template for getText action"></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="click">getAttribute</label>
+                  <textarea class="form-input" type="text" id="attr-s" required
+                    placeholder="Enter snippet template for getAttribute action"></textarea>
+                </div>
+                <div class="form-group text-center">
+                  <button class="btn btn-success" id="save">Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="divider-vert" data-content="Config"></div>
+        <div class="column col">
+          <div class="card bg-dark">
+            <div class="card-body">
+              <p class="title">
+                LetXPath gives you the following meta-data
+              </p>
+              <span class="chip text-primary">1. Locator Value - ${lc}</span>
+              <span class="chip text-primary">2. Variable Name - ${vn}</span>
+              <span class="chip text-primary">3. Method Name - ${mn}</span>
+              <p class="title">
+                Customize as per your requirements
+              </p>
+              <h4>Example:</h4>
+              <details class="accordion" open>
+                <summary class="accordion-header">
+                  <i class="icon icon-arrow-right mr-1"></i>
+                  <span class="chip text-primary">
+                    Protractor JS/TS
+                  </span>
+                </summary>
+                <div class="accordion-body">
+                  <div class="text-left">
+                    <pre class="code" data-lang="JS"><code>private ${vn} = ${lc};
+async clickOn${mn}(){
+  await this.click(this.${vn})
+}</code></pre>
+                  </div>
+                  <span>Protractor JS/TS - Result</span>
+                  <div class=" text-left">
+                    <pre class="code" data-lang="JS"><code>private login = element(by.id('loginId'));
+async clickOnLogin(){
+  await this.click(this.login)
+}</code></pre>
+                  </div>
+                </div>
+              </details>
+              <details class="accordion" open>
+                <summary class="accordion-header">
+                  <i class="icon icon-arrow-right mr-1"></i>
+                  <span class="chip text-primary">
+                    Selenium JAVA/POM
+                  </span>
+                </summary>
+                <div class="accordion-body">
+                  <div class="text-left">
+                    <pre class="code" data-lang="JAVA"><code>${lc} private WebElement ${vn}; 
+public void clickOn${mn}(){
+  this.click(this.${vn})
+}</code></pre>
+                  </div>
+                  <span>Selenium JAVA/POM - Result</span>
+                  <div class="text-left">
+                    <pre class="code" data-lang="JAVA"><code>@FindBy(id= "loginId") private WebElement login;
+public void clickOnLogin(){
+  this.click(this.login);
+}</code></pre>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </main>
+</body>
+
+</html>
