@@ -27,9 +27,6 @@ $(document).ready(function () {
         var selectedvalue = $(this).children("option:selected").val();
         setStorage({ langID: selectedvalue });
         embedCodeSample(selectedvalue);
-        // let toast = document.querySelector('.toast')
-        // toast.textContent = "Default Snippet has been changed to " + selectedvalue
-        // toast.classList.remove('d-hide')
     });
 
     $("form").on("submit", function () {
@@ -44,10 +41,6 @@ $(document).ready(function () {
         setStorage({ 'textvalue': textAct.val() });
         let attrAct = $("#attr-s");
         setStorage({ 'attrvalue': attrAct.val() });
-        alert('Success')
-        // document.querySelector('.toast').classList.remove('d-hide');
-        // document.querySelector(".toast").textContent = 'Success';
-        // alert(clickAct.val(), sendAct.val(), textAct.val(), attrAct.val())
     })
 });
 
