@@ -24,11 +24,13 @@ function getTextBasedXPath(element, tagName) {
                     let c = getNumberOfXPath(t);
                     if (c == 1) {
                         XPATHDATA.push([0, 'Link Text', link.trim()]);
+                        XPATHDATA.push([0, 'Link Text as XPath', t]);
                     } else {
                         let t = `//a[contains(.,'${link.trim()}')]`;
                         let c = getNumberOfXPath(t);
                         if (c == 1) {
                             XPATHDATA.push([0, 'Link XPath', t]);
+                            XPATHDATA.push([0, 'Link Text as XPath', t]);
                         }
                     }
                 }
@@ -38,6 +40,7 @@ function getTextBasedXPath(element, tagName) {
                     let partialLink = `//a[contains(text(),'${link.trim()}')]`;
                     if (getNumberOfXPath(partialLink) == 1) {
                         XPATHDATA.push([0, 'Partial Link Text', link.trim()])
+                        XPATHDATA.push([0, 'Link Text as XPath', partialLink]);
                         gotPartial = true;
                     } else {
                         link = element.textContent;
@@ -53,12 +56,15 @@ function getTextBasedXPath(element, tagName) {
                 hasSpace = link.match(/\s/g);
                 if (hasSpace) {
                     link = link.replace(/\s+/g, " ");
-                    XPATHDATA.push([0, 'Link Text', link.trim()])
+                    XPATHDATA.push([0, 'Link Text', link.trim()]);
+                    XPATHDATA.push([0, 'Link Text as XPath', temp]);
                 }
             } else if (gotPartial == false && getNumberOfXPath(temp) == 1) {
-                XPATHDATA.push([0, 'Link Text', link.trim()])
+                XPATHDATA.push([0, 'Link Text', link.trim()]);
+                XPATHDATA.push([0, 'Link Text as XPath', temp]);
             } else if (gotPartial == false && getNumberOfXPath(`//a[text()='${link.trim()}']`) == 1) {
-                XPATHDATA.push([0, 'Link Text', link.trim()])
+                XPATHDATA.push([0, 'Link Text', link.trim()]);
+                XPATHDATA.push([0, 'Link Text as XPath', `//a[text()='${link.trim()}']`]);
             }
         }
         if (hasSpace) {
