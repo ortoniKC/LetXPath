@@ -1,15 +1,19 @@
 $(document).ready(function () {
     chrome.storage.local.get(['langID', 'customLang', 'clickvalue', 'sendvalue', 'textvalue', 'attrvalue'], (result) => {
         if (result.langID != undefined) {
-            // setStorage({ lang: radioValue, langID: radioID });
-            document.getElementById(result.langID).checked = true;
+            const codeType = result.langID;
+            $("select").val(codeType).change();
+            embedCodeSample(codeType);
+            setStorage({ langID: codeType });
         }
         if (result.customLang != undefined) {
-            // setStorage({ lang: radioValue, langID: radioID });
-            document.getElementById(result.customLang).checked = true;
+            const codeType = result.customLang;
+            $("select").val(codeType).change();
+            embedCodeSample(codeType);
+            setStorage({ langID: codeType });
         } else {
-            setStorage({ lang: 'Selenium - Java', langID: 'javas' });
-            document.getElementById("javas").checked = true;
+            $("select").val(result.langID).change();
+            setStorage({ langID: 'javas' });
         }
         // set edited values in textarea
         if (result.clickvalue != undefined) {
@@ -18,19 +22,13 @@ $(document).ready(function () {
             $("#text-s").val(result.textvalue)
             $("#attr-s").val(result.attrvalue)
         }
-
-
-
     });
-    $("input[type='radio'][name='snippetLanguage']").click(function () {
-        let ip = $("input[name='snippetLanguage']:checked");
-        let radioValue = ip.val();
-        let radioID = ip.attr("id");
-        setStorage({ lang: radioValue, langID: radioID });
-        let toast = document.querySelector('.toast')
-        toast.textContent = "Default Snippet has been changed to " + radioValue
-        toast.classList.remove('d-hide')
-    })
+    $("select#snippets").change(function () {
+        var selectedvalue = $(this).children("option:selected").val();
+        setStorage({ langID: selectedvalue });
+        embedCodeSample(selectedvalue);
+    });
+
     $("form").on("submit", function () {
         let ip = $("input[name='cssnippetLanguage']:checked");
         let customLang = ip.attr("id");
@@ -43,14 +41,43 @@ $(document).ready(function () {
         setStorage({ 'textvalue': textAct.val() });
         let attrAct = $("#attr-s");
         setStorage({ 'attrvalue': attrAct.val() });
-        alert('Success')
-        // document.querySelector('.toast').classList.remove('d-hide');
-        // document.querySelector(".toast").textContent = 'Success';
-        // alert(clickAct.val(), sendAct.val(), textAct.val(), attrAct.val())
     })
 });
 
 function setStorage(obj) {
     chrome.storage.local.set(obj, function () {
     });
+}
+
+function embedCodeSample(codetype) {
+    jQuery("#samplecode").empty();
+    let code;
+    switch (codetype) {
+        case "playwrightJS":
+            code = `await page.locator("locator value");`;
+            break;
+        case "playwrightJava":
+            code = `page.locator("locator value");`;
+            break;
+        case "javas":
+            code = `driver.findElement(By.xpath("locator value"));`;
+            break;
+        case "py":
+            code = `driver.find_element(By.XPATH, "locator value")`;
+            break;
+        case "csharp":
+            code = `driver.FindElement(By.Xpath("locator value"));  `;
+            break;
+        case "protractorjs":
+            code = `element(by.xpath("locator value"));`;
+            break;
+        case "custom":
+            code = `Custome framework`;
+            break;
+        default:
+            code = `driver.findElement(By.xpath("locator value"));`;
+            break;
+    }
+    jQuery("#samplecode").append(`${code}`);
+
 }
