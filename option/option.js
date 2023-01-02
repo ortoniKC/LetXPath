@@ -53,8 +53,11 @@ function embedCodeSample(codetype) {
     jQuery("#samplecode").empty();
     let code;
     switch (codetype) {
-        case "playwright":
+        case "playwrightJS":
             code = `await page.locator("locator value");`;
+            break;
+        case "playwrightJava":
+            code = `page.locator("locator value");`;
             break;
         case "javas":
             code = `driver.findElement(By.xpath("locator value"));`;
