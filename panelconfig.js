@@ -142,8 +142,11 @@ function generateSnippet(type, codeType, codeValue, vn, mn) {
         let code;
         let lang = result.langID;
         switch (lang) {
-            case "playwright":
-                code = playwrightSnippet(type, codeType, codeValue, vn);
+            case "playwrightJS":
+                code = playwrightSnippetJS(type, codeType, codeValue, vn);
+                break;
+            case "playwrightJava":
+                code = playwrightSnippetJava(type, codeType, codeValue, vn);
                 break;
             case "javas":
                 code = javaSnippet(type, codeType, codeValue, vn);
@@ -225,7 +228,55 @@ function javaSnippet(type, codeType, codeValue, variable) {
     return str;
 }
 
-function playwrightSnippet(type, codeType, codeValue, variable) {
+function playwrightSnippetJava(type, codeType, codeValue, variable) {
+    let str;
+    switch (codeType) {
+        case "CSS":
+            str = `page.locator("${codeValue}")`;
+            break;
+        case "Unique Class Atrribute":
+            str = `page.locator(".${codeValue}")`;
+            break;
+        case "Unique TagName":
+            str = `page.locator("${codeValue}")`;
+            break;
+        case "Link Text":
+            str = `page.locator("'${codeValue}'")`;
+            break;
+        case "Unique ID":
+            str = `page.locator("id=${codeValue}")`;
+            break;
+        case "Unique Name":
+            str = `page.locator("[name='${codeValue}']")`;
+            break;
+        case "Unique PartialLinkText":
+            str = `page.locator("a:has-text('${codeValue}'")`;
+            break;
+        default:
+            str = `page.locator("${codeValue}")`;
+            break;
+    }
+    switch (type) {
+        case "click":
+            str += `.click();`
+            break;
+        case "sendKeys":
+            str += `.type();`
+            break;
+        case "getAttribute":
+            str += `.getAttribute();`
+            break;
+        case "getText":
+            str += `.textContent();`
+            break;
+        default:
+            str = 'hide';
+            break;
+    }
+    return str;
+}
+
+function playwrightSnippetJS(type, codeType, codeValue, variable) {
     let str;
     switch (codeType) {
         case "CSS":
