@@ -1,7 +1,7 @@
 {
   "name": "LetXPath",
   "short_name": "XPath finder",
-  "description": "XPath Finder, simple and useful, open-source project",
+  "description": "XPath Finder, simple and useful, open-source project by LetCode with Koushik",
   "author": "Koushik Chatterjee",
   "version": "2.0.2",
   "manifest_version": 2,
