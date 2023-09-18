@@ -6,13 +6,14 @@ $(document).ready(function () {
             embedCodeSample(codeType);
             setStorage({ langID: codeType });
         }
-        if (result.customLang != undefined) {
+        else if (result.customLang != undefined) {
             const codeType = result.customLang;
             $("select").val(codeType).change();
             embedCodeSample(codeType);
             setStorage({ langID: codeType });
         } else {
-            $("select").val(result.langID).change();
+            // $("select").val(result.langID).change();
+            embedCodeSample('javas');
             setStorage({ langID: 'javas' });
         }
         // set edited values in textarea

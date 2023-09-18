@@ -382,28 +382,28 @@ function pySnippet(type, codeType, codeValue, variable) {
     // getAttribute Collection based XPath //input[@placeholder='first name & last name'] firstName" false
     switch (codeType) {
         case "CSS":
-            str = `find_element_by_css_selector("${codeValue}")`;
+            str = `driver.find_element(by=By.CSS_SELECTOR, value="${codeValue}")`;
             break;
         case "Unique Class Atrribute":
-            str = `find_element_by_class_name("${codeValue}")`;
+            str = `driver.find_element(by=By.CLASS_NAME, value="${codeValue}")`;
             break;
         case "Unique TagName":
-            str = `find_element_by_tag_name("${codeValue}")`;
+            str = `driver.find_element(by=By.TAG_NAME, value="${codeValue}")`;
             break;
         case "Link Text":
-            str = `find_element_by_link_text("${codeValue}")`;
+            str = `driver.find_element(by=By.LINK_TEXT, value="${codeValue}")`;
             break;
         case "Unique ID":
-            str = `find_element_by_id("${codeValue}")`;
+            str = `driver.find_element(by=By.ID, value="${codeValue}")`;
             break;
         case "Unique Name":
-            str = `find_element_by_name("${codeValue}")`;
+            str = `driver.find_element(by=By.NAME, value="${codeValue}")`;
             break;
         case "Unique PartialLinkText":
-            str = `find_element_by_partial_link_text("${codeValue}")`;
+            str = `driver.find_element(by=By.PARTIAL_LINK_TEXT, value="${codeValue}")`;
             break;
         default:
-            str = `find_element_by_xpath("${codeValue}")`;
+            str = `driver.find_element(by=By.XPATH, value="${codeValue}")`;
             break;
     }
     switch (type) {
