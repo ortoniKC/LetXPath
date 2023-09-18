@@ -12,7 +12,7 @@ $(document).ready(function () {
             embedCodeSample(codeType);
             setStorage({ langID: codeType });
         } else {
-            $("select").val(result.langID).change();
+            // $("select").val(result.langID).change();
             embedCodeSample('javas');
             setStorage({ langID: 'javas' });
         }
