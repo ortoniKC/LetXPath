@@ -261,7 +261,7 @@ function playwrightSnippetJava(type, codeType, codeValue, variable) {
             str += `.click();`
             break;
         case "sendKeys":
-            str += `.type();`
+            str += `.fill();`
             break;
         case "getAttribute":
             str += `.getAttribute();`
@@ -309,7 +309,7 @@ function playwrightSnippetJS(type, codeType, codeValue, variable) {
             str += `.click();`
             break;
         case "sendKeys":
-            str += `.type();`
+            str += `.fill();`
             break;
         case "getAttribute":
             str += `.getAttribute();`
