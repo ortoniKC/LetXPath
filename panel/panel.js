@@ -26,7 +26,7 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
         buildCSSUI(req)
       } else {
         jQuery("#cssbody").empty();
-        let ui = `<div class="empty">
+        let ui = `<div class="empty bg-dark">
           <p class="empty-title h5">Please select any element to get CSS/XPath</p>
           <p class="empty-subtitle">more new patterns coming soon :)</p>
           <p class="empty-subtitle">Did you know LetXPath is an open-source, if you found something wrong fix it :)</p>
@@ -35,7 +35,7 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
       }
       if (req.xpathid.length == 0) {
         jQuery("#addXPath").empty();
-        let ui = `<div class="empty">
+        let ui = `<div class="empty bg-dark">
           <p class="empty-title h5">Please select any element to get XPath/CSS</p>
           <p class="empty-subtitle">more new patterns coming soon :)</p>
           <p class="empty-subtitle">Did you know LetXPath is an open-source, if you found something wrong fix it :)</p>
@@ -48,7 +48,7 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
       jQuery("#addXPath").empty();
       document.getElementById("cssbadge").attributes.getNamedItem('data-badge').value = 0;
       jQuery("#cssbody").empty();
-      let ui = `<div class="empty">
+      let ui = `<div class="empty bg-dark">
           <p class="empty-title h5">Please select any element to get XPath/CSS</p>
           <p class="empty-subtitle">more new patterns coming soon :)</p>
           <p class="empty-subtitle">Did you know LetXPath is an open-source, if you found something wrong fix it :)</p>
@@ -181,11 +181,11 @@ function targetElement(element) {
 function buildUI(data) {
   jQuery("#addXPath").empty();
   if (data.webtabledetails != null) {
-    let table = `<div class="form-horizontal bg-gray">
+    let table = `<div class="form-horizontal bg-dark">
       <span class="label label-rounded sm label-primary">Table Info - Total no.of table ${data.webtabledetails.totalTables}</span>
       <div class="form-group">
         <div class="col-11">
-        <span class="label label-rounded label-secondary sm">Table unique locator</span>
+        <span class="label label-rounded label-success sm">Table unique locator</span>
           <code class="form-label" id="tablelocator">${data.webtabledetails.tableLocator}</code>
         </div>
         <div class="col-1 p-centered text-center">
@@ -196,7 +196,7 @@ function buildUI(data) {
       </div>
       <div class="form-group">
         <div class="col-11">
-          <span class="label label-rounded label-secondary sm">Locator for selected row</span>
+          <span class="label label-rounded label-success sm">Locator for selected row</span>
           <code class="form-label" id="tabledata">${data.webtabledetails.tableData}</code>
         </div>
         <div class="col-1 p-centered text-center">
@@ -216,14 +216,14 @@ function buildUI(data) {
 }
 // -------- Build XPath UI ---------
 function generateXPathUI(data, i) {
-  let ui = `<div class="form-horizontal">
-    <span class="label label-secondary label-rounded sm">${i + 1}. ${data.xpathid[i][1]}</span>
+  let ui = `<div class="form-horizontal bg-dark">
+    <span class="label label-success label-rounded sm">${i + 1}. ${data.xpathid[i][1]}</span>
     <div class="form-group">
       <div class="col-10 c-hand" id="xpathVal" data-copytarget="#xpath${i}">
         <code class="form-label tooltip tooltip-top" id="xpath${i}" data-copytarget="#xpath${i}" data-tooltip="Click to copy">${data.xpathid[i][2]}</code>
       </div>
       <div class="col-2 tooltip tooltip-top" data-tooltip="Copy Snippet">
-        <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(data, i, data.xpathid, false)}</select>
+      <div class="form-group bg-dark"><select class="form-select select-sm " id="snippetsSelector">${getSelectionValues(data, i, data.xpathid, false)}</select></div>
       </div>
     </div>
   </div>`;
@@ -277,7 +277,7 @@ function buildCSSUI(data) {
   let ui = '';
   for (let i = 0; i < data.cssPath.length; i++) {
     ui += `<div class="form-horizontal">
-      <span class="label label-rounded label-secondary sm">${i + 1}. ${data.cssPath[i][1]}</span>
+      <span class="label label-rounded label-success sm">${i + 1}. ${data.cssPath[i][1]}</span>
         <div class="form-group">
           <div class="col-10 tooltip tooltip-top" id="xpathVal" data-tooltip="Click to copy" data-copytarget="#css${i}">
             <code class="form-label" id="css${i}" data-copytarget="#css${i}">${data.cssPath[i][2]}</code>
