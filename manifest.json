@@ -10,8 +10,10 @@
     "32": "assets/32.png",
     "128": "assets/32.png"
   },
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "permissions": [
-    "<all_urls>",
     "contextMenus",
     "activeTab",
     "storage",
@@ -43,7 +45,6 @@
     }
   ],
   "background": {
-    "persistent": true,
     "service_worker": "service_worker.js"
   },
   "devtools_page": "devtools.html",
