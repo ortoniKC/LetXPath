@@ -3,8 +3,8 @@
   "short_name": "XPath finder",
   "description": "XPath Finder, simple and useful, open-source project by LetCode with Koushik",
   "author": "Koushik Chatterjee",
-  "version": "2.0.3",
-  "manifest_version": 2,
+  "version": "3.0",
+  "manifest_version": 3,
   "icons": {
     "16": "assets/16.png",
     "32": "assets/32.png",
@@ -44,17 +44,17 @@
   ],
   "background": {
     "persistent": true,
-    "scripts": [
-      "background.js"
-    ]
+    "service_worker": "service_worker.js"
   },
   "devtools_page": "devtools.html",
-  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
   "homepage_url": "https://www.letcode.in",
-  "browser_action": {
+  "options_page": "option/option.html",
+  "offline_enabled": true,
+  "action": {
     "default_title": "LetXPath",
     "default_popup": "popup/popup.html"
-  },
-  "options_page": "option/option.html",
-  "offline_enabled": true
+  }
 }
