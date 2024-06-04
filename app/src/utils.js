@@ -14,7 +14,6 @@ function filterAttributesFromElement(item) {
         (item.name === 'tabindex') || ((item.name === 'type') && (item.value === 'text')) ||
         (item.name === 'ac_columns') || // (item.name.startsWith('d')) ||
         (item.name === 'ac_order_by') || (item.name.startsWith('data-ember')) ||
-        (item.name.startsWith('aria-') && !(item.name === "aria-label")) ||
         (item.name === 'href') || (item.name === 'aria-autocomplete') ||
         (item.name === 'autocapitalize') || (item.name === 'jsaction') || (item.name === 'autocorrect') ||
         (item.name === 'aria-haspopup') || (item.name === 'style') || (item.name === 'size') ||
