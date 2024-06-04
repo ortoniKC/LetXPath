@@ -57,6 +57,13 @@ let receiver = (message, sender, sendResponse) => {
     //     }
     // }
     switch (message.request) {
+        case "dotheconversion":
+            const input = message.data;
+            const output = xPathToCss(input);
+            console.log(output);
+            setTimeout(() => {
+                sendResponse({ result: "success" })
+            }, 500);
         case 'parseAxes':
             try {
                 let value = message.data;
@@ -127,7 +134,9 @@ let receiver = (message, sender, sendResponse) => {
             // }
             return;
         default:
-            return true;
+            setTimeout(() => {
+                sendResponse({ result: "success" });
+            }, 250);
     }
 };
 chrome.runtime.onMessage.addListener(receiver);
@@ -224,7 +233,7 @@ function parseAnchorXP(targetElement) {
     if (targetElement != null) {
         try {
             maxIndex = 20;
-            buildXpath(targetElemt, 1, false);
+            buildXpath(targetElemt, 1, false); aq
         } catch (error) {
 
         }

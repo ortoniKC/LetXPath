@@ -70,6 +70,10 @@ chrome.runtime.onConnect.addListener(function (port) {
             sendToContentScript(message);
             return true;
         }
+        if (message.request === "dotheconversion") {
+            sendToContentScript(message);
+            return true;
+        }
         if (message.request === "cleanhighlight") {
             sendToContentScript(message);
             return true;

@@ -3,7 +3,7 @@
   "short_name": "XPath finder",
   "description": "XPath Finder, simple and useful, open-source project by LetCode with Koushik",
   "author": "Koushik Chatterjee",
-  "version": "3.0",
+  "version": "3.0.1",
   "manifest_version": 3,
   "icons": {
     "16": "assets/16.png",
@@ -28,6 +28,7 @@
       ],
       "js": [
         "app/src/content.js",
+        "app/src/conversion.js",
         "app/src/anchorXPath.js",
         "app/src/getCSS.js",
         "app/src/getLabel.js",

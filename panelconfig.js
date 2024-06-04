@@ -39,7 +39,7 @@ $(document).ready(function () {
     });
 
     // --- on click evaluate axes
-    $('body').on('click', "input[type='radio']", (ele) => {
+    $('body').on('click', "div#anchorXPath input[type='radio']", (ele) => {
         let prefol = document.getElementById("anxp").attributes.value.value;
         // find the selected source
         let src = $("input[name='src']:checked").val();
@@ -108,7 +108,20 @@ $(document).ready(function () {
             });
             devtools_connections.postMessage({
                 data: val.value,
-                request: "userSearchXP", tab: chrome.devtools.inspectedWindow.tabId
+                request: "dotheconversion", tab: chrome.devtools.inspectedWindow.tabId
+            });
+        }
+    });
+    $('body').on('click', '#convertSelector', (e) => {
+        // send the value to content script and evaluate
+        const val = document.getElementById("convert");
+        if (val.value.length > 0) {
+            devtools_connections.postMessage({
+                request: "cleanhighlight", tab: chrome.devtools.inspectedWindow.tabId
+            });
+            devtools_connections.postMessage({
+                data: val.value,
+                request: "dotheconversion", tab: chrome.devtools.inspectedWindow.tabId
             });
         }
     });
