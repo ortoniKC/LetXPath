@@ -19,6 +19,7 @@ LetXPath is used to find the best XPath, CSS, and unique locators in any DOM. Mo
 ## Author
 
 - **Koushik Chatterjee** - _Started Project_ - [ortoniKC](https://github.com/ortonikc)
+- Thanks to [ XPath to css conversion](https://github.com/svenheden/xpath-to-css)
 
 See also the list of [contributors](https://github.com/ortoniKC/LetXPath/graphs/contributors) who participated in this project.
 
