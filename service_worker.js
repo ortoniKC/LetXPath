@@ -8,15 +8,6 @@ chrome.contextMenus.create({
 let isSource = false;
 
 /**
- * Toggle the context menu option between "Select Parent" and "Select Child".
- */
-function toggle() {
-    isSource = !isSource;
-    const newTitle = isSource ? "Select Child" : "Select Parent";
-    chrome.contextMenus.update("LetXPath", { title: newTitle });
-}
-
-/**
  * Get XPath information and send a message to the content script.
  * @param {Object} info - Information about the context menu click event.
  * @param {Object} tab - The details of the tab where the click took place.
@@ -34,10 +25,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
 });
 
-// Background.js
-
-let connections = {};
-
 /**
  * Send a message to the content script.
  * @param {Object} request - The message object to send to the content script.
@@ -45,7 +32,7 @@ let connections = {};
 function sendToContentScript(request) {
     chrome.tabs.sendMessage(request.tab, request);
 }
-
+let connections = {};
 chrome.runtime.onConnect.addListener(port => {
     const extensionListener = (message, sender, sendResponse) => {
         const { name, tabId, selector, request } = message;
@@ -78,6 +65,7 @@ chrome.runtime.onConnect.addListener(port => {
                 break;
             }
         }
+        return true;
     });
 });
 
@@ -99,10 +87,10 @@ function handleInstall(details) {
             type: 'basic'
         });
     }
-    // else if (details.reason === "update") {
-    //     updateNotification();
-    //     chrome.notifications.onClicked.addListener(onClickNotification);
-    // }
+    else if (details.reason === "update") {
+        updateNotification();
+        chrome.notifications.onClicked.addListener(onClickNotification);
+    }
 }
 
 /**
@@ -126,16 +114,16 @@ function updateNotification() {
 
 chrome.runtime.onInstalled.addListener(handleInstall);
 
-// Optional code for handling tab updates
 // chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 //     if (changeInfo.status === "complete") {
-//         chrome.runtime.sendMessage({ request: 'pageInfo', tab });
+//         chrome.runtime.sendMessage({ request: 'pageInfo', tab: tab })
 //     }
-// });
+// })
 // chrome.tabs.onCreated.addListener(tab => {
+//     // chrome.runtime.sendMessage({ request: 'pageInfo', tab: tab })
 //     chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 //         if (changeInfo.status === "complete") {
-//             chrome.runtime.sendMessage({ request: 'pageInfo', tab });
+//             chrome.runtime.sendMessage({ request: 'pageInfo', tab: tab })
 //         }
-//     });
-// });
+//     })
+// })
