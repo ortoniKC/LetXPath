@@ -87,7 +87,7 @@
         <a>Axes</a>
       </li>
       <li class="tab-item c-hand" data-option="5">
-        <a>Search</a>
+        <a>Tools</a>
       </li>
       <!-- <li class="tab-item c-hand" data-option="6">
         <a>Record</a>
@@ -140,55 +140,25 @@
     </div>
     <!-- About -->
     <div class="container_item card bg-dark" data-item="4">
-      <div class="card-body bg-dark">
-        <div class="container text-center">
-          <div class="columns">
-            <div class="column">
-              <div class="s-rounded">
-                <a href="https://twitter.com/intent/tweet?text=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk"
-                  target="_blank" class="tooltip tooltip-bottom" data-tooltip="Tweet LetXPath">
-                  <img src="../assets/icons/panel/twitter.svg" alt="tweet" width="40px">
-                </a>
-              </div>
-            </div>
-            <div class="column">
-              <div class="s-rounded">
-                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
-                  target="_blank" class="tooltip tooltip-bottom" data-tooltip="Post LetXPath">
-                  <img src="../assets/icons/panel/linkedin.svg" alt="tweet" width="40px"></a>
-              </div>
-            </div>
-            <div class="column">
-              <div class="s-rounded">
-                <a href="https://www.facebook.com/sharer/sharer.php?u=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
-                  target="_blank" class="tooltip tooltip-bottom" data-tooltip="Share LetXPath">
-                  <img src="../assets/icons/panel/facebook.svg" alt="tweet" width="40px"></img>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div class="columns text-center">
-            <div class="cloumn p-centered">
-              <a href="https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/reviews"
-                target="_blank">
-                <button class="btn btn-primary">💓 Your review is very important, help me to improve
-                  💓</button>
-              </a>
-            </div>
-          </div>
+      <div class="filter container">
+        <input type="radio" id="tag-0" class="filter-tag" name="filter-radio" hidden checked>
+        <input type="radio" id="tag-1" class="filter-tag" name="filter-radio" hidden>
+        <input type="radio" id="tag-2" class="filter-tag" name="filter-radio" hidden>
+
+        <div class="filter-nav">
+          <label class="chip" for="tag-0">All</label>
+          <label class="chip" for="tag-1">Action</label>
+          <label class="chip" for="tag-2">Roleplaying</label>
         </div>
-        <div class="columns text-center">
-          <div class="column">
-            <p>Thank you for your time! Please take a minute to leave your feedback. Your Review
-              helps
-              me not only to improve the product but also to let others know about the product and
-              its
-              usage.
-              I will be forever grateful. Thank you in advance for helping me out!
-            </p>
-            <p>Send me a PR, if you like to <a href="https://github.com/ortoniKC/LetXPath/pulls"
-                target="_blank">contribute</a></p>
+
+        <div class="filter-body">
+          <div class="filter-item card" data-tag="tag-1">
+            <!-- Filter item content -->
           </div>
+          <div class="filter-item card" data-tag="tag-2">
+            <!-- Filter item content -->
+          </div>
+          <!-- Filter items -->
         </div>
       </div>
     </div>
@@ -227,7 +197,7 @@
                 <input type="text" class="form-input" id="convert" placeholder="Enter XPath or CSS">
                 <button id="convertSelector" class="btn btn-primary input-group-btn">Convert</button>
               </div>
-              <div class="form-group" id="insertsearch">
+              <div class="form-group" id="insertCSS">
               </div>
             </div>
           </div>
@@ -239,3 +209,55 @@
 </body>
 
 </html>
+<!-- 
+<div class="card-body bg-dark">
+  <div class="container text-center">
+    <div class="columns">
+      <div class="column">
+        <div class="s-rounded">
+          <a href="https://twitter.com/intent/tweet?text=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk"
+            target="_blank" class="tooltip tooltip-bottom" data-tooltip="Tweet LetXPath">
+            <img src="../assets/icons/panel/twitter.svg" alt="tweet" width="40px">
+          </a>
+        </div>
+      </div>
+      <div class="column">
+        <div class="s-rounded">
+          <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
+            target="_blank" class="tooltip tooltip-bottom" data-tooltip="Post LetXPath">
+            <img src="../assets/icons/panel/linkedin.svg" alt="tweet" width="40px"></a>
+        </div>
+      </div>
+      <div class="column">
+        <div class="s-rounded">
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
+            target="_blank" class="tooltip tooltip-bottom" data-tooltip="Share LetXPath">
+            <img src="../assets/icons/panel/facebook.svg" alt="tweet" width="40px"></img>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="columns text-center">
+      <div class="cloumn p-centered">
+        <a href="https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/reviews"
+          target="_blank">
+          <button class="btn btn-primary">💓 Your review is very important, help me to improve
+            💓</button>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="columns text-center">
+    <div class="column">
+      <p>Thank you for your time! Please take a minute to leave your feedback. Your Review
+        helps
+        me not only to improve the product but also to let others know about the product and
+        its
+        usage.
+        I will be forever grateful. Thank you in advance for helping me out!
+      </p>
+      <p>Send me a PR, if you like to <a href="https://github.com/ortoniKC/LetXPath/pulls"
+          target="_blank">contribute</a></p>
+    </div>
+  </div>
+</div> -->

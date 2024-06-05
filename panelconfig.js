@@ -108,7 +108,7 @@ $(document).ready(function () {
             });
             devtools_connections.postMessage({
                 data: val.value,
-                request: "dotheconversion", tab: chrome.devtools.inspectedWindow.tabId
+                request: "userSearchXP", tab: chrome.devtools.inspectedWindow.tabId
             });
         }
     });
