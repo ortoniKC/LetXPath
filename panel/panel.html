@@ -107,11 +107,10 @@
     </ul>
   </div>
   <div class="container">
-    <div class="toast toast-success d-hide">
-    </div>
+    <div class="toast toast-success d-hide"></div>
   </div>
   <div class="container grid-lg bg-dark" id="tab_container">
-    <div class="container_item card  bg-dark" data-item="1">
+    <div class="container_item card bg-dark" data-item="1">
       <div class="card-body" id="addXPath">
         <div class="empty bg-dark">
           <p class="empty-title h5">Please select any element to get XPath</p>
@@ -140,30 +139,9 @@
     </div>
     <!-- About -->
     <div class="container_item card bg-dark" data-item="4">
-      <div class="filter container">
-        <input type="radio" id="tag-0" class="filter-tag" name="filter-radio" hidden checked>
-        <input type="radio" id="tag-1" class="filter-tag" name="filter-radio" hidden>
-        <input type="radio" id="tag-2" class="filter-tag" name="filter-radio" hidden>
-
-        <div class="filter-nav">
-          <label class="chip" for="tag-0">All</label>
-          <label class="chip" for="tag-1">Action</label>
-          <label class="chip" for="tag-2">Roleplaying</label>
-        </div>
-
-        <div class="filter-body">
-          <div class="filter-item card" data-tag="tag-1">
-            <!-- Filter item content -->
-          </div>
-          <div class="filter-item card" data-tag="tag-2">
-            <!-- Filter item content -->
-          </div>
-          <!-- Filter items -->
-        </div>
-      </div>
     </div>
     <!-- tools -->
-    <div class="container_item active  bg-dark" data-item="5">
+    <div class="container_item active bg-dark" data-item="5">
       <div class="filter">
         <input type="radio" id="tag-1" class="filter-tag" name="filter-radio" hidden checked>
         <input type="radio" id="tag-2" class="filter-tag" name="filter-radio" hidden>
@@ -184,31 +162,30 @@
                 <button id="usxp" class="btn btn-primary input-group-btn">Find</button>
                 <button id="cleanhighlight" class="btn btn-link input-group-btn">Clear</button>
               </div>
-              <div class="form-group" id="insertsearch">
-              </div>
+              <div class="form-group" id="insertsearch"></div>
             </div>
           </div>
           <div class="filter-item container" data-tag="tag-2">
             <div class="empty container bg-dark">
               <div class="title">
-                <h3 class="text-secondary">Convert to XPath or CSS</h3>
+                <h3 class="text-secondary">Convert to CSS</h3>
               </div>
               <div class="input-group">
                 <input type="text" class="form-input" id="convert" placeholder="Enter XPath or CSS">
                 <button id="convertSelector" class="btn btn-primary input-group-btn">Convert</button>
               </div>
-              <div class="form-group" id="insertCSS">
-              </div>
+              <span class="label label-warning">Cannot handle complex XPath!</span>
+              <div class="form-group" id="insertCSS"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </body>
 
 </html>
+
 <!-- 
 <div class="card-body bg-dark">
   <div class="container text-center">
