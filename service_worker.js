@@ -1,168 +1,141 @@
-// create context menu to get XPath on click -  In feature this might removed
+// Create a context menu to get XPath on click. This might be removed in the future.
 chrome.contextMenus.create({
-    "id": "LetXPath",
-    "title": "Select Parent",
-    "contexts": ["all"]
-})
-/**
- * Toggle the context menu option
- */
+    id: "LetXPath",
+    title: "Select Parent",
+    contexts: ["all"]
+});
+
 let isSource = false;
+
+/**
+ * Toggle the context menu option between "Select Parent" and "Select Child".
+ */
 function toggle() {
     isSource = !isSource;
-    if (isSource) {
-        chrome.contextMenus.update('LetXPath', { "title": "Select Child", }, () => { })
-    } else {
-        chrome.contextMenus.update('LetXPath', { "title": "Select Parent", }, () => { })
-    }
+    const newTitle = isSource ? "Select Child" : "Select Parent";
+    chrome.contextMenus.update("LetXPath", { title: newTitle });
 }
+
+/**
+ * Get XPath information and send a message to the content script.
+ * @param {Object} info - Information about the context menu click event.
+ * @param {Object} tab - The details of the tab where the click took place.
+ */
+function getXPath(info, tab) {
+    const msg = { request: 'context_menu_click' };
+    chrome.tabs.sendMessage(tab.id, msg);
+}
+
+// Event listener for context menu clicks.
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId == "LetXPath") {
+    if (info.menuItemId === "LetXPath") {
         toggle();
+        getXPath(info, tab);
     }
 });
-let getXPath = (info, tab) => {
-    let msg = {
-        request: 'context_menu_click'
-    }
-    chrome.tabs.sendMessage(tab.id, msg)
+
+// Background.js
+
+let connections = {};
+
+/**
+ * Send a message to the content script.
+ * @param {Object} request - The message object to send to the content script.
+ */
+function sendToContentScript(request) {
+    chrome.tabs.sendMessage(request.tab, request);
 }
-// on context menu click send message to content script
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-    getXPath(info, tab)
-})
 
-// --------------- Below code is from chrome message passing API, same applicable for other Chromium based API like, 
-// --------------- firefox, MS edge, opera
-// background.js
-
-var connections = {};
-chrome.runtime.onConnect.addListener(function (port) {
-    var extensionListener = function (message, sender, sendResponse) {
-        // The original connection event doesn't include the tab ID of the
-        // DevTools page, so we need to send it explicitly.
-        if (message.name == "devtools_panel") {
-            connections[message.tabId] = port;
+chrome.runtime.onConnect.addListener(port => {
+    const extensionListener = (message, sender, sendResponse) => {
+        const { name, tabId, selector, request } = message;
+        if (name === "devtools_panel" || name === "init") {
+            connections[tabId] = port;
             return true;
         }
-        if (message.name == "init") {
-            connections[message.tabId] = port;
-            return true;
-        }
-        if (message.selector) {
-            if (message.selector.request === "utilsSelector") {
-                if (sender.tab) {
-                    var tabId = sender.tab.id;
-                    if (tabId in connections) {
-                        connections[tabId].postMessage(request);
-                    } else { }
-                } else { }
-                // send message to content script
-                sendToContentScript(message);
+        if (selector && selector.request === "utilsSelector" && sender.tab) {
+            const tabId = sender.tab.id;
+            if (tabId in connections) {
+                connections[tabId].postMessage(request);
             }
-            return true;
-        }
-        if (message.request === "parseAxes") {
             sendToContentScript(message);
             return true;
         }
-        if (message.request === "userSearchXP") {
+        if (["parseAxes", "userSearchXP", "dotheconversion", "cleanhighlight"].includes(request)) {
             sendToContentScript(message);
             return true;
         }
-        if (message.request === "dotheconversion") {
-            sendToContentScript(message);
-            return true;
-        }
-        if (message.request === "cleanhighlight") {
-            sendToContentScript(message);
-            return true;
-        }
-    }
-    // Listen to messages sent from the DevTools page
+    };
+
     port.onMessage.addListener(extensionListener);
-    port.onDisconnect.addListener(function (port) {
+
+    port.onDisconnect.addListener(() => {
         port.onMessage.removeListener(extensionListener);
-        var tabs = Object.keys(connections);
-        for (var i = 0, len = tabs.length; i < len; i++) {
-            if (connections[tabs[i]] == port) {
-                delete connections[tabs[i]]
+        const tabs = Object.keys(connections);
+        for (const tab of tabs) {
+            if (connections[tab] === port) {
+                delete connections[tab];
                 break;
             }
         }
-        return true;
     });
 });
 
-// Receive message from content script and relay to the devTools page for the
-// current tab
+// Install and update notifications
+const installURL = chrome.runtime.getURL("install.html");
+const updateURL = "https://github.com/ortoniKC/LetXPath/releases";
+
 /**
- * @param {} request 
- * @description used to send the message object to the content script
+ * Handle installation and update events.
+ * @param {Object} details - Details about the installation or update event.
  */
-var sendToContentScript = (request) => {
-    chrome.tabs.sendMessage(request.tab, request);
-}
-// install and update notification
-
-let installURL = chrome.runtime.getURL("install.html");
-let updateURL = "https://github.com/ortoniKC/LetXPath/releases";
-// let uninstallURL = "https://letcode.in/uninstall";
-
-// chrome.runtime.setUninstallURL(uninstallURL, () => {
-// });
-
-let installReason = (detail) => {
-    if (detail.reason === "install") {
-        chrome.tabs.create({
-            url: installURL
+function handleInstall(details) {
+    if (details.reason === "install") {
+        chrome.tabs.create({ url: installURL });
+        chrome.notifications.create({
+            title: 'LetXPath By LetCode with Koushik',
+            message: 'Please restart your browser to use LetXPath',
+            iconUrl: 'assets/32.png',
+            type: 'basic'
         });
-        chrome.notifications.create(
-            {
-                title: 'LetXPath',
-                message: 'Please restart your browser to use LetXPath',
-                iconUrl: 'assets/32.png',
-                type: 'basic'
-            }
-        )
     }
-    // else if (detail.reason === "update") {
+    // else if (details.reason === "update") {
     //     updateNotification();
     //     chrome.notifications.onClicked.addListener(onClickNotification);
     // }
 }
 
+/**
+ * Handle click events on update notifications.
+ */
 function onClickNotification() {
-    chrome.tabs.create({
-        url: updateURL
+    chrome.tabs.create({ url: updateURL });
+}
+
+/**
+ * Show an update notification.
+ */
+function updateNotification() {
+    chrome.notifications.create({
+        title: 'LetXPath',
+        message: 'LetXPath has been updated. Please click to read the changelog.',
+        iconUrl: 'assets/32.png',
+        type: 'basic'
     });
 }
 
-function updateNotification() {
-    chrome.notifications.create(
-        {
-            title: 'LetXPath',
-            message: 'LetXPath has been updated. Please click to read the changelog.',
-            iconUrl: 'assets/32.png',
-            type: 'basic'
-        }
-    )
-}
+chrome.runtime.onInstalled.addListener(handleInstall);
 
-chrome.runtime.onInstalled.addListener((details) => {
-    installReason(details)
-})
-
+// Optional code for handling tab updates
 // chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 //     if (changeInfo.status === "complete") {
-//         chrome.runtime.sendMessage({ request: 'pageInfo', tab: tab })
+//         chrome.runtime.sendMessage({ request: 'pageInfo', tab });
 //     }
-// })
+// });
 // chrome.tabs.onCreated.addListener(tab => {
-//     // chrome.runtime.sendMessage({ request: 'pageInfo', tab: tab })
 //     chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 //         if (changeInfo.status === "complete") {
-//             chrome.runtime.sendMessage({ request: 'pageInfo', tab: tab })
+//             chrome.runtime.sendMessage({ request: 'pageInfo', tab });
 //         }
-//     })
-// })
+//     });
+// });

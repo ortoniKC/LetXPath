@@ -1,43 +1,29 @@
 /**
- * @author Koushik Chatterjee <koushik350@gmail.com>
  * @description Generate an XPath expression to locate an element based on its text content.
  * @param {HTMLElement} element - The element for which to generate the XPath.
  * @param {string} tagName - The tag name of the element.
  * @returns {string|null} The generated XPath or null if no valid XPath is found.
  */
 function getTextBasedXPath(element, tagName) {
-    let textBasedXPath = null;
     const textContent = element.textContent.trim();
+    if (!textContent) return null;
 
-    if (textContent.length === 0) return null;
+    if (tagName === 'a') return handleLinkText(element, textContent);
 
-    // Handle link text specifically
-    if (tagName === 'a') {
-        return handleLinkText(element, textContent);
+    const normalizedTextContent = textContent.replace(/\s+/g, " ");
+    const xpaths = [
+        `//${tagName}[normalize-space(text())='${normalizedTextContent}']`,
+        `//${tagName}[text()='${textContent}']`,
+        `//${tagName}[contains(text(),'${textContent}')]`,
+        Array.from(element.childNodes).some(node => node.nodeName === 'BR') ? `//${tagName}[contains(.,'${textContent}')]` : null,
+        handleComplexText(element, tagName, textContent)
+    ].filter(Boolean);
+
+    for (let xpath of xpaths) {
+        if (validateXPath(xpath)) return xpath;
     }
 
-    // Handle normalize-space if the text contains whitespace
-    if (/\s/.test(textContent)) {
-        textBasedXPath = `//${tagName}[text()[normalize-space()='${textContent.replace(/\s+/g, " ")}']]`;
-        if (validateXPath(textBasedXPath)) return textBasedXPath;
-    }
-
-    // Exact text match
-    textBasedXPath = `//${tagName}[text()='${textContent}']`;
-    if (validateXPath(textBasedXPath)) return textBasedXPath;
-
-    // Contains text
-    textBasedXPath = `//${tagName}[contains(text(),'${textContent}')]`;
-    if (validateXPath(textBasedXPath)) return textBasedXPath;
-
-    // Handle <br> tags within text
-    if (Array.from(element.childNodes).some(node => node.nodeName === 'BR')) {
-        textBasedXPath = `//${tagName}[contains(.,'${textContent}')]`;
-        if (validateXPath(textBasedXPath)) return textBasedXPath;
-    }
-
-    // Fallback for multi-line text or other complex cases
-    return handleComplexText(element, tagName, textContent);
+    return null;
 }
 
 /**
@@ -47,16 +33,18 @@ function getTextBasedXPath(element, tagName) {
  * @returns {string|null} The generated XPath or null if no valid XPath is found.
  */
 function handleLinkText(element, textContent) {
-    let linkText = textContent.replace(/\s+/g, " ");
-    let xpath = `//a[normalize-space(text())='${linkText}']`;
-    if (validateXPath(xpath)) return xpath;
-
-    xpath = `//a[contains(text(),'${linkText}')]`;
-    if (validateXPath(xpath)) return xpath;
+    const normalizedTextContent = textContent.replace(/\s+/g, " ");
+    const xpaths = [
+        `//a[normalize-space(text())='${normalizedTextContent}']`,
+        `//a[contains(text(),'${normalizedTextContent}')]`
+    ];
 
     if (element.childElementCount > 0) {
         const partialText = element.children[0].innerText.trim();
-        xpath = `//a[contains(text(),'${partialText}')]`;
+        xpaths.push(`//a[contains(text(),'${partialText}')]`);
+    }
+
+    for (let xpath of xpaths) {
         if (validateXPath(xpath)) return xpath;
     }
 
@@ -71,14 +59,18 @@ function handleLinkText(element, textContent) {
  * @returns {string|null} The generated XPath or null if no valid XPath is found.
  */
 function handleComplexText(element, tagName, textContent) {
-    let textBasedXPath = `//${tagName}[contains(.,'${textContent}')]`;
-    if (validateXPath(textBasedXPath)) return textBasedXPath;
+    const xpaths = [
+        `//${tagName}[contains(.,'${textContent}')]`
+    ];
 
     for (let child of element.childNodes) {
         if (child.nodeType === Node.TEXT_NODE && child.textContent.trim()) {
-            textBasedXPath = `//${tagName}[text()='${child.textContent.trim()}']`;
-            if (validateXPath(textBasedXPath)) return textBasedXPath;
+            xpaths.push(`//${tagName}[text()='${child.textContent.trim()}']`);
         }
+    }
+
+    for (let xpath of xpaths) {
+        if (validateXPath(xpath)) return xpath;
     }
 
     return null;
@@ -90,8 +82,7 @@ function handleComplexText(element, tagName, textContent) {
  * @returns {boolean} True if the XPath is valid (selects exactly one element), otherwise false.
  */
 function validateXPath(xpath) {
-    const resultCount = getNumberOfXPath(xpath);
-    return resultCount === 1;
+    return getNumberOfTextXPath(xpath) === 1;
 }
 
 /**
@@ -100,10 +91,10 @@ function validateXPath(xpath) {
  * @returns {string} The indexed XPath.
  */
 function addIndexToXpath(xpath) {
-    let count = getNumberOfXPath(xpath);
+    const count = getNumberOfTextXPath(xpath);
     if (count > 1) {
         for (let i = 1; i <= count; i++) {
-            let indexedXPath = `(${xpath})[${i}]`;
+            const indexedXPath = `(${xpath})[${i}]`;
             if (validateXPath(indexedXPath)) return indexedXPath;
         }
     }
@@ -115,10 +106,7 @@ function addIndexToXpath(xpath) {
  * @param {string} xpath - The XPath to evaluate.
  * @returns {number} The number of matching elements.
  */
-function getNumberOfXPath(xpath) {
-    // This function should interact with the DOM to count the elements matching the XPath
-    // Implementation depends on the specific context where this function is used.
-    // Example: In a browser extension, use `document.evaluate` to count nodes.
-    let result = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+function getNumberOfTextXPath(xpath) {
+    const result = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     return result.snapshotLength;
 }
