@@ -116,7 +116,7 @@ function generateAxes(req) {
   let ui = `<div class="form-horizontal">
     <div class="form-group">
     <div class="col-12">
-      <code class="form-label tooltip tooltip-bottom" id="anxp" data-copytarget="#anxp" data-tooltip="Click to copy" value="${req.data.proOrFol}">${req.data.defaultXPath}</code>
+      <code class="form-label text-clip tooltip tooltip-bottom" id="anxp" data-copytarget="#anxp" data-tooltip="Click to copy" value="${req.data.proOrFol}">${req.data.defaultXPath}</code>
     </div>
     </div>
   </div>
@@ -186,7 +186,7 @@ function buildUI(data) {
       <div class="form-group">
         <div class="col-11">
         <span class="label label-rounded label-success sm">Table unique locator</span>
-          <code class="form-label" id="tablelocator">${data.webtabledetails.tableLocator}</code>
+          <code class="form-label text-clip" id="tablelocator">${data.webtabledetails.tableLocator}</code>
         </div>
         <div class="col-1 p-centered text-center">
           <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" data-copytarget="#tablelocator">
@@ -197,7 +197,7 @@ function buildUI(data) {
       <div class="form-group">
         <div class="col-11">
           <span class="label label-rounded label-success sm">Locator for selected row</span>
-          <code class="form-label" id="tabledata">${data.webtabledetails.tableData}</code>
+          <code class="form-label text-clip" id="tabledata">${data.webtabledetails.tableData}</code>
         </div>
         <div class="col-1 p-centered text-center">
           <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" id="copytd" data-copytarget="#tabledata">
@@ -220,7 +220,7 @@ function generateXPathUI(data, i) {
     <span class="label label-success label-rounded sm">${i + 1}. ${data.xpathid[i][1]}</span>
     <div class="form-group">
       <div class="col-10 c-hand" id="xpathVal" data-copytarget="#xpath${i}">
-        <code class="form-label tooltip tooltip-top" id="xpath${i}" data-copytarget="#xpath${i}" data-tooltip="Click to copy">${data.xpathid[i][2]}</code>
+        <code class="form-label text-clip tooltip tooltip-top" id="xpath${i}" data-copytarget="#xpath${i}" data-tooltip="Click to copy">${data.xpathid[i][2]}</code>
       </div>
       <div class="col-2 tooltip tooltip-top" data-tooltip="Copy Snippet">
       <div class="form-group bg-dark"><select class="form-select select-sm " id="snippetsSelector">${getSelectionValues(data, i, data.xpathid, false)}</select></div>
@@ -280,7 +280,7 @@ function buildCSSUI(data) {
       <span class="label label-rounded label-success sm">${i + 1}. ${data.cssPath[i][1]}</span>
         <div class="form-group">
           <div class="col-10 tooltip tooltip-top" id="xpathVal" data-tooltip="Click to copy" data-copytarget="#css${i}">
-            <code class="form-label" id="css${i}" data-copytarget="#css${i}">${data.cssPath[i][2]}</code>
+            <code class="form-label text-clip" id="css${i}" data-copytarget="#css${i}">${data.cssPath[i][2]}</code>
           </div>
           <div class="col-2 tooltip tooltip-top" data-tooltip="Copy Snippet">
             <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(data, i, data.cssPath, true)}</select>

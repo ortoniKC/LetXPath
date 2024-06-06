@@ -87,10 +87,10 @@ function handleInstall(details) {
             type: 'basic'
         });
     }
-    else if (details.reason === "update") {
-        updateNotification();
-        chrome.notifications.onClicked.addListener(onClickNotification);
-    }
+    // else if (details.reason === "update") {
+    //     updateNotification();
+    //     chrome.notifications.onClicked.addListener(onClickNotification);
+    // }
 }
 
 /**
