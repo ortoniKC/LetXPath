@@ -3,16 +3,10 @@
  * @description heart - core engine of extension
  */
 
-// get the target element with context click
-"use strict";
-
 let targetElemt = null;
 let enablegcx = false;
 let isRecordEnabled = false;
-// let attachedTabs = {};
-// let version = "1.3";
 /**
- *
  * @param {*} data
  * @description send the data to the panel.js
  */
@@ -21,42 +15,6 @@ function sendToDev(data) {
 }
 // used to send/receive message with in extension
 let receiver = (message, sender, sendResponse) => {
-  // if (message.selector) {
-  //     let selected = message.selector.selectedValue;
-  //     utilsSelectorXPathData = [];
-  //     switch (selected) {
-  //         case "inputs":
-  //             let ip = document.querySelectorAll("input");
-  //             for (let index = 0; index < ip.length; index++) {
-  //                 buildSelectedFileds(ip[index]);
-  //             }
-  //             sendToDev(utilsSelectorXPathData.sort());
-  //             return true;
-  //         case "dropdown":
-  //             let dd = document.querySelectorAll("select");
-  //             for (let index = 0; index < dd.length; index++) {
-  //                 buildSelectedFileds(dd[index]);
-  //             }
-  //             sendToDev(utilsSelectorXPathData.sort());
-  //             return true;
-  //         // case "labels":
-  //         //     let l = document.querySelectorAll("label");
-  //         //     for (let index = 0; index < l.length; index++) {
-  //         //         buildSelectedFileds(l[index]);
-  //         //     }
-  //         //     sendToDev(utilsSelectorXPathData.sort());
-  //         //     return true;
-  //         case "buttons":
-  //             let bt = document.querySelectorAll("button");
-  //             for (let index = 0; index < bt.length; index++) {
-  //                 buildSelectedFileds(bt[index]);
-  //             }
-  //             sendToDev(utilsSelectorXPathData);
-  //             return true;
-  //         default:
-  //             return true;
-  //     }
-  // }
   switch (message.request) {
     case "dotheconversion":
       const input = message.data;
@@ -65,9 +23,8 @@ let receiver = (message, sender, sendResponse) => {
         request: "conversion",
         output: output,
       });
-      setTimeout(() => {
-        sendResponse({ result: "success" });
-      }, 50);
+      sendResponse(true);
+      return true;
     case "parseAxes":
       try {
         let value = message.data;
@@ -97,7 +54,7 @@ let receiver = (message, sender, sendResponse) => {
             });
           }
         }
-        // }
+        sendResponse(true);
         return true;
       } catch (error) {}
     // build possible xpath
@@ -105,8 +62,8 @@ let receiver = (message, sender, sendResponse) => {
       parseAnchorXP(targetElemt);
       atrributesArray = [];
       webTableDetails = null;
+      sendResponse(true);
       return true;
-
     case "userSearchXP":
       let value = message.data;
       // elementOwnerDocument = document;
@@ -137,7 +94,7 @@ let receiver = (message, sender, sendResponse) => {
           count: customCount,
         },
       });
-      // }
+      sendResponse(true);
       return true;
     case "cleanhighlight":
       let removeCSS = "//*[@letcss='1']";
@@ -160,16 +117,14 @@ let receiver = (message, sender, sendResponse) => {
       if (cleanCount > 0) {
         clearHighlighter(cleanSnapshot);
       }
-      // }
-      return;
+      sendResponse(true);
+      return true;
     default:
-      setTimeout(() => {
-        sendResponse({ result: "success" });
-      }, 50);
+      sendResponse(true);
+      return true;
   }
 };
 chrome.runtime.onMessage.addListener(receiver);
-
 // capture mouse events once the DOM is loaded
 window.addEventListener("DOMContentLoaded", (event) => {
   // get the target element once click on the context menu
@@ -546,39 +501,38 @@ function getIDXPath(element, tagName) {
 // Add all atrributes xpath except filter
 function addAllXpathAttributesBbased(attribute, tagName, element) {
   Array.prototype.slice.call(attribute).forEach(function (item) {
-    // Filter attribute not to shown in xpath
-    if (item.value != "letX") {
-      atrributesArray.push(item.name);
+    // Filter attributes that should not be processed
+    if (item.value === "letX" || filterAttributesFromElement(item)) {
+      return;
     }
-    if (!filterAttributesFromElement(item)) {
-      // Pushing xpath to arrays
-      switch (item.name) {
-        case "id":
-          let id = getIDXPath(element, tagName);
-          if (id != null) {
-            XPATHDATA.push([1, "Unique ID", id]);
-            CSSPATHDATA.push([1, "Unique ID", "#" + id]);
-          }
-          break;
-        case "class":
-          let className = getClassXPath(element, tagName);
-          if (className != null) {
-            XPATHDATA.push([3, "Class based XPath", className]);
-          }
-          break;
-        case "name":
-          let name = getNameXPath(element, tagName);
-          if (name != null) {
-            XPATHDATA.push([2, "Name based XPath", name]);
-          }
-          break;
-        default:
-          let temp = item.value;
-          let allXpathAttr = null;
-          if (temp != "") {
-            allXpathAttr = `//${tagName}[@${item.name}='${temp}']`;
-          }
-          if (getNumberOfXPath(allXpathAttr) == 1) {
+
+    // Pushing xpath to arrays
+    switch (item.name) {
+      case "id":
+        let id = getIDXPath(element, tagName);
+        if (id != null) {
+          XPATHDATA.push([1, "Unique ID", id]);
+          CSSPATHDATA.push([1, "Unique ID", `#${id}`]);
+        }
+        break;
+      case "class":
+        let className = getClassXPath(element, tagName);
+        if (className != null) {
+          XPATHDATA.push([3, "Class based XPath", className]);
+        }
+        break;
+      case "name":
+        let name = getNameXPath(element, tagName);
+        if (name != null) {
+          XPATHDATA.push([2, "Name based XPath", name]);
+        }
+        break;
+      default:
+        let temp = item.value;
+        if (temp !== "") {
+          let allXpathAttr = `//${tagName}[@${item.name}='${temp}']`;
+          let xpathResult = getNumberOfXPath(allXpathAttr);
+          if (xpathResult == 1) {
             XPATHDATA.push([4, `${item.name}`, allXpathAttr]);
             CSSPATHDATA.push([
               4,
@@ -586,14 +540,15 @@ function addAllXpathAttributesBbased(attribute, tagName, element) {
               `${tagName}[${item.name}='${temp}']`,
             ]);
           } else {
-            // TODO: can be even better
-            let temp = addIndexToXpath(allXpathAttr);
-            if (temp != undefined) {
-              XPATHDATA.push([4, `${item.name}`, temp]);
+            let indexedXPath = addIndexToXpath(allXpathAttr);
+            if (indexedXPath !== undefined) {
+              XPATHDATA.push([4, `${item.name}`, indexedXPath]);
             }
           }
-          break;
-      }
+        }
+        break;
     }
+    // Always push attribute name to attributesArray
+    atrributesArray.push(item.name);
   });
 }

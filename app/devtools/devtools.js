@@ -7,7 +7,7 @@
 const devtoolsConnections = chrome.runtime.connect({ name: "devtools_panel" });
 
 devtoolsConnections.postMessage({
-  name: "init",
+  name: "devtools_panel",
   tabId: chrome.devtools.inspectedWindow.tabId,
 });
 

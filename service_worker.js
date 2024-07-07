@@ -43,10 +43,8 @@ chrome.runtime.onConnect.addListener((port) => {
   const extensionListener = (message, sender, sendResponse) => {
     const { name, tabId, selector, request } = message;
 
-    if (name === "devtools_panel" || name === "init") {
+    if (name === "devtools_panel") {
       connections[tabId] = port;
-      // No asynchronous response needed here, return false
-      return false;
     }
 
     if (selector && selector.request === "utilsSelector" && sender.tab) {
@@ -55,8 +53,6 @@ chrome.runtime.onConnect.addListener((port) => {
         connections[tabId].postMessage(request);
       }
       sendToContentScript(message);
-      // No asynchronous response needed here, return false
-      return false;
     }
 
     if (
@@ -68,8 +64,6 @@ chrome.runtime.onConnect.addListener((port) => {
       ].includes(request)
     ) {
       sendToContentScript(message);
-      // No asynchronous response needed here, return false
-      return false;
     }
   };
 

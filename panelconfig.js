@@ -1,13 +1,7 @@
 $(document).ready(function () {
   // Establish connection with the service worker
   const devtoolsConnections = chrome.runtime.connect({
-    name: "ortoni_devtools_panel",
-  });
-
-  // Send an initialization message
-  devtoolsConnections.postMessage({
-    name: "init",
-    tabId: chrome.devtools.inspectedWindow.tabId,
+    name: "devtools_panel",
   });
   // ------ highlight XPath & Code Snippets -----------
   $("#tab_header li.tab-item").on("click", function () {

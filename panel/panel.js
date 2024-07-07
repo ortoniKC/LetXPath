@@ -1,331 +1,299 @@
 chrome.runtime.onMessage.addListener((req, rec, res) => {
-  document.querySelector(".toast").classList.add("d-hide");
+  hideToast();
   switch (req.request) {
-    // case "pageInfo":
-    //   console.log(req.request);
-    //   try {
-    //     let ui = `<table class="table table-striped"><tbody>
-    //     <tr>
-    //     <td>Page Title</td>
-    //     <td>${req.tab.title}</td>
-    //     </tr>
-    //     <tr>
-    //     <td>Page URL</td>
-    //     <td>${req.tab.url}</td>
-    //     </tr>
-    //     </tbody></table>`;
-    //     jQuery('#eleInfo').empty();
-    //     jQuery('#eleInfo').append(ui);
-    //   } catch (error) { }
-    //   return true;
-
     case "send_to_dev":
-      buildUI(req);
-      document
-        .getElementById("cssbadge")
-        .attributes.getNamedItem("data-badge").value = "0";
-      if (req.cssPath.length > 0) {
-        buildCSSUI(req);
-      } else {
-        jQuery("#cssbody").empty();
-        let ui = `<div class="empty bg-dark">
-          <p class="empty-title h5">Please select any element to get CSS/XPath</p>
-          <p class="empty-subtitle">more new patterns coming soon :)</p>
-          <p class="empty-subtitle">Did you know LetXPath is an open-source, if you found something wrong fix it :)</p>
-          </div>`;
-        jQuery("#cssbody").append(ui);
-      }
-      if (req.xpathid.length == 0) {
-        jQuery("#addXPath").empty();
-        let ui = `<div class="empty bg-dark">
-          <p class="empty-title h5">Please select any element to get XPath/CSS</p>
-          <p class="empty-subtitle">more new patterns coming soon :)</p>
-          <p class="empty-subtitle">Did you know LetXPath is an open-source, if you found something wrong fix it :)</p>
-          </div>`;
-        jQuery("#addXPath").append(ui);
-      }
+      handleSendToDev(req);
       return true;
     case "anchor":
-      document
-        .getElementById("xpbadge")
-        .attributes.getNamedItem("data-badge").value = 0;
-      jQuery("#addXPath").empty();
-      document
-        .getElementById("cssbadge")
-        .attributes.getNamedItem("data-badge").value = 0;
-      jQuery("#cssbody").empty();
-      let ui = `<div class="empty bg-dark">
-          <p class="empty-title h5">Please select any element to get XPath/CSS</p>
-          <p class="empty-subtitle">more new patterns coming soon :)</p>
-          <p class="empty-subtitle">Did you know LetXPath is an open-source, if you found something wrong fix it :)</p>
-          </div>`;
-      jQuery("#addXPath").append(ui);
-      jQuery("#cssbody").append(ui);
-      generateAxes(req);
+      handleAnchor(req);
+      res(true);
       return true;
     case "axes":
-      $("#anxp").empty();
-      $("#anxp").text(req.data);
+      updateElementText("#anxp", req.data);
+      res(true);
       return true;
     case "fromUtilsSelector":
       utilsLocatorUI(req.data);
+      res(true);
       return true;
     case "customSearchResult":
       buildSearchUI(req.data);
+      res(true);
       return true;
     case "conversion":
       buildConversionUI(req.output);
-      setTimeout(() => {
-        res({ result: "success" });
-      }, 50);
+      res(true);
+      return true;
     default:
+      res(true);
       return true;
   }
 });
 
-function buildSearchUI(data) {
-  jQuery("#insertsearch").empty();
-  let ui = `<label for="count">${data.count}</label>
-    <label for="xpath">${data.xpath}</label>`;
-  $("#insertsearch").append(ui);
+function hideToast() {
+  document.querySelector(".toast").classList.add("d-hide");
 }
+
+function handleSendToDev(req) {
+  buildUI(req);
+  resetBadge("cssbadge", "0");
+  if (req.cssPath.length > 0) {
+    buildCSSUI(req);
+  } else {
+    displayEmptyMessage("#cssbody");
+  }
+  if (req.xpathid.length == 0) {
+    displayEmptyMessage("#addXPath");
+  }
+}
+
+function handleAnchor(req) {
+  resetBadge("xpbadge", "0");
+  clearElementContent("#addXPath");
+  resetBadge("cssbadge", "0");
+  clearElementContent("#cssbody");
+  displayEmptyMessage("#addXPath");
+  displayEmptyMessage("#cssbody");
+  generateAxes(req);
+}
+
+function resetBadge(elementId, value) {
+  document
+    .getElementById(elementId)
+    .attributes.getNamedItem("data-badge").value = value;
+}
+
+function clearElementContent(selector) {
+  document.querySelector(selector).innerHTML = "";
+}
+
+function displayEmptyMessage(selector) {
+  const ui = `<div class="empty bg-dark">
+                <p class="empty-title h5">Please select any element to get CSS/XPath</p>
+                <p class="empty-subtitle">More new patterns coming soon :)</p>
+                <p class="empty-subtitle">Did you know LetXPath is an open-source? If you found something wrong, fix it :)</p>
+              </div>`;
+  document.querySelector(selector).innerHTML = ui;
+}
+
+function buildSearchUI(data) {
+  clearElementContent("#insertsearch");
+  const ui = `<label for="count">${data.count}</label>
+              <label for="xpath">${data.xpath}</label>`;
+  document.querySelector("#insertsearch").innerHTML = ui;
+}
+
 function buildConversionUI(data) {
-  jQuery("#insertCSS").empty();
-  let ui = `<h1 class="title">${data}</h1>`;
-  $("#insertCSS").append(ui);
+  clearElementContent("#insertCSS");
+  const ui = `<h1 class="title">${data}</h1>`;
+  document.querySelector("#insertCSS").innerHTML = ui;
 }
 
 function utilsLocatorUI(data) {
-  let len = data.length;
-  if (len > 0) {
-    let ui = `
-      <table class="table">
-        <thead>
-          <th>Select</th>
-          <th>Name</th>
-          <th>XPath</th>
-        </thead>
-        <tbody>
-          ${getTR()}
-        </tbody>
-      </table>`;
-    $("#show").append(ui);
-  }
-  function getTR() {
-    let tr = "";
-    for (let i = 0; i < data.length; i++) {
-      tr += `<tr><td><input class="checkbox" type="checkbox" name="locator" id="loc${i}"></td>
-            <td>${data[i][1]}</td>
-            <td>${data[i][2][0][2]}</td></tr>`;
-    }
-    return tr;
+  if (data.length > 0) {
+    const ui = `<table class="table">
+                  <thead>
+                    <th>Select</th>
+                    <th>Name</th>
+                    <th>XPath</th>
+                  </thead>
+                  <tbody>
+                    ${data
+                      .map(
+                        (item, index) => `<tr>
+                      <td><input class="checkbox" type="checkbox" name="locator" id="loc${index}"></td>
+                      <td>${item[1]}</td>
+                      <td>${item[2][0][2]}</td>
+                    </tr>`
+                      )
+                      .join("")}
+                  </tbody>
+                </table>`;
+    document.querySelector("#show").innerHTML = ui;
   }
 }
-// generate axes based on user inputs
+
 function generateAxes(req) {
-  // Bring the panel to active
-  $("#tab_header li.tab-item").removeClass("active");
-  $("#tab_header li.tab-item[data-option='3']").addClass("active");
-  $("#tab_container .container_item").removeClass("active");
-  $('div[data-item="3"]').addClass("active");
-  jQuery("#anchorXPath").empty();
-  let ui = `<div class="form-horizontal">
-    <div class="form-group">
-    <div class="col-12">
-      <code class="form-label text-clip tooltip tooltip-bottom" id="anxp" data-copytarget="#anxp" data-tooltip="Click to copy" value="${
-        req.data.proOrFol
-      }">${req.data.defaultXPath}</code>
-    </div>
-    </div>
-  </div>
-    <div class="columns">
-    <div class="column col-xs-6">
-      <p class="chip bg-success">Parent Element</p>
-      ${sourceElement(req.data.src)}
-    </div>
-    <div class="divider-vert" data-content="Axes"></div>
-    <div class="column col-xs-6">
-      <p class="chip bg-success">Child Element</p>
-      ${targetElement(req.data.dst)}
-    </div>
-  </div>`;
-  jQuery("#anchorXPath").append(ui);
+  activatePanel(3);
+  clearElementContent("#anchorXPath");
+  const ui = `<div class="form-horizontal">
+                <div class="form-group">
+                  <div class="col-12 tooltip tooltip-bottom" data-tooltip="Click to copy">
+                    <code class="form-label text-clip" id="anxp" data-copytarget="#anxp" value="${
+                      req.data.proOrFol
+                    }">
+                      ${req.data.defaultXPath}
+                    </code>
+                  </div>
+                </div>
+                <div class="columns">
+                  <div class="column col-xs-6">
+                    <p class="chip bg-success">Parent Element</p>
+                    ${generateElementUI(req.data.src, "src")}
+                  </div>
+                  <div class="divider-vert" data-content="Axes"></div>
+                  <div class="column col-xs-6">
+                    <p class="chip bg-success">Child Element</p>
+                    ${generateElementUI(req.data.dst, "tgt")}
+                  </div>
+                </div>
+              </div>`;
+  document.querySelector("#anchorXPath").innerHTML = ui;
 }
-// Build the source element
-function sourceElement(element) {
-  let ui = "";
-  for (let i = 0; i < element.length; i++) {
-    if (i == 0) {
-      ui += `<div class="form-group has-info">
-        <label class="form-switch">
-          <input type="radio" name="src" value="${element[i][1]}" checked>
-          <i class="form-icon"></i>${i + 1}. ${element[i][2]}
-        </label>
-      </div>`;
-    } else {
-      ui += `<div class="form-group">
-        <label class="form-switch">
-          <input type="radio" name="src" value="${element[i][1]}">
-          <i class="form-icon"></i>${i + 1}. ${element[i][2]}
-        </label>
-      </div>`;
-    }
-  }
-  return ui;
-}
-// Build the target element
-function targetElement(element) {
-  let ui = "";
-  for (let i = 0; i < element.length; i++) {
-    if (i == 0) {
-      ui += `<div class="form-group">
-        <label class="form-switch">
-          <input type="radio" name="tgt" value="${element[i][1]}" checked>
-          <i class="form-icon"></i>${i + 1}. ${element[i][2]}
-        </label>
-      </div>`;
-    } else {
-      ui += `<div class="form-group">
-        <label class="form-switch">
-          <input type="radio" name="tgt" value="${element[i][1]}">
-          <i class="form-icon"></i>${i + 1}. ${element[i][2]}
-        </label>
-      </div>`;
-    }
-  }
-  return ui;
-}
-function buildUI(data) {
-  jQuery("#addXPath").empty();
-  if (data.webtabledetails != null) {
-    let table = `<div class="form-horizontal bg-dark">
-      <span class="label label-rounded sm label-primary">Table Info - Total no.of table ${data.webtabledetails.totalTables}</span>
-      <div class="form-group">
-        <div class="col-11">
-        <span class="label label-rounded label-success sm">Table unique locator</span>
-          <code class="form-label text-clip" id="tablelocator">${data.webtabledetails.tableLocator}</code>
-        </div>
-        <div class="col-1 p-centered text-center">
-          <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" data-copytarget="#tablelocator">
-            <img src="../assets/icons/copy.svg" alt="copy" data-copytarget="#tablelocator">
-          </button>
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="col-11">
-          <span class="label label-rounded label-success sm">Locator for selected row</span>
-          <code class="form-label text-clip" id="tabledata">${data.webtabledetails.tableData}</code>
-        </div>
-        <div class="col-1 p-centered text-center">
-          <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" id="copytd" data-copytarget="#tabledata">
-            <img src="../assets/icons/copy.svg" alt="copy" data-copytarget="#tabledata"">
-          </button>
-        </div>
-      </div>
-    </div>`;
-    jQuery("#addXPath").append(table);
-  }
-  let len = data.xpathid;
+
+function activatePanel(option) {
   document
-    .getElementById("xpbadge")
-    .attributes.getNamedItem("data-badge").value = len.length;
-  for (let i = 0; i < len.length; i++) {
-    generateXPathUI(data, i);
-  }
+    .querySelectorAll("#tab_header li.tab-item")
+    .forEach((tab) => tab.classList.remove("active"));
+  document
+    .querySelector(`#tab_header li.tab-item[data-option='${option}']`)
+    .classList.add("active");
+  document
+    .querySelectorAll("#tab_container .container_item")
+    .forEach((item) => item.classList.remove("active"));
+  document.querySelector(`div[data-item='${option}']`).classList.add("active");
 }
-// -------- Build XPath UI ---------
+
+function generateElementUI(elements, name) {
+  return elements
+    .map(
+      (element, index) => `
+    <div class="form-group ${index === 0 ? "has-info" : ""}">
+      <label class="form-switch">
+        <input type="radio" name="${name}" value="${element[1]}" ${
+        index === 0 ? "checked" : ""
+      }>
+        <i class="form-icon"></i>${index + 1}. ${element[2]}
+      </label>
+    </div>
+  `
+    )
+    .join("");
+}
+
+function buildUI(data) {
+  clearElementContent("#addXPath");
+  if (data.webtabledetails != null) {
+    const tableUI = `<div class="form-horizontal bg-dark">
+                      <span class="label label-rounded sm label-primary">Table Info - Total no.of table ${data.webtabledetails.totalTables}</span>
+                      <div class="form-group">
+                        <div class="col-11">
+                          <span class="label label-rounded label-success sm">Table unique locator</span>
+                          <code class="form-label text-clip" id="tablelocator">${data.webtabledetails.tableLocator}</code>
+                        </div>
+                        <div class="col-1 p-centered text-center">
+                          <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" data-copytarget="#tablelocator">
+                            <img src="../assets/icons/copy.svg" alt="copy" data-copytarget="#tablelocator">
+                          </button>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="col-11">
+                          <span class="label label-rounded label-success sm">Locator for selected row</span>
+                          <code class="form-label text-clip" id="tabledata">${data.webtabledetails.tableData}</code>
+                        </div>
+                        <div class="col-1 p-centered text-center">
+                          <button class="btn btn-link btn-sm tooltip tooltip-top" data-tooltip="Copy value" id="copytd" data-copytarget="#tabledata">
+                            <img src="../assets/icons/copy.svg" alt="copy" data-copytarget="#tabledata">
+                          </button>
+                        </div>
+                      </div>
+                    </div>`;
+    document.querySelector("#addXPath").innerHTML = tableUI;
+  }
+  updateBadgeCount("xpbadge", data.xpathid.length);
+  data.xpathid.forEach((xpath, i) => generateXPathUI(data, i));
+}
+
+function updateBadgeCount(elementId, count) {
+  document
+    .getElementById(elementId)
+    .attributes.getNamedItem("data-badge").value = count;
+}
+
 function generateXPathUI(data, i) {
-  let ui = `<div class="form-horizontal bg-dark">
-    <span class="label label-success label-rounded sm">${i + 1}. ${
+  const ui = `<div class="form-horizontal bg-dark">
+                <span class="label label-success label-rounded sm">${i + 1}. ${
     data.xpathid[i][1]
   }</span>
-    <div class="form-group">
-      <div class="col-10 c-hand tooltip tooltip-top" id="xpathVal" data-copytarget="#xpath${i}" data-tooltip="Click to copy">
-        <code class="form-label text-clip" id="xpath${i}" data-copytarget="#xpath${i}">${
+                <div class="form-group">
+                  <div class="col-10 c-hand tooltip tooltip-top" id="xpathVal" data-copytarget="#xpath${i}" data-tooltip="Click to copy">
+                    <code class="form-label text-clip" id="xpath${i}" data-copytarget="#xpath${i}">${
     data.xpathid[i][2]
   }</code>
-      </div>
-      <div class="col-2 tooltip tooltip-top" data-tooltip="Copy Snippet">
-      <div class="form-group bg-dark"><select class="form-select select-sm " id="snippetsSelector">${getSelectionValues(
-        data,
-        i,
-        data.xpathid,
-        false
-      )}</select></div>
-      </div>
-    </div>
-  </div>`;
-  jQuery("#addXPath").append(ui);
+                  </div>
+                  <div class="col-2 tooltip tooltip-top" data-tooltip="Copy Snippet">
+                    <div class="form-group bg-dark">
+                      <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(
+                        data,
+                        i,
+                        data.xpathid,
+                        false
+                      )}</select>
+                    </div>
+                  </div>
+                </div>
+              </div>`;
+  document.querySelector("#addXPath").innerHTML += ui;
 }
-// ------- build drop-down for snippet based on element type -------
 function getSelectionValues(data, i, xp, isCSS) {
-  // let xp = data.xpathid;
-  let finalOP;
-  let t = "";
-  if (isCSS) {
-    t = "CSS";
-  } else {
-    t = xp[i][1];
-  }
-  let type = data.type;
-  let tag = data.tag;
+  const tag = data.tag;
+  const type = data.type;
+  const t = isCSS ? "CSS" : xp[i][1];
+  const commonOptions = `
+    <option value="snippet" ct="snip" cv="snip" vn="snip">Snippet</option>
+    <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">getAttribute</option>`;
   switch (tag) {
     case "textarea":
-      finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
-        <option value="sendKeys" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">sendKeys</option>
-        <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">getAttribute</option>`;
-      break;
+      return `${commonOptions}
+              <option value="sendKeys" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">sendKeys</option>`;
     case "input":
       if (type === "submit" || type === "radio" || type === "checkbox") {
-        finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
-          <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">click</option>
-          <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">getAttribute</option>`;
+        return `${commonOptions}
+                <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">click</option>`;
       } else {
-        finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
-          <option value="sendKeys" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">sendKeys</option>
-          <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">getAttribute</option>`;
+        return `${commonOptions}
+                <option value="sendKeys" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">sendKeys</option>`;
       }
-      break;
     case "img":
-      finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
-        <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">click</option>
-        <option value="getAttribute" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">getAttribute</option>`;
-      break;
+      return `${commonOptions}
+              <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">click</option>`;
     default:
-      finalOP = `<option value = "snippet" ct = "snip" cv = "snip" vn = "snip">Snippet</option>
-        <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">click</option>
-        <option value="getText" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">getText</option>`;
-      break;
+      return `${commonOptions}
+              <option value="click" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">click</option>
+              <option value="getText" ct="${t}" cv="${xp[i][2]}" vn="${data.variablename}" mn="${data.methodname}">getText</option>`;
   }
-  return finalOP;
 }
+
 function buildCSSUI(data) {
-  document
-    .getElementById("cssbadge")
-    .attributes.getNamedItem("data-badge").value = data.cssPath.length;
-  jQuery("#cssbody").empty();
-  let ui = "";
-  for (let i = 0; i < data.cssPath.length; i++) {
-    ui += `<div class="form-horizontal">
-      <span class="label label-rounded label-success sm">${i + 1}. ${
-      data.cssPath[i][1]
-    }</span>
-        <div class="form-group">
-          <div class="col-10 tooltip tooltip-top" id="xpathVal" data-tooltip="Click to copy" data-copytarget="#css${i}">
-            <code class="form-label text-clip" id="css${i}" data-copytarget="#css${i}">${
-      data.cssPath[i][2]
+  updateBadgeCount("cssbadge", data.cssPath.length);
+  clearElementContent("#cssbody");
+  data.cssPath.forEach((item, i) => {
+    const ui = `<div class="form-horizontal">
+                  <span class="label label-rounded label-success sm">${
+                    i + 1
+                  }. ${item[1]}</span>
+                  <div class="form-group">
+                    <div class="col-10 tooltip tooltip-top" id="xpathVal" data-tooltip="Click to copy" data-copytarget="#css${i}">
+                      <code class="form-label text-clip" id="css${i}" data-copytarget="#css${i}">${
+      item[2]
     }</code>
-          </div>
-          <div class="col-2 tooltip tooltip-top" data-tooltip="Copy Snippet">
-            <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(
-              data,
-              i,
-              data.cssPath,
-              true
-            )}</select>
-          </div>
-        </div>
-      </div>`;
-  }
-  jQuery("#cssbody").append(ui);
+                    </div>
+                    <div class="col-2 tooltip tooltip-top" data-tooltip="Copy Snippet">
+                      <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(
+                        data,
+                        i,
+                        data.cssPath,
+                        true
+                      )}</select>
+                    </div>
+                  </div>
+                </div>`;
+    document.querySelector("#cssbody").innerHTML += ui;
+  });
+}
+
+// Helper function to update element text content
+function updateElementText(selector, text) {
+  document.querySelector(selector).textContent = text;
 }
