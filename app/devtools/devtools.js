@@ -24,7 +24,7 @@ function updatePanel() {
       { useContentScriptContext: true },
       (result, exceptionInfo) => {
         if (exceptionInfo) {
-          console.error("Error evaluating script:", exceptionInfo);
+          console.log(exceptionInfo);
         }
       }
     );

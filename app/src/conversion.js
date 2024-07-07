@@ -56,13 +56,13 @@ function preParseXpath(expr) {
 
 function xPathToCss(expr) {
   if (!expr) {
-    console.log("Missing XPath expression");
+    return "Missing XPath expression";
   }
 
   expr = preParseXpath(expr);
 
   if (!isValidXPath(expr)) {
-    console.log("Invalid or unsupported XPath: " + expr);
+    return "Invalid or unsupported XPath: " + expr;
   }
 
   const xPathArr = expr.split("|");
@@ -79,7 +79,7 @@ function xPathToCss(expr) {
       let attr;
 
       if (!nodes && position === 0) {
-        console.log("Invalid or unsupported XPath: " + expr);
+        return "Invalid or unsupported XPath: " + expr;
       }
 
       const match = {
@@ -187,7 +187,7 @@ function xPathToCss(expr) {
     const result = css.join("");
 
     if (result === "") {
-      console.log("Invalid or unsupported XPath");
+      return "Invalid or unsupported XPath";
     }
 
     cssSelectors.push(result);

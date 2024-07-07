@@ -1,7 +1,11 @@
-chrome.contextMenus.create({
-  id: "LetXPath",
-  title: "Select Parent",
-  contexts: ["all"],
+// Remove all existing context menu items to avoid duplicates
+chrome.contextMenus.removeAll(() => {
+  // Create the context menu item
+  chrome.contextMenus.create({
+    id: "LetXPath",
+    title: "Select Parent",
+    contexts: ["all"],
+  });
 });
 
 let isSource = false;
@@ -41,7 +45,8 @@ chrome.runtime.onConnect.addListener((port) => {
 
     if (name === "devtools_panel" || name === "init") {
       connections[tabId] = port;
-      return true;
+      // No asynchronous response needed here, return false
+      return false;
     }
 
     if (selector && selector.request === "utilsSelector" && sender.tab) {
@@ -50,7 +55,8 @@ chrome.runtime.onConnect.addListener((port) => {
         connections[tabId].postMessage(request);
       }
       sendToContentScript(message);
-      return true;
+      // No asynchronous response needed here, return false
+      return false;
     }
 
     if (
@@ -62,7 +68,8 @@ chrome.runtime.onConnect.addListener((port) => {
       ].includes(request)
     ) {
       sendToContentScript(message);
-      return true;
+      // No asynchronous response needed here, return false
+      return false;
     }
   };
 
@@ -77,7 +84,6 @@ chrome.runtime.onConnect.addListener((port) => {
         break;
       }
     }
-    return true;
   });
 });
 
@@ -93,10 +99,11 @@ function handleInstall(details) {
       iconUrl: "assets/32.png",
       type: "basic",
     });
-  } else if (details.reason === "update") {
-    updateNotification();
-    chrome.notifications.onClicked.addListener(onClickNotification);
   }
+  // else if (details.reason === "update") {
+  //   updateNotification();
+  //   chrome.notifications.onClicked.addListener(onClickNotification);
+  // }
 }
 
 function onClickNotification() {

@@ -1,11 +1,11 @@
 $(document).ready(function () {
   // Establish connection with the service worker
-  const devtools_connections = chrome.runtime.connect({
+  const devtoolsConnections = chrome.runtime.connect({
     name: "devtools_panel",
   });
 
   // Send an initialization message
-  devtools_connections.postMessage({
+  devtoolsConnections.postMessage({
     name: "init",
     tabId: chrome.devtools.inspectedWindow.tabId,
   });
@@ -23,7 +23,7 @@ $(document).ready(function () {
     } else {
       $("input[name='filter-radio']").prop("checked", false);
     }
-    devtools_connections.postMessage({
+    devtoolsConnections.postMessage({
       request: "cleanhighlight",
       tab: chrome.devtools.inspectedWindow.tabId,
     });
@@ -36,7 +36,7 @@ $(document).ready(function () {
       request: "utilsSelector",
       selectedValue: selectedvalue,
     };
-    devtools_connections.postMessage({
+    devtoolsConnections.postMessage({
       selector,
       tab: chrome.devtools.inspectedWindow.tabId,
     });
@@ -66,7 +66,7 @@ $(document).ready(function () {
     // find the selected target
     let tgt = $("input[name='tgt']:checked").val();
     // get both values
-    devtools_connections.postMessage({
+    devtoolsConnections.postMessage({
       data: `//${src + prefol + tgt}`,
       request: "parseAxes",
       tab: chrome.devtools.inspectedWindow.tabId,
@@ -124,11 +124,11 @@ $(document).ready(function () {
     // send the value to content script and evaluate
     const val = document.getElementById("searchVal");
     if (val.value.length > 0) {
-      devtools_connections.postMessage({
+      devtoolsConnections.postMessage({
         request: "cleanhighlight",
         tab: chrome.devtools.inspectedWindow.tabId,
       });
-      devtools_connections.postMessage({
+      devtoolsConnections.postMessage({
         data: val.value,
         request: "userSearchXP",
         tab: chrome.devtools.inspectedWindow.tabId,
@@ -139,7 +139,8 @@ $(document).ready(function () {
     // send the value to content script and evaluate
     const val = document.getElementById("convert");
     if (val.value.length > 0) {
-      devtools_connections.postMessage({
+      console.log(devtoolsConnections);
+      devtoolsConnections.postMessage({
         data: val.value,
         request: "dotheconversion",
         tab: chrome.devtools.inspectedWindow.tabId,
@@ -154,7 +155,7 @@ $(document).ready(function () {
   $("body").on("click", "#cleanhighlight", () => {
     document.getElementById("searchVal").value = "";
     jQuery("#insertsearch").empty();
-    devtools_connections.postMessage({
+    devtoolsConnections.postMessage({
       request: "cleanhighlight",
       tab: chrome.devtools.inspectedWindow.tabId,
     });
