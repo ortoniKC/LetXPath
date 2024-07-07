@@ -11,6 +11,10 @@
   <script defer src="../panelconfig.js"></script>
   <script defer src="../panel/panel.js"></script>
   <style>
+    body {
+      zoom: 0.8;
+    }
+
     span.label {
       font-size: small;
     }
@@ -110,7 +114,7 @@
     <div class="toast toast-success d-hide"></div>
   </div>
   <div class="container grid-lg bg-dark" id="tab_container">
-    <div class="container_item card bg-dark" data-item="1">
+    <div class="container_item card bg-dark active" data-item="1">
       <div class="card-body" id="addXPath">
         <div class="empty bg-dark">
           <p class="empty-title h5">Please select any element to get XPath</p>
@@ -138,20 +142,15 @@
       </div>
     </div>
     <!-- About -->
-    <div class="container_item card bg-dark active" data-item="4">
+    <div class="container_item card bg-dark" data-item="4">
       <div class="container">
-
-        <!-- Filter -->
-
         <div class="filter">
-          <input type="radio" id="tag-0" class="filter-tag" name="filter-radio" hidden>
           <input type="radio" id="tag-1" class="filter-tag" name="filter-radio" hidden>
           <input type="radio" id="tag-2" class="filter-tag" name="filter-radio" hidden>
           <input type="radio" id="tag-3" class="filter-tag" name="filter-radio" hidden>
           <input type="radio" id="tag-4" class="filter-tag" name="filter-radio" hidden>
 
           <div class="filter-nav">
-            <label class="chip" for="tag-0"></label>
             <label class="chip" for="tag-1">Info</label>
             <label class="chip" for="tag-2">Ratings</label>
             <label class="chip" for="tag-3">Learning</label>
@@ -159,7 +158,6 @@
           </div>
 
           <div class="filter-body">
-            <!-- <div class="filter-item card" data-tag="tag-0"></div> -->
             <div class="filter-item card" data-tag="tag-1">
               <div class="card-body bg-dark">
                 <h3>Simple, Useful, Open-Source XPath Finder</h3>
@@ -260,7 +258,7 @@
                     <p>UPI: ortoni@ybl</p>
                     <p>Thank you for your support!</p>
                   </div>
-                  <div class="column col-3">
+                  <div class="column">
                     <img src="../assets/ortoni.png" width="120px" alt="ortoni@ybl">
                   </div>
                 </div>
@@ -268,17 +266,12 @@
             </div>
           </div>
         </div>
-
-        <!-- filter ends -->
-
-
-
       </div>
     </div>
     <!-- tools -->
     <div class="container_item bg-dark" data-item="5">
       <div class="filter">
-        <input type="radio" id="tag-5" class="filter-tag" name="filter-radio" hidden checked>
+        <input type="radio" id="tag-5" class="filter-tag" name="filter-radio" hidden>
         <input type="radio" id="tag-6" class="filter-tag" name="filter-radio" hidden>
 
         <div class="filter-nav">
@@ -288,29 +281,29 @@
 
         <div class="filter-body">
           <div class="filter-item container" data-tag="tag-5">
-            <div class="empty container bg-dark">
+            <div class="container bg-dark">
               <div class="title">
-                <h3 class="text-secondary">Custom Search</h3>
+                <h3 class="text-secondary text-center">Custom Search</h3>
               </div>
               <div class="input-group">
                 <input type="text" class="form-input" id="searchVal" placeholder="Type your XPath">
                 <button id="usxp" class="btn btn-primary input-group-btn">Find</button>
                 <button id="cleanhighlight" class="btn btn-link input-group-btn">Clear</button>
               </div>
-              <div class="form-group" id="insertsearch"></div>
+              <div class="form-group text-center" id="insertsearch"></div>
             </div>
           </div>
           <div class="filter-item container" data-tag="tag-6">
-            <div class="empty container bg-dark">
+            <div class="container bg-dark">
               <div class="title">
-                <h3 class="text-secondary">Convert to CSS</h3>
+                <h3 class="text-secondary text-center">Convert to CSS</h3>
               </div>
               <div class="input-group">
                 <input type="text" class="form-input" id="convert" placeholder="Enter XPath or CSS">
                 <button id="convertSelector" class="btn btn-primary input-group-btn">Convert</button>
               </div>
               <span class="label label-warning">Cannot handle complex XPath!</span>
-              <div class="form-group" id="insertCSS"></div>
+              <div class="form-group text-center" id="insertCSS"></div>
             </div>
           </div>
         </div>

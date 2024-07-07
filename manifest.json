@@ -54,9 +54,5 @@
   },
   "homepage_url": "https://www.letcode.in",
   "options_page": "option/option.html",
-  "offline_enabled": true,
-  "action": {
-    "default_title": "LetXPath",
-    "default_popup": "popup/popup.html"
-  }
+  "offline_enabled": true
 }
