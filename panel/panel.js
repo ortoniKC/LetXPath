@@ -240,8 +240,8 @@ function generateXPathUI(data, i) {
     data.xpathid[i][1]
   }</span>
     <div class="form-group">
-      <div class="col-10 c-hand" id="xpathVal" data-copytarget="#xpath${i}">
-        <code class="form-label text-clip tooltip tooltip-top" id="xpath${i}" data-copytarget="#xpath${i}" data-tooltip="Click to copy">${
+      <div class="col-10 c-hand tooltip tooltip-top" id="xpathVal" data-copytarget="#xpath${i}" data-tooltip="Click to copy">
+        <code class="form-label text-clip" id="xpath${i}" data-copytarget="#xpath${i}">${
     data.xpathid[i][2]
   }</code>
       </div>

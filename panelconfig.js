@@ -1,7 +1,7 @@
 $(document).ready(function () {
   // Establish connection with the service worker
   const devtoolsConnections = chrome.runtime.connect({
-    name: "devtools_panel",
+    name: "ortoni_devtools_panel",
   });
 
   // Send an initialization message
