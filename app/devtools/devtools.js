@@ -24,7 +24,6 @@ function updatePanel() {
       { useContentScriptContext: true },
       (result, exceptionInfo) => {
         if (exceptionInfo) {
-          console.log(exceptionInfo);
         }
       }
     );

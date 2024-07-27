@@ -116,10 +116,6 @@ function xPathToCss(expr) {
             '*="' +
             match["cvalue"] +
             '"]';
-        } else {
-          console.log(
-            "Invalid or unsupported XPath attribute: " + match["cattr"]
-          );
         }
       } else if (match["matched"]) {
         switch (match["mattr"]) {
@@ -135,14 +131,8 @@ function xPathToCss(expr) {
             break;
           case "text()":
           case ".":
-            console.log(
-              "Invalid or unsupported XPath attribute: " + match["mattr"]
-            );
           default:
             if (match["mattr"].indexOf("@") !== 0) {
-              console.log(
-                "Invalid or unsupported XPath attribute: " + match["mattr"]
-              );
             }
             if (match["mvalue"].indexOf(" ") !== -1) {
               match["mvalue"] =
@@ -167,9 +157,6 @@ function xPathToCss(expr) {
       if (match["nth"]) {
         if (match["nth"].indexOf("last") === -1) {
           if (isNaN(parseInt(match["nth"], 10))) {
-            console.log(
-              "Invalid or unsupported XPath attribute: " + match["nth"]
-            );
           }
           nth =
             parseInt(match["nth"], 10) !== 1

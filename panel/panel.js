@@ -30,8 +30,6 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
         return true;
     }
   } catch (error) {
-    console.log(error);
-    alert(error);
   }
 });
 

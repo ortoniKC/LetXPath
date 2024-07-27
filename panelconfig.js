@@ -134,7 +134,6 @@ $(document).ready(function () {
     // send the value to content script and evaluate
     const val = document.getElementById("convert");
     if (val.value.length > 0) {
-      console.log(devtoolsConnections);
       devtoolsConnections.postMessage({
         data: val.value,
         request: "dotheconversion",
@@ -204,10 +203,6 @@ function generateSnippet(type, codeType, codeValue, vn, mn) {
           break;
         case "custom":
           code = customSnippets(type, codeType, codeValue, vn, result, mn);
-          // alert('Not yet implemented')
-          // chrome.storage.local.get(['click-value'], (result) => {
-          //     console.log(result);
-          // })
           break;
         default:
           code = javaSnippet(type, codeType, codeValue, vn);
