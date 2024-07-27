@@ -4,12 +4,12 @@
  */
 
 // Establish a connection to the DevTools panel
-var devtoolsConnections = chrome.runtime.connect({ name: "devtools_panel" });
+// var devtoolsConnections = chrome.runtime.connect({ name: "devtools_panel" });
 
-devtoolsConnections.postMessage({
-  name: "devtools_panel",
-  tabId: chrome.devtools.inspectedWindow.tabId,
-});
+// devtoolsConnections.postMessage({
+//   name: "devtools_panel",
+//   tabId: chrome.devtools.inspectedWindow.tabId,
+// });
 
 const html = "panel/panel.html";
 let isActive = false;

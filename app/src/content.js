@@ -11,9 +11,7 @@ let isRecordEnabled = false;
  * @description send the data to the panel.js
  */
 function sendToDev(data) {
-  chrome.runtime
-    .sendMessage({ request: "fromUtilsSelector", data: data })
-    .then(() => {});
+  sendMessage({ request: "fromUtilsSelector", data: data });
 }
 // used to send/receive message with in extension
 let receiver = (message, sender, sendResponse) => {
@@ -21,14 +19,10 @@ let receiver = (message, sender, sendResponse) => {
     case "dotheconversion":
       const input = message.data;
       const output = xPathToCss(input);
-      chrome.runtime
-        .sendMessage({
-          request: "conversion",
-          output: output,
-        })
-        .then(() => {
-          sendResponse(true);
-        });
+      sendMessage({
+        request: "conversion",
+        output: output,
+      });
       // sendResponse(true);
       break;
     case "parseAxes":
@@ -43,37 +37,21 @@ let receiver = (message, sender, sendResponse) => {
         );
         let axesCount = axesSnapshot.snapshotLength;
         if (axesCount == 0 || axesCount == undefined) {
-          chrome.runtime
-            .sendMessage({
-              request: "axes",
-              data: "Sorry! Please try with different XPath combination",
-            })
-            .then(() => {
-              sendResponse(true);
-            });
+          sendMessage({
+            request: "axes",
+            data: "Sorry! Please try with different XPath combination",
+          });
         } else if (axesCount == 1) {
-          chrome.runtime
-            .sendMessage({ request: "axes", data: value })
-            .then(() => {
-              sendResponse(true);
-            });
+          sendMessage({ request: "axes", data: value });
         } else if (axesCount > 1) {
           let ex = addIndexToAxesXpath(value);
           if (ex != null) {
-            chrome.runtime
-              .sendMessage({ request: "axes", data: ex })
-              .then(() => {
-                sendResponse(true);
-              });
+            sendMessage({ request: "axes", data: ex });
           } else {
-            chrome.runtime
-              .sendMessage({
-                request: "axes",
-                data: "Sorry! Please try with different XPath combination",
-              })
-              .then(() => {
-                sendResponse(true);
-              });
+            sendMessage({
+              request: "axes",
+              data: "Sorry! Please try with different XPath combination",
+            });
           }
         }
         // sendResponse(true);
@@ -111,17 +89,13 @@ let receiver = (message, sender, sendResponse) => {
       if (customCount > 0) {
         addHighlighter(customSnapshot);
       }
-      chrome.runtime
-        .sendMessage({
-          request: "customSearchResult",
-          data: {
-            xpath: isXPathCorrect,
-            count: customCount,
-          },
-        })
-        .then(() => {
-          sendResponse(true);
-        });
+      sendMessage({
+        request: "customSearchResult",
+        data: {
+          xpath: isXPathCorrect,
+          count: customCount,
+        },
+      });
       // sendResponse(true);
       // return true;
       break;
@@ -151,7 +125,6 @@ let receiver = (message, sender, sendResponse) => {
       break;
     default:
       sendResponse(true);
-      return true;
   }
 };
 chrome.runtime.onMessage.addListener(receiver);
@@ -237,7 +210,7 @@ function parseDOM(targetElement) {
         atrributesArray: atrributesArray,
       };
       //
-      chrome.runtime.sendMessage(domInfo).then(() => {});
+      sendMessage(domInfo);
 
       atrributesArray = [];
       // getAnchorXPath = [];
@@ -246,7 +219,13 @@ function parseDOM(targetElement) {
     }
   } catch (error) {}
 }
-
+async function sendMessage(msg) {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage(msg, (response) => {
+      resolve(response);
+    });
+  });
+}
 function parseAnchorXP(targetElement) {
   if (targetElement != null) {
     try {
@@ -259,12 +238,10 @@ function parseAnchorXP(targetElement) {
 
 function buildXpath(element, boolAnchor, utils) {
   if (element.shadowRoot != null) {
-    chrome.runtime
-      .sendMessage({
-        shadowRoot: true,
-        anchor: undefined,
-      })
-      .then(() => {});
+    sendMessage({
+      shadowRoot: true,
+      anchor: undefined,
+    });
 
     throw new TypeError("shadow dom not yet supported");
   }

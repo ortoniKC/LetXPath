@@ -1,12 +1,12 @@
-// Remove all existing context menu items to avoid duplicates
-chrome.contextMenus.removeAll(() => {
-  // Create the context menu item
-  chrome.contextMenus.create({
-    id: "LetXPath",
-    title: "Select Parent",
-    contexts: ["all"],
-  });
-});
+// // Remove all existing context menu items to avoid duplicates
+// chrome.contextMenus.removeAll(() => {
+//   // Create the context menu item
+//   chrome.contextMenus.create({
+//     id: "LetXPath",
+//     title: "Select Parent",
+//     contexts: ["all"],
+//   });
+// });
 
 let isSource = false;
 function toggle() {
@@ -21,10 +21,16 @@ function toggle() {
     );
   }
 }
+async function sendMessageTotab(tab, msg) {
+  chrome.tabs.sendMessage(tab, msg).then("Sent to CS");
+  // return new Promise((resolve) => {
+  //   resolve(response);
+  // });
+}
 
 function getXPath(info, tab) {
   const msg = { request: "context_menu_click" };
-  chrome.tabs.sendMessage(tab.id, msg).then(() => {});
+  sendMessageTotab(tab.id, msg);
 }
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
@@ -35,50 +41,18 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 function sendToContentScript(request) {
-  chrome.tabs.sendMessage(request.tab, request).then(() => {});
+  sendMessageTotab(request.tab, request);
 }
 
-let connections = {};
-chrome.runtime.onConnect.addListener((port) => {
-  const extensionListener = (message, sender, sendResponse) => {
-    const { name, tabId, selector, request } = message;
-
-    if (name === "devtools_panel_config") {
-      connections[tabId] = port;
-    }
-
-    if (selector && selector.request === "utilsSelector" && sender.tab) {
-      const tabId = sender.tab.id;
-      if (tabId in connections) {
-        connections[tabId].postMessage(request);
-      }
-      sendToContentScript(message);
-    }
-
-    if (
-      [
-        "parseAxes",
-        "userSearchXP",
-        "dotheconversion",
-        "cleanhighlight",
-      ].includes(request)
-    ) {
-      sendToContentScript(message);
-    }
-  };
-
-  port.onMessage.addListener(extensionListener);
-
-  port.onDisconnect.addListener(() => {
-    port.onMessage.removeListener(extensionListener);
-    const tabs = Object.keys(connections);
-    for (const tab of tabs) {
-      if (connections[tab] === port) {
-        delete connections[tab];
-        break;
-      }
-    }
-  });
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (
+    ["parseAxes", "userSearchXP", "dotheconversion", "cleanhighlight"].includes(
+      message.request
+    )
+  ) {
+    sendToContentScript(message);
+    sendResponse("Hello");
+  }
 });
 
 const installURL = chrome.runtime.getURL("install.html");
@@ -98,6 +72,11 @@ function handleInstall(details) {
   //   updateNotification();
   //   chrome.notifications.onClicked.addListener(onClickNotification);
   // }
+  chrome.contextMenus.create({
+    id: "LetXPath",
+    title: "Select Parent",
+    contexts: ["all"],
+  });
 }
 
 function onClickNotification() {

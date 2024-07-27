@@ -4,33 +4,33 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
     switch (req.request) {
       case "send_to_dev":
         handleSendToDev(req);
-        return true;
+        res("completed");
+        break;
       case "anchor":
         handleAnchor(req);
-        res(true);
-        return true;
+        res("completed");
+        break;
       case "axes":
         updateElementText("#anxp", req.data);
-        res(true);
-        return true;
+        res("completed");
+        break;
       case "fromUtilsSelector":
         utilsLocatorUI(req.data);
-        res(true);
-        return true;
+        res("completed");
+        break;
       case "customSearchResult":
         buildSearchUI(req.data);
-        res(true);
-        return true;
+        res("completed");
+        break;
       case "conversion":
         buildConversionUI(req.output);
-        res(true);
-        return true;
+        res("completed");
+        break;
       default:
-        res(true);
-        return true;
+        res("completed");
+        break;
     }
-  } catch (error) {
-  }
+  } catch (error) {}
 });
 
 function hideToast() {

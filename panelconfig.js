@@ -1,9 +1,11 @@
 // panelconfig.js
 $(document).ready(function () {
   // Establish connection with the service worker
-  var devtoolsConnections = chrome.runtime.connect({
-    name: "devtools_panel_config",
-  });
+  // var devtoolsConnections = chrome.tabs.connect(
+  //   chrome.devtools.inspectedWindow.tabId
+  // );
+
+  const tabId = chrome.devtools.inspectedWindow.tabId;
   // ------ highlight XPath & Code Snippets -----------
   $("#tab_header li.tab-item").on("click", function () {
     let number = $(this).data("option");
@@ -18,9 +20,8 @@ $(document).ready(function () {
     } else {
       $("input[name='filter-radio']").prop("checked", false);
     }
-    devtoolsConnections.postMessage({
+    sendMessageToCS(tabId, {
       request: "cleanhighlight",
-      tab: chrome.devtools.inspectedWindow.tabId,
     });
   });
 
@@ -31,9 +32,8 @@ $(document).ready(function () {
       request: "utilsSelector",
       selectedValue: selectedvalue,
     };
-    devtoolsConnections.postMessage({
+    sendMessageToCS(tabId, {
       selector,
-      tab: chrome.devtools.inspectedWindow.tabId,
     });
   });
   // --- snippet changer
@@ -61,10 +61,9 @@ $(document).ready(function () {
     // find the selected target
     let tgt = $("input[name='tgt']:checked").val();
     // get both values
-    devtoolsConnections.postMessage({
-      data: `//${src + prefol + tgt}`,
+    sendMessageToCS(tabId, {
       request: "parseAxes",
-      tab: chrome.devtools.inspectedWindow.tabId,
+      data: `//${src + prefol + tgt}`,
     });
   });
 
@@ -119,14 +118,12 @@ $(document).ready(function () {
     // send the value to content script and evaluate
     const val = document.getElementById("searchVal");
     if (val.value.length > 0) {
-      devtoolsConnections.postMessage({
+      sendMessageToCS(tabId, {
         request: "cleanhighlight",
-        tab: chrome.devtools.inspectedWindow.tabId,
       });
-      devtoolsConnections.postMessage({
-        data: val.value,
+      sendMessageToCS(tabId, {
         request: "userSearchXP",
-        tab: chrome.devtools.inspectedWindow.tabId,
+        data: val.value,
       });
     }
   });
@@ -134,10 +131,9 @@ $(document).ready(function () {
     // send the value to content script and evaluate
     const val = document.getElementById("convert");
     if (val.value.length > 0) {
-      devtoolsConnections.postMessage({
+      sendMessageToCS(tabId, {
         data: val.value,
         request: "dotheconversion",
-        tab: chrome.devtools.inspectedWindow.tabId,
       });
     }
   });
@@ -149,12 +145,22 @@ $(document).ready(function () {
   $("body").on("click", "#cleanhighlight", () => {
     document.getElementById("searchVal").value = "";
     jQuery("#insertsearch").empty();
-    devtoolsConnections.postMessage({
+    sendMessageToCS(tabId, {
       request: "cleanhighlight",
-      tab: chrome.devtools.inspectedWindow.tabId,
     });
   });
 });
+function sendMessageToCS(tabId, request) {
+  chrome.tabs.sendMessage(tabId, request).then(() => {
+    console.log("sent", request);
+  });
+
+  // return new Promise((resolve) => {
+  //   chrome.tabs.sendMessage(tabId, request);
+  //   resolve();
+  // });
+}
+
 function copyToClipBoard(range, node) {
   try {
     window.getSelection().removeAllRanges();
