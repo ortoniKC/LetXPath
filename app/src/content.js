@@ -11,7 +11,9 @@ let isRecordEnabled = false;
  * @description send the data to the panel.js
  */
 function sendToDev(data) {
-  chrome.runtime.sendMessage({ request: "fromUtilsSelector", data: data });
+  chrome.runtime
+    .sendMessage({ request: "fromUtilsSelector", data: data })
+    .then(() => {});
 }
 // used to send/receive message with in extension
 let receiver = (message, sender, sendResponse) => {
@@ -19,12 +21,16 @@ let receiver = (message, sender, sendResponse) => {
     case "dotheconversion":
       const input = message.data;
       const output = xPathToCss(input);
-      chrome.runtime.sendMessage({
-        request: "conversion",
-        output: output,
-      });
-      sendResponse(true);
-      return true;
+      chrome.runtime
+        .sendMessage({
+          request: "conversion",
+          output: output,
+        })
+        .then(() => {
+          sendResponse(true);
+        });
+      // sendResponse(true);
+      break;
     case "parseAxes":
       try {
         let value = message.data;
@@ -37,33 +43,51 @@ let receiver = (message, sender, sendResponse) => {
         );
         let axesCount = axesSnapshot.snapshotLength;
         if (axesCount == 0 || axesCount == undefined) {
-          chrome.runtime.sendMessage({
-            request: "axes",
-            data: "Sorry! Please try with different XPath combination",
-          });
+          chrome.runtime
+            .sendMessage({
+              request: "axes",
+              data: "Sorry! Please try with different XPath combination",
+            })
+            .then(() => {
+              sendResponse(true);
+            });
         } else if (axesCount == 1) {
-          chrome.runtime.sendMessage({ request: "axes", data: value });
+          chrome.runtime
+            .sendMessage({ request: "axes", data: value })
+            .then(() => {
+              sendResponse(true);
+            });
         } else if (axesCount > 1) {
           let ex = addIndexToAxesXpath(value);
           if (ex != null) {
-            chrome.runtime.sendMessage({ request: "axes", data: ex });
+            chrome.runtime
+              .sendMessage({ request: "axes", data: ex })
+              .then(() => {
+                sendResponse(true);
+              });
           } else {
-            chrome.runtime.sendMessage({
-              request: "axes",
-              data: "Sorry! Please try with different XPath combination",
-            });
+            chrome.runtime
+              .sendMessage({
+                request: "axes",
+                data: "Sorry! Please try with different XPath combination",
+              })
+              .then(() => {
+                sendResponse(true);
+              });
           }
         }
-        sendResponse(true);
-        return true;
+        // sendResponse(true);
+        // return true;
+        break;
       } catch (error) {}
     // build possible xpath
     case "context_menu_click":
       parseAnchorXP(targetElemt);
       atrributesArray = [];
       webTableDetails = null;
-      sendResponse(true);
-      return true;
+      // sendResponse(true);
+      // return true;
+      break;
     case "userSearchXP":
       let value = message.data;
       // elementOwnerDocument = document;
@@ -87,15 +111,20 @@ let receiver = (message, sender, sendResponse) => {
       if (customCount > 0) {
         addHighlighter(customSnapshot);
       }
-      chrome.runtime.sendMessage({
-        request: "customSearchResult",
-        data: {
-          xpath: isXPathCorrect,
-          count: customCount,
-        },
-      });
-      sendResponse(true);
-      return true;
+      chrome.runtime
+        .sendMessage({
+          request: "customSearchResult",
+          data: {
+            xpath: isXPathCorrect,
+            count: customCount,
+          },
+        })
+        .then(() => {
+          sendResponse(true);
+        });
+      // sendResponse(true);
+      // return true;
+      break;
     case "cleanhighlight":
       let removeCSS = "//*[@letcss='1']";
       // elementOwnerDocument = document;
@@ -117,8 +146,9 @@ let receiver = (message, sender, sendResponse) => {
       if (cleanCount > 0) {
         clearHighlighter(cleanSnapshot);
       }
-      sendResponse(true);
-      return true;
+      // sendResponse(true);
+      // return true;
+      break;
     default:
       sendResponse(true);
       return true;
@@ -207,7 +237,8 @@ function parseDOM(targetElement) {
         atrributesArray: atrributesArray,
       };
       //
-      chrome.runtime.sendMessage(domInfo);
+      chrome.runtime.sendMessage(domInfo).then(() => {});
+
       atrributesArray = [];
       // getAnchorXPath = [];
       // anchroXPathData = [];
@@ -228,10 +259,13 @@ function parseAnchorXP(targetElement) {
 
 function buildXpath(element, boolAnchor, utils) {
   if (element.shadowRoot != null) {
-    chrome.runtime.sendMessage({
-      shadowRoot: true,
-      anchor: undefined,
-    });
+    chrome.runtime
+      .sendMessage({
+        shadowRoot: true,
+        anchor: undefined,
+      })
+      .then(() => {});
+
     throw new TypeError("shadow dom not yet supported");
   }
   let removeletX = `//*${letXP}`;

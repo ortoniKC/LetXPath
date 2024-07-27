@@ -24,7 +24,7 @@ function toggle() {
 
 function getXPath(info, tab) {
   const msg = { request: "context_menu_click" };
-  chrome.tabs.sendMessage(tab.id, msg);
+  chrome.tabs.sendMessage(tab.id, msg).then(() => {});
 }
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
@@ -35,7 +35,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 function sendToContentScript(request) {
-  chrome.tabs.sendMessage(request.tab, request);
+  chrome.tabs.sendMessage(request.tab, request).then(() => {});
 }
 
 let connections = {};

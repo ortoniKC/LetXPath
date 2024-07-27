@@ -1,7 +1,7 @@
 // panelconfig.js
 $(document).ready(function () {
   // Establish connection with the service worker
-  devtoolsConnections = chrome.runtime.connect({
+  var devtoolsConnections = chrome.runtime.connect({
     name: "devtools_panel",
   });
   // ------ highlight XPath & Code Snippets -----------

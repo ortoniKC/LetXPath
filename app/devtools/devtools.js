@@ -4,7 +4,7 @@
  */
 
 // Establish a connection to the DevTools panel
-const devtoolsConnections = chrome.runtime.connect({ name: "devtools_panel" });
+var devtoolsConnections = chrome.runtime.connect({ name: "devtools_panel" });
 
 devtoolsConnections.postMessage({
   name: "devtools_panel",
