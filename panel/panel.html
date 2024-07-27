@@ -1,3 +1,4 @@
+<!-- panel.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -42,7 +43,7 @@
     .copied::after {
       font-family: 'Oxygen Mono', monospace;
       position: absolute;
-      top: 50%;
+      /* top: 50%; */
       display: block;
       content: "Copied";
       font-size: 0.75em;
@@ -299,10 +300,10 @@
                 <h3 class="text-secondary text-center">Convert to CSS</h3>
               </div>
               <div class="input-group">
-                <input type="text" class="form-input" id="convert" placeholder="Enter XPath or CSS">
+                <input type="text" class="form-input" id="convert" placeholder="Enter XPath">
                 <button id="convertSelector" class="btn btn-primary input-group-btn">Convert</button>
               </div>
-              <span class="label label-warning">Cannot handle complex XPath!</span>
+              <span class="label label-warning">Cannot handle complex XPath! <strong>(Beta)</strong></span>
               <div class="form-group text-center" id="insertCSS"></div>
             </div>
           </div>
