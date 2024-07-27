@@ -2,7 +2,7 @@
 $(document).ready(function () {
   // Establish connection with the service worker
   var devtoolsConnections = chrome.runtime.connect({
-    name: "devtools_panel",
+    name: "devtools_panel_config",
   });
   // ------ highlight XPath & Code Snippets -----------
   $("#tab_header li.tab-item").on("click", function () {
