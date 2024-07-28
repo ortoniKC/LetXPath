@@ -1,6 +1,6 @@
 {
-  "name": "LetXPath - XPath Finder",
-  "version": "1.0.0",
+  "name": "letxpath",
+  "version": "3.0.1",
   "description": "Open-source project - XPath Finder",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,7 @@
   "publisher": "LetCode",
   "license": "ISC",
   "dependencies": {
-    "@types/chrome": "0.0.106"
+    "@types/chrome": "^0.0.268"
   },
   "devDependencies": {
     "jquery": "^3.5.1"

@@ -1,5 +1,6 @@
 {
     "liveServer.settings.port": 5501,
     "files.autoSave": "afterDelay",
-    "editor.fontSize": 14
+    "editor.fontSize": 14,
+    "editor.formatOnSave": true
 }

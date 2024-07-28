@@ -1,3 +1,4 @@
+<!-- panel.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,10 +7,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LetXPath</title>
   <link rel="stylesheet" href="../app/styles/main.css">
+  <link rel="stylesheet" href="../app/styles/exp.css">
   <script defer src="../app/utils/jquery.js"></script>
   <script defer src="../panelconfig.js"></script>
   <script defer src="../panel/panel.js"></script>
   <style>
+    body {
+      zoom: 0.9;
+    }
+
     span.label {
       font-size: small;
     }
@@ -86,16 +92,14 @@
         <a>Axes</a>
       </li>
       <li class="tab-item c-hand" data-option="5">
-        <a>Search</a>
+        <a>Tools</a>
       </li>
       <!-- <li class="tab-item c-hand" data-option="6">
         <a>Record</a>
       </li> -->
       <!-- about -->
       <li class="tab-item tooltip tooltip-bottom c-hand" data-tooltip="About LetXPath" data-option="4">
-        <a>
-          <img src="../assets/32.png" alt="letxpath">
-        </a>
+        <a>About</a>
       </li>
       <!-- settings -->
       <li id="openSetting" class="tooltip tooltip-left c-hand my-2" data-tooltip="Setting">
@@ -106,11 +110,10 @@
     </ul>
   </div>
   <div class="container">
-    <div class="toast toast-success d-hide">
-    </div>
+    <div class="toast toast-success d-hide"></div>
   </div>
   <div class="container grid-lg bg-dark" id="tab_container">
-    <div class="container_item card active bg-dark" data-item="1">
+    <div class="container_item card bg-dark active" data-item="1">
       <div class="card-body" id="addXPath">
         <div class="empty bg-dark">
           <p class="empty-title h5">Please select any element to get XPath</p>
@@ -139,78 +142,185 @@
     </div>
     <!-- About -->
     <div class="container_item card bg-dark" data-item="4">
-      <div class="card-body bg-dark">
-        <div class="container text-center">
-          <div class="columns">
-            <div class="column">
-              <div class="s-rounded">
-                <a href="https://twitter.com/intent/tweet?text=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk"
-                  target="_blank" class="tooltip tooltip-bottom" data-tooltip="Tweet LetXPath">
-                  <img src="../assets/icons/panel/twitter.svg" alt="tweet" width="40px">
-                </a>
-              </div>
-            </div>
-            <div class="column">
-              <div class="s-rounded">
-                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
-                  target="_blank" class="tooltip tooltip-bottom" data-tooltip="Post LetXPath">
-                  <img src="../assets/icons/panel/linkedin.svg" alt="tweet" width="40px"></a>
-              </div>
-            </div>
-            <div class="column">
-              <div class="s-rounded">
-                <a href="https://www.facebook.com/sharer/sharer.php?u=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
-                  target="_blank" class="tooltip tooltip-bottom" data-tooltip="Share LetXPath">
-                  <img src="../assets/icons/panel/facebook.svg" alt="tweet" width="40px"></img>
-                </a>
-              </div>
-            </div>
+      <div class="container">
+        <div class="filter">
+          <input type="radio" id="tag-1" class="filter-tag" name="filter-radio" hidden>
+          <input type="radio" id="tag-2" class="filter-tag" name="filter-radio" hidden>
+          <input type="radio" id="tag-3" class="filter-tag" name="filter-radio" hidden>
+          <input type="radio" id="tag-4" class="filter-tag" name="filter-radio" hidden>
+          <input type="radio" id="tag-7" class="filter-tag" name="filter-radio" hidden>
+
+          <div class="filter-nav">
+            <label class="chip" for="tag-1">Info</label>
+            <label class="chip" for="tag-2">Ratings</label>
+            <label class="chip" for="tag-3">Learning</label>
+            <label class="chip" for="tag-4">Donation</label>
+            <label class="chip" for="tag-7">Explore</label>
           </div>
-          <div class="columns text-center">
-            <div class="cloumn p-centered">
-              <a href="https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/reviews"
-                target="_blank">
-                <button class="btn btn-primary">💓 Your review is very important, help me to improve
-                  💓</button>
-              </a>
+
+          <div class="filter-body">
+            <div class="filter-item card" data-tag="tag-1">
+              <div class="card-body bg-dark">
+                <h3>Simple, Useful, Open-Source XPath Finder</h3>
+                <p>LetXPath by LetCode with Koushik is an open-source tool for finding XPath and CSS selectors with a
+                  single click, offering code snippets based on the element type.</p>
+                <ul>Features:</ul>
+                <li>Single-click XPath generation</li>
+                <li>Dynamic and Axes-based XPaths</li>
+                <li>Code snippets for Selenium (Java, Python, C#), Protractor JS, Playwright Node & Java
+                </li>
+                <p>Send me a PR, if you like to <a href="https://github.com/ortoniKC/LetXPath/pulls"
+                    target="_blank">contribute</a>
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="columns text-center">
-          <div class="column">
-            <p>Thank you for your time! Please take a minute to leave your feedback. Your Review
-              helps
-              me not only to improve the product but also to let others know about the product and
-              its
-              usage.
-              I will be forever grateful. Thank you in advance for helping me out!
-            </p>
-            <p>Send me a PR, if you like to <a href="https://github.com/ortoniKC/LetXPath/pulls"
-                target="_blank">contribute</a></p>
+            <div class="filter-item card" data-tag="tag-2">
+              <div class="card-body bg-dark">
+                <div class="columns text-center">
+                  <div class="column">
+                    <p>Thank you for your time! Please take a minute to leave your feedback. Your Review
+                      helps
+                      me not only to improve the product but also to let others know about the product and
+                      its
+                      usage.
+                      I will be forever grateful. Thank you in advance for helping me out!
+                    </p>
+                    <div class="columns text-center">
+                      <div class="cloumn p-centered">
+                        <a href="https://chromewebstore.google.com/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/reviews"
+                          target="_blank">
+                          <button class="btn btn-link">💓 Your review is very important, help me to improve
+                            💓</button>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="container text-center">
+                    <p>Share us on social media!</p>
+                    <div class="columns text-center">
+                      <div class="column col-4"></div>
+                      <div class="column col-1">
+                        <div class="s-rounded">
+                          <a href="https://twitter.com/intent/tweet?text=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk"
+                            target="_blank" class="tooltip tooltip-top" data-tooltip="Tweet LetXPath">
+                            <img src="../assets/icons/panel/twitter.svg" alt="tweet" width="25px">
+                          </a>
+                        </div>
+                      </div>
+                      <div class="column col-1">
+                        <div class="s-rounded">
+                          <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
+                            target="_blank" class="tooltip tooltip-top" data-tooltip="Post LetXPath">
+                            <img src="../assets/icons/panel/linkedin.svg" alt="tweet" width="25px"></a>
+                        </div>
+                      </div>
+                      <div class="column col-1">
+                        <div class="s-rounded">
+                          <a href="https://www.facebook.com/sharer/sharer.php?u=https://chrome.google.com/webstore/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/"
+                            target="_blank" class="tooltip tooltip-top" data-tooltip="Share LetXPath">
+                            <img src="../assets/icons/panel/facebook.svg" alt="tweet" width="25px"></img>
+                          </a>
+                        </div>
+                      </div>
+                      <div class="column col-1">
+                        <iframe
+                          src="https://ghbtns.com/github-btn.html?user=ortoniKC&repo=LetXPath&type=star&count=true"
+                          frameborder="0" scrolling="0" width="150" height="20" title="GitHub"></iframe>
+                      </div>
+                      <div class="column col-4"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="filter-item card" data-tag="tag-3">
+              <div class="card-body bg-dark">
+                <div class="container bg-dark ">
+                  <h3 class="text-center">Unique Value</h3>
+                  <p>LetXPath not only provides XPaths but also includes video tutorials on building the tool itself.
+                  </p>
+                  <p class="text-secondar">Source Code: <a href="https://github.com/ortoniKC/LetXPath"
+                      target="_blank">GitHub</a>
+                  </p>
+                  <p class="text-secondar">Tutorial: <a href="https://youtube.com/@letcode" target="_blank">YouTube</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="filter-item card" data-tag="tag-4">
+              <div class="card-body bg-dark">
+                <h3>Free and Always Free</h3>
+                <p class="text-primary">Support LetXPath</p>
+                <div class="columns">
+                  <div class="column">
+                    <p>If you find LetXPath useful, please consider supporting its development by making a donation.
+                      Your
+                      contributions help keep this project free and continuously improving.</p>
+                    <p>UPI: ortoni@ybl</p>
+                    <p>Thank you for your support!</p>
+                  </div>
+                  <div class="column">
+                    <img src="../assets/ortoni.png" width="120px" alt="ortoni@ybl">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="filter-item card" data-tag="tag-7">
+              <div class="card-body bg-dark">
+                <div class="container bg-dark ">
+                  <h3 class="text-center">Other products by Koushik</h3>
+                  <p class="text-secondar">Ortoni Report: <a href="https://www.npmjs.com/package/ortoni-report"
+                      target="_blank">Playwright HTML Report</a>
+                  </p>
+                  <p class="text-secondar">Playwright Runner: <a
+                      href="https://marketplace.visualstudio.com/items?itemName=ortoni.ortoni" target="_blank">VSCode
+                      Extension</a>
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Custom Search -->
-    <div class="container_item card bg-dark" data-item="5">
-      <div class="empty container bg-dark">
-        <div class="title">
-          <h3 class="text-secondary">Custom Search</h3>
+    <!-- tools -->
+    <div class="container_item bg-dark" data-item="5">
+      <div class="filter">
+        <input type="radio" id="tag-5" class="filter-tag" name="filter-radio" hidden>
+        <input type="radio" id="tag-6" class="filter-tag" name="filter-radio" hidden>
+
+        <div class="filter-nav">
+          <label class="chip" for="tag-5">Search</label>
+          <label class="chip" for="tag-6">Conversion</label>
         </div>
-        <div class="input-group">
-          <input type="text" class="form-input" id="searchVal" placeholder="Type your XPath">
-          <button id="usxp" class="btn btn-primary input-group-btn">Find</button>
-          <button id="cleanhighlight" class="btn btn-link input-group-btn">Clear</button>
-        </div>
-        <div class="form-group" id="insertsearch">
-        </div>
-      </div>
-    </div>
-    <!-- Record -->
-    <div class="container_item card bg-dark" data-item="6">
-      <div class="empty container bg-dark">
-        <div class="title">
-          <h3 class="text-secondary">TODO</h3>
+
+        <div class="filter-body">
+          <div class="filter-item container" data-tag="tag-5">
+            <div class="container bg-dark">
+              <div class="title">
+                <h3 class="text-secondary text-center">Custom Search</h3>
+              </div>
+              <div class="input-group">
+                <input type="text" class="form-input" id="searchVal" placeholder="Type your XPath">
+                <button id="usxp" class="btn btn-primary input-group-btn">Find</button>
+                <button id="cleanhighlight" class="btn btn-link input-group-btn">Clear</button>
+              </div>
+              <div class="form-group text-center" id="insertsearch"></div>
+            </div>
+          </div>
+          <div class="filter-item container" data-tag="tag-6">
+            <div class="container bg-dark">
+              <div class="title">
+                <h3 class="text-secondary text-center">Convert to CSS</h3>
+              </div>
+              <div class="input-group">
+                <input type="text" class="form-input" id="convert" placeholder="Enter XPath">
+                <button id="convertSelector" class="btn btn-primary input-group-btn">Convert</button>
+              </div>
+              <span class="label label-warning">Cannot handle complex XPath! <strong>(Beta)</strong></span>
+              <div class="form-group text-center" id="insertCSS"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
