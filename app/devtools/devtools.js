@@ -24,7 +24,9 @@ function updatePanel() {
       { useContentScriptContext: true },
       (result, exceptionInfo) => {
         if (exceptionInfo) {
+          console.error("XPath generation failed:", exceptionInfo.description);
         }
+        console.info("Logged result:", result);
       }
     );
   }
