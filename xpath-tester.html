@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XPath Selector Testing Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .header {
+            background: #ff6b6b;
+            padding: 20px;
+            color: white;
+        }
+        .header h1 {
+            background: #ee5a5a;
+            padding: 10px;
+        }
+        .nav {
+            background: #4ecdc4;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .nav-item {
+            background: #45b8b0;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .container {
+            display: flex;
+            min-height: calc(100vh - 200px);
+        }
+        .sidebar {
+            background: #95e1d3;
+            width: 250px;
+            padding: 20px;
+            transition: width 0.3s;
+        }
+        .sidebar.collapsed {
+            width: 50px;
+            overflow: hidden;
+        }
+        .sidebar-toggle {
+            background: #88d4c6;
+            padding: 10px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            text-align: center;
+            border-radius: 3px;
+        }
+        .sidebar-section {
+            background: #7dc9bb;
+            margin: 10px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .sidebar-header {
+            background: #6fbfb1;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .sidebar-content {
+            background: #8fd4c7;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s;
+        }
+        .sidebar-content.expanded {
+            max-height: 500px;
+            padding: 10px;
+        }
+        .sidebar-item {
+            background: #a2dfd3;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: #ffeaa7;
+        }
+        .content-section {
+            background: #fddc8e;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .content-header {
+            background: #fcd575;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .content-body {
+            background: #fbe8a3;
+            padding: 10px;
+        }
+        .nested-level-1 {
+            background: #dfe6e9;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #b2bec3;
+        }
+        .nested-level-2 {
+            background: #ecf0f1;
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 4px solid #95a5a6;
+        }
+        .nested-level-3 {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid #7f8c8d;
+        }
+        .data-table {
+            background: #fab1a0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffeaa7;
+        }
+        th {
+            background: #fd79a8;
+            padding: 10px;
+            color: white;
+        }
+        td {
+            background: #fdcb6e;
+            padding: 8px;
+            border: 1px solid #ffeaa7;
+        }
+        tr:nth-child(even) td {
+            background: #ffeaa7;
+        }
+        .footer {
+            background: #a29bfe;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        .footer-section {
+            background: #9388f7;
+            display: inline-block;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 5px;
+        }
+        .card {
+            background: #74b9ff;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            width: calc(33% - 20px);
+            vertical-align: top;
+        }
+        .card-header {
+            background: #6caff5;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+        .card-body {
+            background: #8dc5ff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .card-footer {
+            background: #a5d4ff;
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header" id="main-header">
+        <h1>XPath Selector Testing Page</h1>
+        <div class="header-meta" style="background: #ff8787; padding: 10px; margin-top: 10px;">
+            <span class="header-label" style="background: #ffa3a3; padding: 5px; margin-right: 10px;">Version: 1.0</span>
+            <span class="header-label" style="background: #ffa3a3; padding: 5px;">Date: 2025-01-15</span>
+        </div>
+    </header>
+
+    <nav class="nav" id="main-nav">
+        <div class="nav-item" data-page="home">Home</div>
+        <div class="nav-item" data-page="about">About</div>
+        <div class="nav-item" data-page="products">Products</div>
+        <div class="nav-item" data-page="contact">Contact</div>
+    </nav>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-toggle" onclick="toggleSidebar()">☰</div>
+            
+            <div class="sidebar-section" data-section="menu">
+                <div class="sidebar-header" onclick="toggleSection(this)">Menu Items</div>
+                <div class="sidebar-content">
+                    <div class="sidebar-item" data-item="dashboard">Dashboard</div>
+                    <div class="sidebar-item" data-item="analytics">Analytics</div>
+                    <div class="sidebar-item" data-item="reports">Reports</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section" data-section="tools">
+                <div class="sidebar-header" onclick="toggleSection(this)">Tools</div>
+                <div class="sidebar-content">
+                    <div class="sidebar-item" data-item="calculator">Calculator</div>
+                    <div class="sidebar-item" data-item="converter">Converter</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section" data-section="settings">
+                <div class="sidebar-header" onclick="toggleSection(this)">Settings</div>
+                <div class="sidebar-content">
+                    <div class="sidebar-item" data-item="profile">Profile</div>
+                    <div class="sidebar-item" data-item="preferences">Preferences</div>
+                    <div class="sidebar-item" data-item="security">Security</div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content" id="main-content">
+            <section class="content-section" data-section="intro">
+                <div class="content-header">
+                    <h2>Introduction Section</h2>
+                </div>
+                <div class="content-body">
+                    <p>This page is designed for testing XPath selectors with various nested structures.</p>
+                    <div class="nested-level-1" data-level="1">
+                        <h3>Nested Level 1</h3>
+                        <p>First level of nesting</p>
+                        <div class="nested-level-2" data-level="2">
+                            <h4>Nested Level 2</h4>
+                            <p>Second level of nesting</p>
+                            <div class="nested-level-3" data-level="3">
+                                <h5>Nested Level 3</h5>
+                                <p>Third level of nesting with <span style="background: #ffe5e5; padding: 3px;">inline span</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" data-section="cards">
+                <div class="content-header">
+                    <h2>Card Components</h2>
+                </div>
+                <div class="content-body">
+                    <div class="card" data-card="1">
+                        <div class="card-header">Card 1</div>
+                        <div class="card-body">
+                            <p>Card body content</p>
+                            <ul style="background: #b4dbff; padding: 10px; margin: 5px 0;">
+                                <li style="background: #c9e4ff; padding: 5px; margin: 3px 0;">Item 1</li>
+                                <li style="background: #c9e4ff; padding: 5px; margin: 3px 0;">Item 2</li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">Card Footer</div>
+                    </div>
+
+                    <div class="card" data-card="2">
+                        <div class="card-header">Card 2</div>
+                        <div class="card-body">
+                            <p>Another card</p>
+                            <div style="background: #c9e4ff; padding: 8px;">
+                                <span style="background: #ddeeff; padding: 5px;">Nested span</span>
+                            </div>
+                        </div>
+                        <div class="card-footer">Card Footer</div>
+                    </div>
+
+                    <div class="card" data-card="3">
+                        <div class="card-header">Card 3</div>
+                        <div class="card-body">
+                            <p>Third card</p>
+                        </div>
+                        <div class="card-footer">Card Footer</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="data-table" data-section="table">
+                <h3 style="background: #e17055; padding: 10px; color: white; margin-bottom: 10px;">Data Table</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-id="1">
+                            <td>001</td>
+                            <td>Product A</td>
+                            <td>Electronics</td>
+                            <td><span style="background: #55efc4; padding: 3px 8px; border-radius: 3px;">Active</span></td>
+                        </tr>
+                        <tr data-id="2">
+                            <td>002</td>
+                            <td>Product B</td>
+                            <td>Furniture</td>
+                            <td><span style="background: #fdcb6e; padding: 3px 8px; border-radius: 3px;">Pending</span></td>
+                        </tr>
+                        <tr data-id="3">
+                            <td>003</td>
+                            <td>Product C</td>
+                            <td>Electronics</td>
+                            <td><span style="background: #55efc4; padding: 3px 8px; border-radius: 3px;">Active</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="content-section" data-section="complex">
+                <div class="content-header">
+                    <h2>Complex Nested Structure</h2>
+                </div>
+                <div class="content-body">
+                    <div class="nested-level-1">
+                        <h3>Parent Container</h3>
+                        <div class="nested-level-2">
+                            <h4>Child Container 1</h4>
+                            <div class="nested-level-3">
+                                <p>Grandchild 1-1</p>
+                            </div>
+                            <div class="nested-level-3">
+                                <p>Grandchild 1-2</p>
+                            </div>
+                        </div>
+                        <div class="nested-level-2">
+                            <h4>Child Container 2</h4>
+                            <div class="nested-level-3">
+                                <p>Grandchild 2-1</p>
+                                <div style="background: #ffffff; padding: 8px; margin: 5px 0;">
+                                    <span style="background: #e8e8e8; padding: 5px;">Great-grandchild</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="footer" id="main-footer">
+        <div class="footer-section" data-footer="company">
+            <h4 style="background: #8479eb; padding: 8px; margin-bottom: 5px;">Company Info</h4>
+            <p>XPath Test Page © 2025</p>
+        </div>
+        <div class="footer-section" data-footer="links">
+            <h4 style="background: #8479eb; padding: 8px; margin-bottom: 5px;">Quick Links</h4>
+            <ul style="list-style: none; background: #8b82f0; padding: 8px;">
+                <li style="background: #9d95f5; padding: 5px; margin: 3px 0;">Privacy</li>
+                <li style="background: #9d95f5; padding: 5px; margin: 3px 0;">Terms</li>
+            </ul>
+        </div>
+        <div class="footer-section" data-footer="contact">
+            <h4 style="background: #8479eb; padding: 8px; margin-bottom: 5px;">Contact</h4>
+            <p>test@example.com</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            content.classList.toggle('expanded');
+        }
+    </script>
+</body>
+</html>
