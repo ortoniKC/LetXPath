@@ -1,7 +1,11 @@
 # Spec-001: DevTools Context Menu Integration for Axes-Based XPath
 
 ## Status
-**Draft** | Version 1.0 | Created: November 8, 2025
+**Ready for Implementation** | Version 1.1 | Created: November 8, 2025 | Reviewed: November 8, 2025
+
+### Revision History
+- **v1.0** - Initial draft
+- **v1.1** - Corrected cross-context state management issues, removed infeasible Task 3.2, updated keyboard shortcut limitations, adjusted timeline estimates
 
 ## Overview
 Add the ability to trigger "Select Parent" and "Select Child" operations directly from within Chrome DevTools Elements panel context menu, eliminating the need to right-click on the actual webpage. This enhancement improves the user experience for generating axes-based XPath selectors.
@@ -289,32 +293,46 @@ case "anchor":
 ### Phase 2: User Experience Enhancements
 
 #### Task 2.1: Visual Feedback for Parent Selection
-**File**: `app/devtools/devtools.js`
+**Files**: `app/devtools/devtools.js`, `panel/panel.js`
+
+**Implementation Strategy**: Send messages from devtools.js to panel.js for UI updates
 
 ```javascript
-// Add UI notification system
+// In devtools.js
 function showNotification(message, type = 'info') {
-  // TODO: Implement notification display in sidebar
-  // Options:
-  // 1. Update sidebar with temporary banner
-  // 2. Use Chrome notifications API
-  // 3. Add status indicator to panel
+  // Send notification to panel for display
+  chrome.runtime.sendMessage({
+    request: 'show_notification',
+    data: { message, type }
+  });
+  // Also log to console for debugging
   console.info(`[LetXPath] ${message}`);
 }
 
-// Update selectAxesParent
-function selectAxesParent() {
-  // ... existing code ...
-  showNotification("Parent element selected. Now select a child element.", "success");
-}
+// In panel/panel.js (add to existing message listener)
+chrome.runtime.onMessage.addListener((req, rec, res) => {
+  // ... existing cases ...
+  if (req.request === 'show_notification') {
+    const toast = document.querySelector('.toast');
+    toast.textContent = req.data.message;
+    toast.classList.remove('d-hide');
+    toast.classList.add('toast-' + req.data.type);
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      toast.classList.add('d-hide');
+    }, 3000);
+  }
+});
 ```
 
 **Acceptance Criteria:**
 - [ ] User sees confirmation after selecting parent
 - [ ] Clear indication that child selection is next step
 - [ ] Notification is non-intrusive
+- [ ] Uses existing toast UI component in panel
 
-**Estimated Effort**: 4 hours
+**Estimated Effort**: 3 hours (reduced - reuses existing UI)
 
 ---
 
@@ -330,43 +348,62 @@ function selectAxesParent() {
 
 **Recommended**: Option 1 (simplest, most explicit)
 
+**⚠️ CRITICAL ISSUE**: `dupArray` and `tagArrHolder` are global variables in `content.js`, NOT accessible from `devtools.js` context!
+
+**Corrected Implementation**:
 ```javascript
 // Keep both menu items always visible
-// Handle state internally in callbacks
+// Handle state validation via eval in content script
 
 function selectAxesParent() {
-  if (dupArray.length > 0) {
-    // Already have a parent, ask user to confirm reset
-    if (confirm("Reset current axes selection and start over?")) {
-      resetAxesSelection();
-    } else {
-      return;
+  chrome.devtools.inspectedWindow.eval(
+    "(function() { " +
+    "  if (typeof dupArray !== 'undefined' && dupArray.length > 0) { " +
+    "    return { needsReset: true, currentLength: dupArray.length }; " +
+    "  } " +
+    "  return { needsReset: false }; " +
+    "})()",
+    { useContentScriptContext: true },
+    (result, exceptionInfo) => {
+      if (result && result.needsReset) {
+        if (confirm(`Reset current axes selection (${result.currentLength} element(s)) and start over?`)) {
+          // Reset via eval
+          chrome.devtools.inspectedWindow.eval(
+            "dupArray.length = 0; tagArrHolder.length = 0;",
+            { useContentScriptContext: true }
+          );
+        } else {
+          return;
+        }
+      }
+      // Continue with parent selection
+      selectAxesParent(); // Original function from Task 1.2
     }
-  }
-  // ... continue with parent selection
+  );
 }
 
 function selectAxesChild() {
-  if (dupArray.length === 0) {
-    showNotification("Please select a parent element first", "warning");
-    return;
-  }
-  if (dupArray.length === 2) {
-    // Already complete, ask to reset
-    if (confirm("Generate new axes XPath? This will clear the current selection.")) {
-      resetAxesSelection();
-      return;
+  // Check state before proceeding
+  chrome.devtools.inspectedWindow.eval(
+    "(function() { " +
+    "  if (typeof dupArray === 'undefined' || dupArray.length === 0) { " +
+    "    return { error: 'Please select a parent element first' }; " +
+    "  } " +
+    "  if (dupArray.length >= 2) { " +
+    "    return { error: 'Already complete. Reset to start over.' }; " +
+    "  } " +
+    "  return { ok: true }; " +
+    "})()",
+    { useContentScriptContext: true },
+    (result, exceptionInfo) => {
+      if (result && result.error) {
+        showNotification(result.error, "warning");
+        return;
+      }
+      // Continue with child selection
+      selectAxesChild(); // Original function from Task 1.2
     }
-    return;
-  }
-  // ... continue with child selection
-}
-
-function resetAxesSelection() {
-  dupArray.length = 0;
-  tagArrHolder.length = 0;
-  axesSelectionMode = 'parent';
-  showNotification("Axes selection reset. Select a parent element.", "info");
+  );
 }
 ```
 
@@ -374,8 +411,9 @@ function resetAxesSelection() {
 - [ ] Selecting child before parent shows helpful error
 - [ ] User can reset and start over
 - [ ] Clear feedback at each step
+- [ ] State checks work across DevTools/content script boundary
 
-**Estimated Effort**: 3 hours
+**Estimated Effort**: 4 hours (increased due to cross-context complexity)
 
 ---
 
@@ -474,39 +512,28 @@ function isDescendantOrFollowing(parent, child) {
 
 ---
 
-#### Task 3.2: State Persistence
-**File**: `app/devtools/devtools.js`
+#### Task 3.2: State Persistence ⚠️ REMOVED - NOT FEASIBLE
 
-```javascript
-// Persist state when DevTools panel closes/reopens
-function saveAxesState() {
-  chrome.storage.local.set({
-    letxpath_axes_mode: axesSelectionMode,
-    letxpath_axes_selections: dupArray.length
-  });
-}
+**Decision**: Remove this task from scope.
 
-function loadAxesState() {
-  chrome.storage.local.get(['letxpath_axes_mode', 'letxpath_axes_selections'], (result) => {
-    if (result.letxpath_axes_mode) {
-      axesSelectionMode = result.letxpath_axes_mode;
-    }
-    if (result.letxpath_axes_selections > 0) {
-      showNotification(`Resuming axes selection (${result.letxpath_axes_selections}/2 elements selected)`, 'info');
-    }
-  });
-}
+**Reason**: 
+- `dupArray` lives in content script context and stores actual XPath data structures
+- DevTools context has no direct access to content script globals
+- Persisting complex XPath data structures to storage would require deep serialization
+- When DevTools closes, the content script continues running and maintains state naturally
+- When page reloads, state SHOULD be cleared (old elements become invalid)
 
-// Call on initialization
-loadAxesState();
-```
+**Alternative Approach**:
+- State naturally persists while DevTools is closed (content script keeps running)
+- State naturally clears on page reload (appropriate behavior)
+- No additional implementation needed
 
-**Acceptance Criteria:**
-- [ ] Selection state persists across DevTools close/reopen
-- [ ] User can resume where they left off
-- [ ] State cleared after successful generation
+**Revised Acceptance Criteria:**
+- [ ] ~~Selection state persists across DevTools close/reopen~~ (Not needed - content script maintains state)
+- [ ] State clears on page navigation (existing behavior)
+- [ ] Document that parent selection must be redone after page reload
 
-**Estimated Effort**: 2 hours
+**Estimated Effort**: 0 hours (removed from scope)
 
 ---
 
@@ -566,9 +593,9 @@ loadAxesState();
 **Test Websites**:
 1. https://letcode.in (test automation practice site)
 2. https://the-internet.herokuapp.com/
-3. Complex SPA: https://reactjs.org/
-4. Table-heavy: Wikipedia
-5. Shadow DOM: Chrome settings page (chrome://settings)
+3. Complex SPA: https://react.dev/ (updated URL)
+4. Table-heavy: Wikipedia article with tables
+5. Shadow DOM: Developer-accessible site with shadow DOM (NOT chrome://settings - DevTools doesn't work on chrome:// URLs)
 
 **Acceptance Criteria:**
 - [ ] All P0 tests pass
@@ -611,31 +638,50 @@ function clearAxesHighlight() {
 
 ---
 
-#### Task 4.2: Keyboard Shortcuts
-**Complexity**: Medium
+#### Task 4.2: Keyboard Shortcuts ⚠️ API LIMITATION
+**Complexity**: High (not Medium)
 **Value**: High
 
 Add keyboard shortcuts for power users:
 - `Ctrl+Shift+P` - Select Parent
-- `Ctrl+Shift+C` - Select Child
+- `Ctrl+Shift+C` - Select Child  
 - `Ctrl+Shift+R` - Reset Selection
 
+**⚠️ CRITICAL LIMITATION**: `chrome.commands` API is NOT available in DevTools context!
+
+**Alternative Approaches**:
+1. **Use background script** - Commands trigger in service_worker.js, which sends messages to DevTools
+2. **DevTools keyboard handling** - Use `document.addEventListener('keydown')` in panel (only works when panel has focus)
+3. **Skip keyboard shortcuts** - Wait for Chrome to add DevTools command support
+
+**Recommended**: Approach 2 (panel-level keyboard handling)
+
 ```javascript
-// In devtools.js
-chrome.commands.onCommand.addListener((command) => {
-  switch(command) {
-    case 'select-axes-parent':
-      selectAxesParent();
-      break;
-    case 'select-axes-child':
-      selectAxesChild();
-      break;
-    case 'reset-axes-selection':
-      resetAxesSelection();
-      break;
+// In panel/panel.js (where DOM events work)
+document.addEventListener('keydown', (e) => {
+  // Only trigger if not typing in input field
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    return;
   }
+  
+  if (e.ctrlKey && e.shiftKey && e.key === 'P') {
+    e.preventDefault();
+    // Send message to trigger parent selection
+    chrome.runtime.sendMessage({ request: 'keyboard_select_parent' });
+  }
+  // ... similar for child and reset
+});
+
+// In devtools.js, listen for keyboard messages
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.request === 'keyboard_select_parent') {
+    selectAxesParent();
+  }
+  // ... etc
 });
 ```
+
+**Caveat**: Only works when LetXPath panel/sidebar has focus.
 
 **Manifest.json addition**:
 ```json
@@ -721,17 +767,21 @@ Maintain existing webpage context menu for users who prefer it.
 ### 3. State Management
 
 **Current Implementation**:
-- `dupArray` is global in content.js
-- State is shared between webpage and DevTools contexts
+- `dupArray` is global in content.js (content script context)
+- State is shared between webpage and DevTools contexts naturally (same content script)
 
 **Proposed**:
-- Keep shared state for both entry points
-- Add `axesSelectionMode` in devtools.js for UI state
-- Sync state via messages if needed
+- Keep shared state for both entry points (both ultimately call `buildXpath` in content.js)
+- Add `axesSelectionMode` in devtools.js for UI tracking only
+- State access from devtools.js requires `eval()` calls - cannot directly read/write
 
-**Risk**: Race conditions if both methods used simultaneously.
+**Key Insight**: Both webpage context menu and DevTools context menu invoke the SAME content script code, so state naturally syncs.
 
-**Mitigation**: Document that only one method should be used at a time.
+**Risk**: User confusion if switching methods mid-flow, not actual data corruption.
+
+**Mitigation**: 
+- Document the shared state behavior as a feature, not a bug
+- Visual feedback shows which step user is on regardless of entry point
 
 ---
 
@@ -822,28 +872,44 @@ Maintain existing webpage context menu for users who prefer it.
 
 | Phase | Tasks | Effort | Duration |
 |-------|-------|--------|----------|
-| Phase 1: Core | Tasks 1.1-1.4 | 8 hours | 1-2 days |
-| Phase 2: UX | Tasks 2.1-2.3 | 8 hours | 1-2 days |
-| Phase 3: Testing | Tasks 3.1-3.4 | 17 hours | 2-3 days |
-| Phase 4: Optional | Tasks 4.1-4.3 | 9 hours | 1-2 days |
-| **Total** | | **42 hours** | **5-9 days** |
+| Phase 1: Core | Tasks 1.1-1.4 | 8 hours | 1 day |
+| Phase 2: UX | Tasks 2.1-2.3 | 9 hours | 1 day |
+| Phase 3: Testing | Tasks 3.1, 3.3-3.4 | 15 hours | 2 days |
+| Phase 4: Optional | Tasks 4.1-4.3 | 11 hours | 1-2 days |
+| **Total (Core + Testing)** | | **32 hours** | **4 days** |
+| **Total (with Optional)** | | **43 hours** | **5-6 days** |
 
-**Recommended Sprint**: 2 weeks (allows for discovery, refactoring, and unexpected issues)
+**Recommended Sprint**: 1 week for MVP (Phases 1-3), +1 week for polish (Phase 4)
+
+**AI Self-Assessment**: 
+- **Phase 1**: High confidence - straightforward API usage
+- **Phase 2**: Medium confidence - cross-context state management tricky
+- **Phase 3**: High confidence - testing and error handling
+- **Phase 4**: Medium confidence - workarounds for API limitations
 
 ---
 
 ## Definition of Done
 
+**MVP (Minimum Viable Product)**:
 - [ ] All Phase 1 tasks completed and tested
-- [ ] All Phase 2 tasks completed and tested
-- [ ] All Phase 3 P0 and P1 tests passing
-- [ ] Code reviewed by at least one other developer
-- [ ] Documentation updated (README, constitution)
+- [ ] Phase 2 Task 2.1 (notifications) completed
+- [ ] Phase 2 Task 2.3 (auto tab switch) completed
+- [ ] Phase 3 Task 3.1 (error handling) completed
+- [ ] All Phase 3 P0 tests passing
 - [ ] No console errors in normal usage
+- [ ] Documentation updated (README with usage instructions)
+- [ ] Works on Chrome (primary target)
+
+**Full Release**:
+- [ ] All MVP criteria met
+- [ ] Phase 2 Task 2.2 (conditional display) completed
+- [ ] All Phase 3 P1 tests passing
+- [ ] Constitution updated with new architecture
 - [ ] Works on Chrome, Edge, Brave (Chromium-based browsers)
-- [ ] Performance benchmarks met
+- [ ] Performance benchmarks met (< 50ms overhead)
 - [ ] Release notes written
-- [ ] Beta version deployed to Chrome Web Store
+- [ ] User feedback from at least 3 beta testers
 
 ---
 
