@@ -36,7 +36,7 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
         res("completed");
         break;
     }
-  } catch (error) {}
+  } catch (error) { }
 });
 
 function hideToast() {

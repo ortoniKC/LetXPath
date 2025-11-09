@@ -53,7 +53,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     sendToContentScript(message);
     sendResponse("Hello");
   }
-  
+
   // Handle show_notification - just pass through, don't block
   if (message.request === "show_notification") {
     sendResponse("acknowledged");

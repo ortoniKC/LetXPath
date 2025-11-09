@@ -217,7 +217,7 @@ function parseDOM(targetElement) {
       // anchroXPathData = [];
       webTableDetails = null;
     }
-  } catch (error) {}
+  } catch (error) { }
 }
 async function sendMessage(msg) {
   return new Promise((resolve) => {
@@ -321,8 +321,6 @@ function handleDevToolsAxesSelection(element, mode) {
   }
 }
 
-// Expose to global scope for DevTools eval
-window.handleDevToolsAxesSelection = handleDevToolsAxesSelection;
 
 function buildXpath(element, boolAnchor, utils) {
   if (element.shadowRoot != null) {
