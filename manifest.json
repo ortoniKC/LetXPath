@@ -52,7 +52,7 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
-  "homepage_url": "https://www.letcode.in",
+  "homepage_url": "https://www.google.com",
   "options_page": "option/option.html",
   "offline_enabled": true
 }
