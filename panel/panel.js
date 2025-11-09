@@ -4,37 +4,43 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
     switch (req.request) {
       case "send_to_dev":
         handleSendToDev(req);
-        res("completed");
+        res({ status: "completed" });
         break;
       case "anchor":
         handleAnchor(req);
-        res("completed");
+        res({ status: "completed" });
         break;
       case "axes":
         updateElementText("#anxp", req.data);
-        res("completed");
+        res({ status: "completed" });
         break;
       case "fromUtilsSelector":
         utilsLocatorUI(req.data);
-        res("completed");
+        res({ status: "completed" });
         break;
       case "customSearchResult":
         buildSearchUI(req.data);
-        res("completed");
+        res({ status: "completed" });
         break;
       case "conversion":
         buildConversionUI(req.output);
-        res("completed");
+        res({ status: "completed" });
         break;
       case "show_notification":
         showNotificationToast(req.data.message, req.data.type);
-        res("completed");
+        res({ status: "completed" });
         break;
       default:
-        res("completed");
+        res({ status: "completed" });
         break;
     }
-  } catch (error) { }
+  } catch (error) {
+    console.error("[LetXPath Panel] Message handling error:", error);
+    res({ status: "error", error: error.message });
+  }
+
+  // Return true to indicate async response handling
+  return true;
 });
 
 function hideToast() {

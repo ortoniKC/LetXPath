@@ -69,7 +69,7 @@ $(document).ready(function () {
 
   // --- open option page
   $("body").on("click", "#openSetting", () => {
-    chrome.runtime.openOptionsPage(() => {});
+    chrome.runtime.openOptionsPage(() => { });
   });
   // --- click to copy code
   $("body").on("click", "#copyCode", (t) => {
@@ -77,7 +77,7 @@ $(document).ready(function () {
       var from = document.getElementById("sniplang");
       var range = document.createRange();
       copyToClipBoard(range, from);
-    } catch (error) {}
+    } catch (error) { }
   });
   // To copy Xpath
   $("body").on("click", "#xpathVal", (e) => {
@@ -88,7 +88,7 @@ $(document).ready(function () {
       var from = document.getElementById(c);
       var range = document.createRange();
       copyToClipBoard(range, from);
-    } catch (error) {}
+    } catch (error) { }
   });
   // click to copy axes xpath
   $("body").on("click", "#anxp", (e) => {
@@ -99,7 +99,7 @@ $(document).ready(function () {
       var from = document.getElementById(c);
       var range = document.createRange();
       copyToClipBoard(range, from);
-    } catch (error) {}
+    } catch (error) { }
   });
   // click to copy table values
   $("body").on("click", ".btn.btn-link.btn-sm", (e) => {
@@ -110,7 +110,7 @@ $(document).ready(function () {
       var from = document.getElementById(c);
       var range = document.createRange();
       copyToClipBoard(range, from);
-    } catch (error) {}
+    } catch (error) { }
   });
 
   // ----- custom search
@@ -149,7 +149,62 @@ $(document).ready(function () {
       request: "cleanhighlight",
     });
   });
+
+  // Axes XPath: Select Parent button
+  $("body").on("click", "#selectParentBtn", () => {
+    chrome.devtools.inspectedWindow.eval(
+      "handleDevToolsAxesSelection($0, 'parent')",
+      { useContentScriptContext: true },
+      (result, exceptionInfo) => {
+        if (exceptionInfo) {
+          showToastMessage("Parent selection failed: " + exceptionInfo.description, "error");
+        } else if (result && !result.success) {
+          showToastMessage(result.error, "error");
+        } else {
+          showToastMessage("Parent element selected. Now select a child element and click 'Select Child'.", "success");
+        }
+      }
+    );
+  });
+
+  // Axes XPath: Select Child button
+  $("body").on("click", "#selectChildBtn", () => {
+    chrome.devtools.inspectedWindow.eval(
+      "handleDevToolsAxesSelection($0, 'child')",
+      { useContentScriptContext: true },
+      (result, exceptionInfo) => {
+        if (exceptionInfo) {
+          showToastMessage("Child selection failed: " + exceptionInfo.description, "error");
+        } else if (result && !result.success) {
+          showToastMessage(result.error, "error");
+        } else {
+          showToastMessage("Axes XPath generated! Check the results below.", "success");
+        }
+      }
+    );
+  });
 });
+
+function showToastMessage(message, type = "info") {
+  const toast = document.querySelector(".toast");
+  if (toast) {
+    toast.textContent = message;
+    toast.classList.remove("d-hide", "toast-primary", "toast-success", "toast-warning", "toast-error");
+
+    const typeClassMap = {
+      info: "toast-primary",
+      success: "toast-success",
+      warning: "toast-warning",
+      error: "toast-error"
+    };
+    toast.classList.add(typeClassMap[type] || "toast-primary");
+
+    setTimeout(() => {
+      toast.classList.add("d-hide");
+    }, 3000);
+  }
+}
+
 function sendMessageToCS(tabId, request) {
   chrome.tabs.sendMessage(tabId, request).then(() => {
     console.log("sent", request);
@@ -172,7 +227,7 @@ function copyToClipBoard(range, node) {
     setTimeout(function () {
       node.classList.remove("copied");
     }, 1500);
-  } catch (error) {}
+  } catch (error) { }
 }
 
 function generateSnippet(type, codeType, codeValue, vn, mn) {

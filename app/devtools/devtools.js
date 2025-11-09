@@ -160,27 +160,6 @@ function showNotification(message, type = 'info') {
   console.info(`[LetXPath] ${message}`);
 }
 
-/**
- * Creates DevTools context menu items for axes-based XPath selection
- */
-function createAxesContextMenuItems() {
-  // Create parent selection menu item
-  chrome.devtools.panels.elements.createContextMenuItem(
-    "LetXPath: Select Parent",
-    function () {
-      selectAxesParent();
-    }
-  );
-
-  // Create child selection menu item
-  chrome.devtools.panels.elements.createContextMenuItem(
-    "LetXPath: Select Child",
-    function () {
-      selectAxesChild();
-    }
-  );
-}
-
 // Create the sidebar pane in the Elements panel
 chrome.devtools.panels.elements.createSidebarPane("LetXPath", (sideBar) => {
   sideBar.setPage(html);
@@ -193,5 +172,6 @@ chrome.devtools.panels.elements.createSidebarPane("LetXPath", (sideBar) => {
   sideBar.onHidden.addListener(onHidden);
 });
 
-// Initialize context menu items
-createAxesContextMenuItems();
+// Expose axes selection functions globally so they can be called from panel buttons
+window.selectAxesParent = selectAxesParent;
+window.selectAxesChild = selectAxesChild;

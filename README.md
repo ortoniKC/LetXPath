@@ -20,11 +20,14 @@ LetXPath is an open-source project designed to help you find XPath and CSS selec
 
 LetXPath supports generating axes-based XPath selectors that express relationships between elements using XPath axes like `following::`, `preceding::`, `descendant::`, etc.
 
-#### Method 1: DevTools Context Menu (Recommended) ⭐
+#### Method 1: LetXPath Sidebar Buttons (Recommended) ⭐
 1. **Open Chrome DevTools** and navigate to the **Elements** panel
-2. **Right-click on the parent element** in the Elements panel → Select **"LetXPath: Select Parent"**
-3. **Right-click on the child element** in the Elements panel → Select **"LetXPath: Select Child"**
-4. **View the generated axes-based XPath** in the LetXPath sidebar under the **"Axes"** tab
+2. **Open the LetXPath sidebar** and click on the **"Axes"** tab
+3. **Select a parent element** in the Elements panel (`$0`)
+4. **Click the "Select Parent ($0)" button** in the LetXPath Axes tab
+5. **Select a child element** in the Elements panel
+6. **Click the "Select Child ($0)" button** in the LetXPath Axes tab
+7. **View the generated axes-based XPath** displayed in the Axes tab
 
 The extension will automatically determine the best axis relationship (`following::`, `preceding::`, `descendant::`, etc.) based on the elements' positions in the DOM.
 
@@ -33,7 +36,7 @@ The extension will automatically determine the best axis relationship (`followin
 2. Right-click on another element in the webpage → Select **"Select Child"**
 3. View results in the LetXPath sidebar under the **"Axes"** tab
 
-**💡 Tip**: The DevTools method is preferred as it integrates seamlessly with your existing DevTools workflow and doesn't clutter the webpage with additional context menu items.
+**💡 Tip**: The sidebar button method is preferred as it provides clear visual feedback and integrates seamlessly with your DevTools workflow.
 
 #### Best Practices for Axes XPath
 - Select elements in the order they appear in the document (parent before child)

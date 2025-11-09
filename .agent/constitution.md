@@ -32,7 +32,7 @@ Content Script (content.js) - Processes requests
 - DevTools context CANNOT directly access DOM - always use `.eval()` with `useContentScriptContext: true`
 - Content scripts have DOM access via `elementOwnerDocument` variable
 - Service workers handle webpage context menu clicks and route messages
-- **NEW:** DevTools context menu for axes selection calls `handleDevToolsAxesSelection()` exposed on `window`
+- **NEW:** Axes tab buttons in panel trigger `handleDevToolsAxesSelection()` via `chrome.devtools.inspectedWindow.eval()`
 - Panel UI uses `panelconfig.js` (jQuery-based) for event handling and snippet generation
 - All cross-context communication MUST be serializable (no functions, DOM nodes)
 - Message format includes `request` field (string) and optional `data` field
@@ -84,11 +84,11 @@ Content Script (content.js) - Processes requests
 - Store second selection in `dupArray[1]`
 - Generate combinations using `getAnchorXPath()`
 - System auto-detects whether to use `following::` or `preceding::` (not `following-sibling::`/`preceding-sibling::`)
-- **Two context menu options:**
-  1. **DevTools context menu** (recommended): Right-click in Elements panel, uses `$0`
+- **Two selection methods:**
+  1. **Sidebar buttons** (recommended): Click "Select Parent ($0)" and "Select Child ($0)" buttons in Axes tab, uses `$0`
   2. **Webpage context menu** (legacy): Right-click on page, uses `event.target`
 - Both methods share the same `dupArray` state in content script
-- DevTools method calls `handleDevToolsAxesSelection()` which invokes `buildXpath(element, 1, false)`
+- Sidebar buttons call `handleDevToolsAxesSelection()` via `chrome.devtools.inspectedWindow.eval()` which invokes `buildXpath(element, 1, false)`
 
 ### 4. CSS Selector Generation
 

@@ -132,10 +132,24 @@
     </div>
     <!-- Axes -->
     <div class="container_item card bg-dark" data-item="3">
+      <div class="container bg-dark mb-2">
+        <div class="columns">
+          <div class="column col-6">
+            <button id="selectParentBtn" class="btn btn-primary btn-block">Select Parent ($0)</button>
+          </div>
+          <div class="column col-6">
+            <button id="selectChildBtn" class="btn btn-success btn-block">Select Child ($0)</button>
+          </div>
+        </div>
+        <p class="text-small text-center mt-1">
+          <strong>How to use:</strong> Select an element in the Elements panel, then click "Select Parent".
+          Select another element, then click "Select Child" to generate axes-based XPath.
+        </p>
+      </div>
       <div class="card-body" id="anchorXPath">
         <div class="empty bg-dark">
-          <p class="empty-title h5">Please use the context menu (Right click on page) to select parent & child element
-          </p>
+          <p class="empty-title h5">Click the buttons above to select parent & child elements</p>
+          <p class="empty-subtitle">Or use the webpage context menu (Right click on page) to select elements</p>
           <p class="empty-subtitle">You can switch between XPath, CSS & Axes any time :)</p>
         </div>
       </div>
