@@ -16,20 +16,23 @@ LetXPath is a Chrome DevTools extension for generating XPath and CSS selectors w
 ### 1. Chrome Extension Communication Model
 ```
 DevTools Sidebar (devtools.js)
-    ↓ chrome.devtools.inspectedWindow.eval("parseDOM($0)")
+    ↓ chrome.devtools.inspectedWindow.eval("parseDOM($0)") - Standard selection
+    ↓ OR chrome.devtools.inspectedWindow.eval("handleDevToolsAxesSelection($0, mode)") - Axes selection
 Content Script (content.js) - DOM Access & XPath Generation
-    ↓ chrome.runtime.sendMessage({ request: "send_to_dev", data: ... })
+    ↓ chrome.runtime.sendMessage({ request: "send_to_dev", data: ... }) - Standard XPath
+    ↓ OR chrome.runtime.sendMessage({ request: "anchor", data: ... }) - Axes XPath
 Panel UI (panel.js) - Receives via chrome.runtime.onMessage
     ↓ User interactions trigger chrome.tabs.sendMessage()
 Service Worker (service_worker.js) - Context Menu & Background Tasks
-    ↓ chrome.tabs.sendMessage() to content scripts
+    ↓ chrome.tabs.sendMessage() to content scripts (webpage context menu)
 Content Script (content.js) - Processes requests
 ```
 
 **Rules:**
 - DevTools context CANNOT directly access DOM - always use `.eval()` with `useContentScriptContext: true`
 - Content scripts have DOM access via `elementOwnerDocument` variable
-- Service workers handle context menu clicks and route messages
+- Service workers handle webpage context menu clicks and route messages
+- **NEW:** DevTools context menu for axes selection calls `handleDevToolsAxesSelection()` exposed on `window`
 - Panel UI uses `panelconfig.js` (jQuery-based) for event handling and snippet generation
 - All cross-context communication MUST be serializable (no functions, DOM nodes)
 - Message format includes `request` field (string) and optional `data` field
@@ -70,8 +73,8 @@ Content Script (content.js) - Processes requests
 
 **Anchor XPath Pattern:**
 ```javascript
-// Select parent element (right-click context menu "Select Parent")
-// Then select child element (right-click shows "Select Child")
+// Select parent element via context menu (DevTools or webpage)
+// Then select child element
 // Generate: //parentLocator/following::childLocator
 // Or: //parentLocator/preceding::childLocator
 ```
@@ -81,7 +84,11 @@ Content Script (content.js) - Processes requests
 - Store second selection in `dupArray[1]`
 - Generate combinations using `getAnchorXPath()`
 - System auto-detects whether to use `following::` or `preceding::` (not `following-sibling::`/`preceding-sibling::`)
-- Context menu toggles between parent/child selection modes via `service_worker.js`
+- **Two context menu options:**
+  1. **DevTools context menu** (recommended): Right-click in Elements panel, uses `$0`
+  2. **Webpage context menu** (legacy): Right-click on page, uses `event.target`
+- Both methods share the same `dupArray` state in content script
+- DevTools method calls `handleDevToolsAxesSelection()` which invokes `buildXpath(element, 1, false)`
 
 ### 4. CSS Selector Generation
 
@@ -207,13 +214,14 @@ CSSPATHDATA = [
 **Common Request Types:**
 - `"send_to_dev"` - Content script sends XPath data to panel
 - `"anchor"` - Send axes-based XPath data
-- `"context_menu_click"` - Service worker notifies content script of context menu click
+- `"context_menu_click"` - Service worker notifies content script of webpage context menu click
 - `"parseAxes"` - Evaluate custom axes XPath combination
 - `"userSearchXP"` - Custom search from panel
 - `"dotheconversion"` - Convert XPath to CSS
 - `"cleanhighlight"` - Remove highlight attributes from elements
 - `"customSearchResult"` - Return search results to panel
 - `"conversion"` - Return CSS conversion result
+- **NEW:** `"show_notification"` - Display notification toast in panel (from DevTools context)
 
 ### 8. Testing & Validation
 

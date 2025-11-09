@@ -57,7 +57,7 @@ let receiver = (message, sender, sendResponse) => {
         // sendResponse(true);
         // return true;
         break;
-      } catch (error) {}
+      } catch (error) { }
     // build possible xpath
     case "context_menu_click":
       parseAnchorXP(targetElemt);
@@ -217,7 +217,7 @@ function parseDOM(targetElement) {
       // anchroXPathData = [];
       webTableDetails = null;
     }
-  } catch (error) {}
+  } catch (error) { }
 }
 async function sendMessage(msg) {
   return new Promise((resolve) => {
@@ -232,9 +232,94 @@ function parseAnchorXP(targetElement) {
       maxIndex = 20;
       buildXpath(targetElemt, 1, false);
       aq;
-    } catch (error) {}
+    } catch (error) { }
   }
 }
+
+/**
+ * Handles axes-based XPath selection from DevTools context menu
+ * @param {HTMLElement} element - The element selected via $0
+ * @param {string} mode - Either 'parent' or 'child'
+ * @returns {Object} Result object with success status and optional error
+ * @author LetXPath DevTools Integration
+ */
+function handleDevToolsAxesSelection(element, mode) {
+  if (!element || element.nodeType !== 1) {
+    console.error("Invalid element provided to handleDevToolsAxesSelection");
+    return { success: false, error: "Invalid element selected. Please select a valid DOM element." };
+  }
+
+  try {
+    // Check for shadow DOM
+    if (element.shadowRoot != null) {
+      return {
+        success: false,
+        error: "Shadow DOM elements are not yet supported for axes XPath"
+      };
+    }
+
+    // Check for same element selection
+    if (dupArray.length > 0) {
+      let removeletX = `//*[@letxxpath='letX']`;
+      let previousElement = elementOwnerDocument.evaluate(
+        removeletX,
+        elementOwnerDocument,
+        null,
+        XPathResult.FIRST_ORDERED_NODE_TYPE,
+        null
+      );
+      if (previousElement.singleNodeValue === element) {
+        return {
+          success: false,
+          error: "Cannot select the same element twice. Please select a different element."
+        };
+      }
+    }
+
+    // For child selection, validate element order
+    if (mode === 'child' && dupArray.length === 1) {
+      let removeletX = `//*[@letxxpath='letX']`;
+      let parentElement = elementOwnerDocument.evaluate(
+        removeletX,
+        elementOwnerDocument,
+        null,
+        XPathResult.FIRST_ORDERED_NODE_TYPE,
+        null
+      );
+      if (parentElement.singleNodeValue) {
+        // Check if child comes after parent in document order
+        let position = parentElement.singleNodeValue.compareDocumentPosition(element);
+        let isFollowing = (position & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+        let isContained = parentElement.singleNodeValue.contains(element);
+
+        if (!isFollowing && !isContained) {
+          // Don't return error - allow preceding axis
+          console.info("[LetXPath] Child element precedes parent - will use preceding:: axis");
+        }
+      }
+    }
+
+    // Set maxIndex higher for axes XPath (as per constitution)
+    maxIndex = 20;
+
+    // Build XPath with axes flag (second parameter = 1 for axes mode)
+    buildXpath(element, 1, false);
+
+    console.log(`[LetXPath] DevTools ${mode} selection completed. dupArray length: ${dupArray.length}`);
+
+    return {
+      success: true,
+      mode: mode,
+      dupArrayLength: dupArray.length
+    };
+  } catch (error) {
+    console.error("Error in handleDevToolsAxesSelection:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Expose to global scope for DevTools eval
+window.handleDevToolsAxesSelection = handleDevToolsAxesSelection;
 
 function buildXpath(element, boolAnchor, utils) {
   if (element.shadowRoot != null) {
@@ -257,7 +342,7 @@ function buildXpath(element, boolAnchor, utils) {
     // if (rea.singleNodeValue != null) {
     //     rea.singleNodeValue.removeAttribute('letaxes');
     // }
-  } catch (error) {}
+  } catch (error) { }
 
   // add a attribute to locate the element
   element.setAttribute("letxxpath", "letX");
@@ -315,7 +400,7 @@ function buildXpath(element, boolAnchor, utils) {
       frameXPATH = frameXPath(fr[0]);
       // console.log(frameXPATH);
     }
-  } catch (error) {}
+  } catch (error) { }
 
   // To get all attribuites
   let attributeElement = element.attributes;
@@ -326,41 +411,41 @@ function buildXpath(element, boolAnchor, utils) {
   // To iterate all attributes xpath
   try {
     addAllXpathAttributesBbased(attributeElement, tagName, element);
-  } catch (e) {}
+  } catch (e) { }
 
   // Following-sibling push to array
   try {
     xpathFollowingSibling(preiousSiblingElement, tagName);
-  } catch (e) {}
+  } catch (e) { }
 
   // Text Based xpath
   try {
     if (element.innerText != "") xpathText(element, tagName);
-  } catch (e) {}
+  } catch (e) { }
 
   // to find label - following xpath only if tag name name is 'input or textarea'
   try {
     if (tagName === "input" || tagName === "textarea") {
       findLabel(element, tagName);
     }
-  } catch (e) {}
+  } catch (e) { }
 
   // get Parent node
   try {
     getParent(element, tagName);
-  } catch (error) {}
+  } catch (error) { }
 
   try {
     if (element.closest("table")) {
       tag = "select";
       handleTable(element);
     }
-  } catch (error) {}
+  } catch (error) { }
   // Based on parent XPath
   try {
     if (XPATHDATA.length < 3)
       XPATHDATA.push([90, "Closest ID XPath", getXPathWithPosition(element)]);
-  } catch (error) {}
+  } catch (error) { }
 
   try {
     let css = getLongCssPath(element);
@@ -369,7 +454,7 @@ function buildXpath(element, boolAnchor, utils) {
     if (csslen.length < 5) CSSPATHDATA.push([11, "Closest ID CSS", css]);
     // if (elementOwnerDocument.querySelectorAll(css).length == 1)
     // console.log(CSSPATHDATA);
-  } catch (error) {}
+  } catch (error) { }
 
   // try {
   //     if (utils) {
@@ -382,7 +467,7 @@ function buildXpath(element, boolAnchor, utils) {
     case 0:
       try {
         removeletxxpath(element);
-      } catch (e) {}
+      } catch (e) { }
       break;
     case 1:
       tagArrHolder.push(tagName);

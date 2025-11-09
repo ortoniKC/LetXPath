@@ -16,6 +16,31 @@ LetXPath is an open-source project designed to help you find XPath and CSS selec
 4. **Axis-Based XPaths**: Creates XPaths based on axes.
 5. **User-Enhanced Axes**: Allows enhanced axes XPaths through user selection.
 
+### Using Axes-Based XPath (Parent-Child Relationships) 🎯
+
+LetXPath supports generating axes-based XPath selectors that express relationships between elements using XPath axes like `following::`, `preceding::`, `descendant::`, etc.
+
+#### Method 1: DevTools Context Menu (Recommended) ⭐
+1. **Open Chrome DevTools** and navigate to the **Elements** panel
+2. **Right-click on the parent element** in the Elements panel → Select **"LetXPath: Select Parent"**
+3. **Right-click on the child element** in the Elements panel → Select **"LetXPath: Select Child"**
+4. **View the generated axes-based XPath** in the LetXPath sidebar under the **"Axes"** tab
+
+The extension will automatically determine the best axis relationship (`following::`, `preceding::`, `descendant::`, etc.) based on the elements' positions in the DOM.
+
+#### Method 2: Webpage Context Menu (Legacy)
+1. Right-click directly on an element in the webpage → Select **"Select Parent"**
+2. Right-click on another element in the webpage → Select **"Select Child"**
+3. View results in the LetXPath sidebar under the **"Axes"** tab
+
+**💡 Tip**: The DevTools method is preferred as it integrates seamlessly with your existing DevTools workflow and doesn't clutter the webpage with additional context menu items.
+
+#### Best Practices for Axes XPath
+- Select elements in the order they appear in the document (parent before child)
+- The system automatically detects the optimal axis relationship
+- If you select elements in reverse order, the system may use `preceding::` axis
+- You can reset and start over by selecting a new parent element
+
 ### Code Snippets 🎓
 1. **XPath with Driver Code**: Provides driver code snippets.
 2. **Supported Frameworks**: Currently supports Selenium (Java, Python, C#), Protractor JS, and Playwright (Node & Java).

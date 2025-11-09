@@ -26,15 +26,52 @@ chrome.runtime.onMessage.addListener((req, rec, res) => {
         buildConversionUI(req.output);
         res("completed");
         break;
+      case "show_notification":
+        showNotificationToast(req.data.message, req.data.type);
+        res("completed");
+        break;
       default:
         res("completed");
         break;
     }
-  } catch (error) {}
+  } catch (error) { }
 });
 
 function hideToast() {
   document.querySelector(".toast").classList.add("d-hide");
+}
+
+/**
+ * Shows notification toast to user
+ * @param {string} message - Message to display
+ * @param {string} type - Type of notification: 'info', 'success', 'warning', 'error'
+ */
+function showNotificationToast(message, type = 'info') {
+  const toast = document.querySelector('.toast');
+  if (!toast) {
+    console.warn("Toast element not found in panel");
+    return;
+  }
+
+  // Set message (use textContent for security)
+  toast.textContent = message;
+
+  // Remove previous type classes
+  toast.classList.remove('d-hide', 'toast-primary', 'toast-success', 'toast-warning', 'toast-error');
+
+  // Add appropriate type class
+  const typeClassMap = {
+    'info': 'toast-primary',
+    'success': 'toast-success',
+    'warning': 'toast-warning',
+    'error': 'toast-error'
+  };
+  toast.classList.add(typeClassMap[type] || 'toast-primary');
+
+  // Auto-hide after 3 seconds
+  setTimeout(() => {
+    toast.classList.add('d-hide');
+  }, 3000);
 }
 
 function handleSendToDev(req) {
@@ -102,14 +139,14 @@ function utilsLocatorUI(data) {
                   </thead>
                   <tbody>
                     ${data
-                      .map(
-                        (item, index) => `<tr>
+        .map(
+          (item, index) => `<tr>
                       <td><input class="checkbox" type="checkbox" name="locator" id="loc${index}"></td>
                       <td>${item[1]}</td>
                       <td>${item[2][0][2]}</td>
                     </tr>`
-                      )
-                      .join("")}
+        )
+        .join("")}
                   </tbody>
                 </table>`;
     document.querySelector("#show").innerHTML = ui;
@@ -122,9 +159,8 @@ function generateAxes(req) {
   const ui = `<div class="form-horizontal">
                 <div class="form-group">
                   <div class="col-12 tooltip tooltip-bottom" data-tooltip="Click to copy">
-                    <code class="form-label text-clip" id="anxp" data-copytarget="#anxp" value="${
-                      req.data.proOrFol
-                    }">
+                    <code class="form-label text-clip" id="anxp" data-copytarget="#anxp" value="${req.data.proOrFol
+    }">
                       ${req.data.defaultXPath}
                     </code>
                   </div>
@@ -163,9 +199,8 @@ function generateElementUI(elements, name) {
       (element, index) => `
     <div class="form-group ${index === 0 ? "has-info" : ""}">
       <label class="form-switch">
-        <input type="radio" name="${name}" value="${element[1]}" ${
-        index === 0 ? "checked" : ""
-      }>
+        <input type="radio" name="${name}" value="${element[1]}" ${index === 0 ? "checked" : ""
+        }>
         <i class="form-icon"></i>${index + 1}. ${element[2]}
       </label>
     </div>
@@ -216,23 +251,21 @@ function updateBadgeCount(elementId, count) {
 
 function generateXPathUI(data, i) {
   const ui = `<div class="form-horizontal bg-dark">
-                <span class="label label-success label-rounded sm">${i + 1}. ${
-    data.xpathid[i][1]
-  }</span>
+                <span class="label label-success label-rounded sm">${i + 1}. ${data.xpathid[i][1]
+    }</span>
                 <div class="form-group">
                   <div class="col-10 c-hand tooltip tooltip-top" id="xpathVal" data-copytarget="#xpath${i}" data-tooltip="Click to copy">
-                    <code class="form-label text-clip" id="xpath${i}" data-copytarget="#xpath${i}">${
-    data.xpathid[i][2]
-  }</code>
+                    <code class="form-label text-clip" id="xpath${i}" data-copytarget="#xpath${i}">${data.xpathid[i][2]
+    }</code>
                   </div>
                   <div class="col-2 tooltip tooltip-top" data-tooltip="Copy Snippet">
                     <div class="form-group bg-dark">
                       <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(
-                        data,
-                        i,
-                        data.xpathid,
-                        false
-                      )}</select>
+      data,
+      i,
+      data.xpathid,
+      false
+    )}</select>
                     </div>
                   </div>
                 </div>
@@ -273,22 +306,20 @@ function buildCSSUI(data) {
   clearElementContent("#cssbody");
   data.cssPath.forEach((item, i) => {
     const ui = `<div class="form-horizontal">
-                  <span class="label label-rounded label-success sm">${
-                    i + 1
-                  }. ${item[1]}</span>
+                  <span class="label label-rounded label-success sm">${i + 1
+      }. ${item[1]}</span>
                   <div class="form-group">
                     <div class="col-10 tooltip tooltip-top" id="xpathVal" data-tooltip="Click to copy" data-copytarget="#css${i}">
-                      <code class="form-label text-clip" id="css${i}" data-copytarget="#css${i}">${
-      item[2]
-    }</code>
+                      <code class="form-label text-clip" id="css${i}" data-copytarget="#css${i}">${item[2]
+      }</code>
                     </div>
                     <div class="col-2 tooltip tooltip-top" data-tooltip="Copy Snippet">
                       <select class="form-select select-sm" id="snippetsSelector">${getSelectionValues(
-                        data,
-                        i,
-                        data.cssPath,
-                        true
-                      )}</select>
+        data,
+        i,
+        data.cssPath,
+        true
+      )}</select>
                     </div>
                   </div>
                 </div>`;

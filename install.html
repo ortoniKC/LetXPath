@@ -75,10 +75,20 @@
 
                     <h3>Step 6: Axes XPath</h3>
                     <ol>
-                        <li><strong>Toggle XPath Types</strong>:
+                        <li><strong>Generate Axes-Based XPath</strong>:
                             <ul>
-                                <li>Right click on the webpage to select the Parent element, then the child element</li>
-                                <li>You can toggle with different Axes combination</li>
+                                <li><strong>Method 1 (Recommended):</strong> In Chrome DevTools Elements panel:
+                                    <ul>
+                                        <li>Right-click on a parent element → Select "LetXPath: Select Parent"</li>
+                                        <li>Right-click on a child element → Select "LetXPath: Select Child"</li>
+                                        <li>View the generated axes XPath in the "Axes" tab</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Method 2 (Legacy):</strong> Right-click directly on the webpage to select
+                                    Parent and Child elements</li>
+                                <li>The extension automatically determines the best axis relationship (following::,
+                                    preceding::, etc.)</li>
+                                <li>You can toggle between different axes combinations in the Axes tab</li>
                             </ul>
                         </li>
                     </ol>
