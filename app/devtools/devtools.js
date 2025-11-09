@@ -154,6 +154,11 @@ function showNotification(message, type = 'info') {
   chrome.runtime.sendMessage({
     request: 'show_notification',
     data: { message, type }
+  }, function(response) {
+    // Silently handle errors
+    if (chrome.runtime.lastError) {
+      // Ignore
+    }
   });
 
   // Also log to console for debugging

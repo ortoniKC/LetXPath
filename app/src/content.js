@@ -192,11 +192,8 @@ function parseDOM(targetElement) {
         maxIndex = tempMaxIndex != null ? tempMaxIndex : 5;
         buildXpath(targetElement, 0, false);
       } catch (error) {
-        if (error.message === "shadow dom not yet supported") {
+        if (error.message === "shadow dom not yet supported")
           XPATHDATA = undefined;
-        } else {
-          console.error("[LetXPath] buildXpath error:", error);
-        }
       }
       let domInfo = {
         request: "send_to_dev",
@@ -212,37 +209,24 @@ function parseDOM(targetElement) {
         anchor: false,
         atrributesArray: atrributesArray,
       };
-
-      // Send message with error handling
-      sendMessage(domInfo).catch(error => {
-        console.error("[LetXPath] Failed to send DOM info:", error);
-      });
+      //
+      sendMessage(domInfo);
 
       atrributesArray = [];
       // getAnchorXPath = [];
       // anchroXPathData = [];
       webTableDetails = null;
     }
-  } catch (error) {
-    console.error("[LetXPath] parseDOM error:", error);
-  }
+  } catch (error) {}
 }
 async function sendMessage(msg) {
   return new Promise((resolve) => {
-    try {
-      chrome.runtime.sendMessage(msg, (response) => {
-        // Check for errors
-        if (chrome.runtime.lastError) {
-          console.warn("[LetXPath] Message sending failed:", chrome.runtime.lastError.message);
-          resolve(null);
-          return;
-        }
-        resolve(response);
-      });
-    } catch (error) {
-      console.error("[LetXPath] Failed to send message:", error);
-      resolve(null);
-    }
+    chrome.runtime.sendMessage(msg, (response) => {
+      if (chrome.runtime.lastError) {
+        // Silently handle errors - don't log to avoid console spam
+      }
+      resolve(response);
+    });
   });
 }
 function parseAnchorXP(targetElement) {

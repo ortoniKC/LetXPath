@@ -45,31 +45,19 @@ function sendToContentScript(request) {
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  try {
-    if (
-      ["parseAxes", "userSearchXP", "dotheconversion", "cleanhighlight"].includes(
-        message.request
-      )
-    ) {
-      sendToContentScript(message);
-      sendResponse({ status: "forwarded" });
-      return true; // Keep channel open for async response
-    }
-
-    // Handle show_notification - just acknowledge, panel will handle it
-    if (message.request === "show_notification") {
-      sendResponse({ status: "acknowledged" });
-      return true;
-    }
-
-    // Default response
-    sendResponse({ status: "completed" });
-  } catch (error) {
-    console.error("[LetXPath Service Worker] Message handling error:", error);
-    sendResponse({ status: "error", error: error.message });
+  if (
+    ["parseAxes", "userSearchXP", "dotheconversion", "cleanhighlight"].includes(
+      message.request
+    )
+  ) {
+    sendToContentScript(message);
+    sendResponse("Hello");
   }
-
-  return true; // Keep message channel open
+  
+  // Handle show_notification - just pass through, don't block
+  if (message.request === "show_notification") {
+    sendResponse("acknowledged");
+  }
 });
 
 const installURL = chrome.runtime.getURL("install.html");
