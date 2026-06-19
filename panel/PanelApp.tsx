@@ -444,8 +444,15 @@ const PanelApp: React.FC = () => {
         }
         /* Custom styling overrides for inputs and selectors */
         select.form-select {
-          background-position: right 4px center !important;
-          padding-right: 14px !important;
+          appearance: auto !important;
+          -webkit-appearance: auto !important;
+          background: #252526 !important;
+          border: 1px solid #3c3c3c !important;
+          color: #cccccc !important;
+          padding: 1px 2px !important;
+          font-size: 10px !important;
+          height: 18px !important;
+          border-radius: 2px !important;
         }
         input.form-input::placeholder {
           color: #555;
@@ -865,8 +872,10 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '3px',
+    flexShrink: 1,
+    flexGrow: 0,
     width: '84px',
-    minWidth: '84px',
+    minWidth: '40px',
     overflow: 'hidden'
   },
   priorityBadge: {
@@ -889,6 +898,7 @@ const styles = {
   },
   codeSnippet: {
     flex: 1,
+    minWidth: '20px',
     backgroundColor: '#151515',
     color: '#4ec9b0', // VSCode teal color for selector strings
     border: '1px solid #2d2d2d',
@@ -903,13 +913,17 @@ const styles = {
     userSelect: 'all' as const
   },
   actionSelect: {
+    appearance: 'auto' as any,
+    WebkitAppearance: 'auto' as any,
     backgroundColor: '#252526',
     color: '#cccccc',
     border: '1px solid #3c3c3c',
     borderRadius: '2px',
     padding: '1px 2px',
     fontSize: '10px',
-    width: '64px',
+    width: '72px',
+    minWidth: '72px',
+    flexShrink: 0,
     cursor: 'pointer',
     outline: 'none',
     height: '18px'
