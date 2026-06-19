@@ -77,6 +77,68 @@ interface DevToolsMessageRequest {
   webtabledetails?: WebTableDetails | null;
 }
 
+const colorizeXPath = (xpath: string): React.ReactNode => {
+  const tokenRegex = /('(?:\\'|[^'])*'|"(?:\\"|[^"])*"|[a-zA-Z-]+::|@[a-zA-Z0-9_-]+|[a-zA-Z-]+\s*\(|text\s*\(\)|\/\/|\/|\[|\]|\(|\)|=|\b(?:and|or)\b|\d+|[a-zA-Z0-9_-]+)/g;
+  const tokens = xpath.split(tokenRegex);
+  return tokens.map((token, idx) => {
+    if (!token) return null;
+    let color = '#d4d4d4';
+    if (token.startsWith("'") || token.startsWith('"')) {
+      color = '#ce9178'; // string
+    } else if (token.endsWith('::')) {
+      color = '#c586c0'; // axes
+    } else if (token.startsWith('@')) {
+      color = '#9cdcfe'; // attribute
+    } else if (token.includes('(')) {
+      color = '#dcdcaa'; // function
+    } else if (token === '//' || token === '/') {
+      color = '#ff5d5b'; // slash
+    } else if (['[', ']', '(', ')', '='].includes(token)) {
+      color = '#ffd700'; // brackets/operators
+    } else if (['and', 'or'].includes(token)) {
+      color = '#569cd6'; // logic
+    } else if (/^\d+$/.test(token)) {
+      color = '#b5cea8'; // index
+    } else if (/^[a-zA-Z0-9_-]+$/.test(token)) {
+      const tags = ['input', 'div', 'label', 'span', 'a', 'button', 'form', 'img', 'textarea', 'select', 'option', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'ul', 'li', 'ol'];
+      if (tags.includes(token.toLowerCase())) {
+        color = '#569cd6'; // tag
+      } else {
+        color = '#4ec9b0'; // identifier
+      }
+    }
+    return <span key={idx} style={{ color }}>{token}</span>;
+  });
+};
+
+const colorizeCSS = (css: string): React.ReactNode => {
+  const tokenRegex = /(\.[a-zA-Z0-9_-]+|#[a-zA-Z0-9_-]+|\[[a-zA-Z0-9_-]+|=['"]?[a-zA-Z0-9_-\s&]*['"]?\]|:[a-zA-Z0-9_-]+|>[+~*]?|[a-zA-Z0-9_-]+)/g;
+  const tokens = css.split(tokenRegex);
+  return tokens.map((token, idx) => {
+    if (!token) return null;
+    let color = '#d4d4d4';
+    if (token.startsWith('.')) {
+      color = '#dcdcaa'; // class
+    } else if (token.startsWith('#')) {
+      color = '#ce9178'; // id
+    } else if (token.startsWith('[')) {
+      color = '#9cdcfe'; // attribute
+    } else if (token.startsWith('=')) {
+      color = '#ce9178'; // attribute value
+    } else if (token.startsWith(':')) {
+      color = '#c586c0'; // pseudo class
+    } else if (['>', '+', '~', '*', '^=', '$=', '*='].includes(token)) {
+      color = '#ff5d5b'; // combinators
+    } else if (/^[a-zA-Z0-9_-]+$/.test(token)) {
+      const tags = ['input', 'div', 'label', 'span', 'a', 'button', 'form', 'img', 'textarea', 'select', 'option', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'ul', 'li', 'ol'];
+      if (tags.includes(token.toLowerCase())) {
+        color = '#569cd6'; // tag
+      }
+    }
+    return <span key={idx} style={{ color }}>{token}</span>;
+  });
+};
+
 const PanelApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState<number>(1);
   const [selectedElement, setSelectedElement] = useState<SelectedElement | null>(null);
@@ -512,13 +574,13 @@ const PanelApp: React.FC = () => {
                     <div style={styles.tableRow}>
                       <span style={styles.tableLabel}>Table XPath:</span>
                       <code style={styles.tableCode} title="Click to copy Table Locator" onClick={() => copyToClipboard(selectedElement.webtabledetails!.tableLocator, 'Table Locator copied!')}>
-                        {selectedElement.webtabledetails.tableLocator}
+                        {colorizeXPath(selectedElement.webtabledetails.tableLocator)}
                       </code>
                     </div>
                     <div style={styles.tableRow}>
                       <span style={styles.tableLabel}>Selected Row XPath:</span>
                       <code style={styles.tableCode} title="Click to copy Row Locator" onClick={() => copyToClipboard(selectedElement.webtabledetails!.tableData, 'Row Locator copied!')}>
-                        {selectedElement.webtabledetails.tableData}
+                        {colorizeXPath(selectedElement.webtabledetails.tableData)}
                       </code>
                     </div>
                   </div>
@@ -539,7 +601,7 @@ const PanelApp: React.FC = () => {
                           title="Click to copy locator" 
                           onClick={() => copyToClipboard(value, 'Locator copied!')}
                         >
-                          {value}
+                          {colorizeXPath(value)}
                         </code>
                         <select 
                           className="form-select select-sm" 
@@ -585,7 +647,7 @@ const PanelApp: React.FC = () => {
                         title="Click to copy CSS" 
                         onClick={() => copyToClipboard(value, 'CSS Path copied!')}
                       >
-                        {value}
+                        {colorizeCSS(value)}
                       </code>
                       <select 
                         className="form-select select-sm" 
@@ -622,7 +684,7 @@ const PanelApp: React.FC = () => {
                 <div style={styles.axesResultBox}>
                   <div style={{ fontSize: '9px', color: '#858585', marginBottom: '2px' }}>Resulting XPath:</div>
                   <code style={styles.axesResultCode} title="Click to copy Axes XPath" onClick={() => copyToClipboard(axesXPathResult, 'Axes XPath copied!')}>
-                    {axesXPathResult}
+                    {colorizeXPath(axesXPathResult)}
                   </code>
                 </div>
 
@@ -719,7 +781,7 @@ const PanelApp: React.FC = () => {
                 <div style={styles.convertBox}>
                   <div style={{ fontSize: '9px', color: '#858585', marginBottom: '2px' }}>CSS Selector Output:</div>
                   <code style={styles.convertCode} title="Click to copy CSS Selector" onClick={() => copyToClipboard(convertResult, 'Converted CSS copied!')}>
-                    {convertResult}
+                    {colorizeCSS(convertResult)}
                   </code>
                 </div>
               )}
