@@ -1,9 +1,6 @@
-/**
- * @author Koushik Chatterjee <koushik350@gmail.com>
- * @description evaluates the xpath
- */
-// Filter values not to push
-function filterAttributesFromElement(item) {
+import { state } from './state';
+
+export function filterAttributesFromElement(item: Attr): boolean {
     return (item.name === "letaxes") || (item.name === 'letxxpath') || (item.name === "script") ||
         (item.name === 'jsname') || (item.name === 'jsmodel') || (item.name === 'jsdata') ||
         (item.name === 'jscontroller') || (item.name === 'face') || (item.name.includes('pattern')) ||
@@ -12,7 +9,7 @@ function filterAttributesFromElement(item) {
         (item.name === 'required') || (item.name === 'strtindx') ||
         ((item.name === 'title') && (item.value === '')) || (item.name === 'autofocus') ||
         (item.name === 'tabindex') || ((item.name === 'type') && (item.value === 'text')) ||
-        (item.name === 'ac_columns') || // (item.name.startsWith('d')) ||
+        (item.name === 'ac_columns') ||
         (item.name === 'ac_order_by') || (item.name.startsWith('data-ember')) ||
         (item.name === 'href') || (item.name === 'aria-autocomplete') ||
         (item.name === 'autocapitalize') || (item.name === 'jsaction') || (item.name === 'autocorrect') ||
@@ -26,94 +23,95 @@ function filterAttributesFromElement(item) {
         (item.name === 'maxlength') || (item.name === 'routerlinkactive') || (item.name === 'src') ||
         (item.name === 'xpath') || (item.name === 'xpathtest') || (item.name === 'css');
 }
-// Add Index to All XPATH
-function addIndexToXpath(allXpathAttr) {
+
+export function addIndexToXpath(allXpathAttr: string): string | null | undefined {
     try {
         let index = 0;
-        let doc = elementOwnerDocument.evaluate(allXpathAttr, elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
-        let next = doc.iterateNext();
+        let doc = state.elementOwnerDocument.evaluate(allXpathAttr, state.elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
+        let next = doc.iterateNext() as HTMLElement | null;
         try {
-            while (next && index <= maxIndex) {
+            while (next && index <= state.maxIndex) {
                 index++;
-                if ((next.attributes.letxxpath) != undefined) {
-                    throw 'break';
+                if (next.attributes.getNamedItem('letxxpath') != null) {
+                    throw new Error('break');
                 }
-                next = doc.iterateNext();
+                next = doc.iterateNext() as HTMLElement | null;
             }
         } catch (error) { }
         let indexedXpath = `(${allXpathAttr})[${index}]`;
-        if (index <= maxIndex) {
-            let c = getNumberOfXPath(indexedXpath)
-            if (c > 0) {
+        if (index <= state.maxIndex) {
+            let c = getNumberOfXPath(indexedXpath);
+            if (c !== undefined && c > 0) {
                 return indexedXpath;
             }
-        } else
+        } else {
             return null;
+        }
     } catch (error) { }
 }
-// Add Index to Axes XPATH
-function addIndexToAxesXpath(allXpathAttr) {
+
+export function addIndexToAxesXpath(allXpathAttr: string): string | null | undefined {
     try {
         let index = 0;
-        let doc = elementOwnerDocument.evaluate(allXpathAttr, elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
-        let next = doc.iterateNext();
+        let doc = state.elementOwnerDocument.evaluate(allXpathAttr, state.elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
+        let next = doc.iterateNext() as HTMLElement | null;
         try {
-            while (next && index <= maxIndex) {
+            while (next && index <= state.maxIndex) {
                 index++;
-                if ((next.attributes.letaxes) != undefined) {
-                    throw 'break';
+                if (next.attributes.getNamedItem('letaxes') != null) {
+                    throw new Error('break');
                 }
-                next = doc.iterateNext();
+                next = doc.iterateNext() as HTMLElement | null;
             }
         } catch (error) { }
         let indexedXpath = `(${allXpathAttr})[${index}]`;
-        if (index <= maxIndex) {
-            let c = getNumberOfXPath(indexedXpath)
-            if (c > 0) {
+        if (index <= state.maxIndex) {
+            let c = getNumberOfXPath(indexedXpath);
+            if (c !== undefined && c > 0) {
                 return indexedXpath;
             }
-        } else
+        } else {
             return null;
+        }
     } catch (error) { }
-
-}
-// To get count of each element - returns int
-function getNumberOfXPath(element) {
-    try {
-        return elementOwnerDocument.evaluate('count(' + element + ')', elementOwnerDocument, null, XPathResult.ANY_TYPE, null).numberValue;
-    } catch (error) { }
-}
-// Check if xpath is correct or not - returns boolean
-function evaluateXPathExpression(element) {
-    try {
-        return elementOwnerDocument.evaluate(element, elementOwnerDocument, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-    } catch (error) { }
-}
-// Remove added element
-function removeletxxpath(element) {
-    element.removeAttribute('letxxpath', 'letX');
 }
 
-function frameXPath(hasFrame) {
+export function getNumberOfXPath(element: string): number | undefined {
+    try {
+        return state.elementOwnerDocument.evaluate('count(' + element + ')', state.elementOwnerDocument, null, XPathResult.ANY_TYPE, null).numberValue;
+    } catch (error) { }
+}
+
+export function evaluateXPathExpression(element: string): XPathResult | undefined {
+    try {
+        return state.elementOwnerDocument.evaluate(element, state.elementOwnerDocument, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    } catch (error) { }
+}
+
+export function removeletxxpath(element: HTMLElement): void {
+    element.removeAttribute('letxxpath');
+}
+
+export function frameXPath(hasFrame: HTMLIFrameElement): string | undefined {
     if (hasFrame != undefined) {
-        let id, src, name;
+        let id: string | undefined, src: string | undefined, name: string | undefined;
         let attr = hasFrame.attributes;
         for (let i = 0; i < attr.length; i++) {
             switch (attr[i].name) {
                 case "id":
-                    id = attr.id.nodeValue;
+                    id = attr.getNamedItem('id')?.nodeValue || undefined;
                     break;
                 case "name":
-                    name = attr.name.nodeValue;
+                    name = attr.getNamedItem('name')?.nodeValue || undefined;
                     break;
                 case "src":
-                    src = attr.src.nodeValue;
+                    src = attr.getNamedItem('src')?.nodeValue || undefined;
                     break;
                 default:
                     break;
             }
         }
-        let frametag = hasFrame.tagName.toLocaleLowerCase();
+        let frametag = hasFrame.tagName.toLowerCase();
         if (id != undefined) {
             return `//${frametag}[@id='${id}']`;
         }
@@ -126,28 +124,30 @@ function frameXPath(hasFrame) {
     }
 }
 
-// add highlighter to all matching XPath
-
-function addHighlighter(result) {
+export function addHighlighter(result: XPathResult): void {
     try {
         for (let i = 0; i < result.snapshotLength; i++) {
-            node = result.snapshotItem(i);
-            node.setAttribute("letcss", "1");
+            const node = result.snapshotItem(i) as HTMLElement;
+            if (node) node.setAttribute("letcss", "1");
         }
-    } catch (error) {
-        // console.debug(error);
-    }
-
+    } catch (error) { }
 }
 
-function clearHighlighter(result) {
+export function clearHighlighter(result: XPathResult): void {
     try {
         for (let i = 0; i < result.snapshotLength; i++) {
-            node = result.snapshotItem(i);
-            node.removeAttribute("letcss");
+            const node = result.snapshotItem(i) as HTMLElement;
+            if (node) node.removeAttribute("letcss");
         }
-    } catch (error) {
-        // console.debug(error);
-    }
+    } catch (error) { }
+}
 
+export function checkIDNameClassHref(parent: HTMLElement, bo: boolean): boolean {
+    if (parent && parent.attributes) {
+        Array.prototype.slice.call(parent.attributes).forEach(function (item: Attr) {
+            if (item.name === 'id' || item.name === 'class' || item.name === 'name')
+                bo = true;
+        });
+    }
+    return bo;
 }

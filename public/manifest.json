@@ -27,18 +27,7 @@
         "<all_urls>"
       ],
       "js": [
-        "app/src/content.js",
-        "app/src/conversion.js",
-        "app/src/anchorXPath.js",
-        "app/src/getCSS.js",
-        "app/src/getLabel.js",
-        "app/src/methodName.js",
-        "app/src/record.js",
-        "app/src/search.js",
-        "app/src/textXPath.js",
-        "app/src/utils.js",
-        "app/src/parentElements.js",
-        "app/src/handleTable.js"
+        "app/src/content.js"
       ],
       "css": [
         "app/styles/highlight.css"

@@ -1,64 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LetXPath Setting</title>
-    <script src="../app/utils/jquery.js"></script>
-    <script src="option.js"></script>
-    <link rel="stylesheet" href="../app/styles/main.css">
-    <style>
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LetXPath Settings</title>
 </head>
-
 <body class="bg-dark">
-    <main>
-        <section class="container">
-            <div class="columns">
-                <div class="column col-3"></div>
-                <div class="column col-6">
-                    <div class="hero bg-primary">
-                        <div class="hero-body">
-                            <h1>Code snippet</h1>
-                            <p>Configuration</p>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="container p-centered">
-                        <div class="form-group bg-dark">
-                            <select class="form-select" id="snippets">
-                                <option>Choose an option</option>
-                                <option value="playwrightJava">Playwright - Java</option>
-                                <option value="playwrightJS">Playwright - Node</option>
-                                <option value="javas">Selenium Java</option>
-                                <option value="py">Selenium Python</option>
-                                <option value="csharp">Selenium C#</option>
-                                <option value="protractorjs">Protractor</option>
-                                <option value="custom" disabled>Custom Framework</option>
-                            </select>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="container">
-                        <div class="card">
-                            <div class="card-header">
-                                <div class="card-title h5">Code sample</div>
-                            </div>
-                            <div class="card-body">
-                                <pre class="code">
-                                <code id="samplecode" class="code bg-success">
-                                    <p>hi am code</p>
-                                </code>
-                            </pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="column col-3"></div>
-            </div>
-        </section>
-    </main>
+  <div id="root"></div>
+  <script type="module" src="./index.tsx"></script>
 </body>
-
 </html>

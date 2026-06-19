@@ -1,4 +1,4 @@
-function isValidXPath(expr) {
+export function isValidXPath(expr: string): boolean {
   return (
     typeof expr != "undefined" &&
     expr.replace(/[\s-_=]/g, "") !== "" &&
@@ -10,7 +10,7 @@ function isValidXPath(expr) {
   );
 }
 
-function getValidationRegex() {
+export function getValidationRegex(): RegExp {
   let regex =
     "(?P<node>" +
     "(" +
@@ -26,7 +26,7 @@ function getValidationRegex() {
     ")" +
     ")";
 
-  const subRegexes = {
+  const subRegexes: Record<string, string> = {
     tag: "([a-zA-Z][a-zA-Z0-9:-]{0,20}|\\*)",
     attribute: "[.a-zA-Z_:][-\\w:.]*(\\(\\))?)",
     value: "\\s*[\\w/:][-/\\w\\s,:;.]*",
@@ -47,14 +47,14 @@ function getValidationRegex() {
   return new RegExp(regex, "gi");
 }
 
-function preParseXpath(expr) {
+export function preParseXpath(expr: string): string {
   return expr.replace(
     /contains\s*\(\s*concat\(["']\s+["']\s*,\s*@class\s*,\s*["']\s+["']\)\s*,\s*["']\s+([a-zA-Z0-9-_]+)\s+["']\)/gi,
     '@class="$1"'
   );
 }
 
-function xPathToCss(expr) {
+export function xPathToCss(expr: string): string {
   if (!expr) {
     return "Missing XPath expression";
   }
@@ -67,17 +67,15 @@ function xPathToCss(expr) {
 
   const xPathArr = expr.split("|");
   const prog = getValidationRegex();
-  const cssSelectors = [];
+  const cssSelectors: string[] = [];
   let xindex = 0;
 
   while (xPathArr[xindex]) {
-    const css = [];
+    const css: string[] = [];
     let position = 0;
-    let nodes;
+    let nodes: RegExpExecArray | null;
 
     while ((nodes = prog.exec(xPathArr[xindex]))) {
-      let attr;
-
       if (!nodes && position === 0) {
         return "Invalid or unsupported XPath: " + expr;
       }
@@ -107,6 +105,7 @@ function xPathToCss(expr) {
       }
 
       const tag = match["tag"] === "*" ? "" : match["tag"] || "";
+      let attr = "";
 
       if (match["contained"]) {
         if (match["cattr"].indexOf("@") === 0) {
@@ -129,11 +128,7 @@ function xPathToCss(expr) {
               "." +
               match["mvalue"].replace(/^\s+|\s+$/, "").replace(/\s/g, ".");
             break;
-          case "text()":
-          case ".":
           default:
-            if (match["mattr"].indexOf("@") !== 0) {
-            }
             if (match["mvalue"].indexOf(" ") !== -1) {
               match["mvalue"] =
                 '"' + match["mvalue"].replace(/^\s+|\s+$/, "") + '"';
@@ -156,8 +151,6 @@ function xPathToCss(expr) {
 
       if (match["nth"]) {
         if (match["nth"].indexOf("last") === -1) {
-          if (isNaN(parseInt(match["nth"], 10))) {
-          }
           nth =
             parseInt(match["nth"], 10) !== 1
               ? ":nth-of-type(" + match["nth"] + ")"
