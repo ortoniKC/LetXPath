@@ -682,11 +682,10 @@ const PanelApp: React.FC = () => {
                 {/* XPaths list */}
                 <div style={styles.locatorList}>
                   {selectedElement.xpathid.map((item, idx) => {
-                    const [priority, label, value] = item;
+                    const [, label, value] = item;
                     return (
                       <div key={idx} style={styles.locatorRow}>
                         <div style={styles.labelBox}>
-                          <span style={styles.priorityBadge}>{priority}</span>
                           <span style={styles.locatorLabel} title={label}>{label}</span>
                         </div>
                         <code 
@@ -728,11 +727,10 @@ const PanelApp: React.FC = () => {
             ) : (
               <div style={styles.locatorList}>
                 {selectedElement.cssPath.map((item, idx) => {
-                  const [priority, label, value] = item;
+                  const [, label, value] = item;
                   return (
                     <div key={idx} style={styles.locatorRow}>
                       <div style={styles.labelBox}>
-                        <span style={styles.priorityBadge}>{priority}</span>
                         <span style={styles.locatorLabel} title={label}>{label}</span>
                       </div>
                       <code 
