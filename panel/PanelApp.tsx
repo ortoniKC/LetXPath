@@ -426,34 +426,60 @@ const PanelApp: React.FC = () => {
 
   return (
     <div style={styles.appContainer}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        /* Custom scrollbar for dark mode panel */
+        ::-webkit-scrollbar {
+          width: 5px;
+          height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+          background: #181a1b;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #37373d;
+          border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #464649;
+        }
+        /* Custom styling overrides for inputs and selectors */
+        select.form-select {
+          background-position: right 4px center !important;
+          padding-right: 14px !important;
+        }
+        input.form-input::placeholder {
+          color: #555;
+        }
+      `}} />
+
       {toast && (
-        <div style={styles.toast} className="toast toast-success">
+        <div style={styles.toast}>
           <span>{toast}</span>
         </div>
       )}
 
       {/* Tab Navigation header */}
       <div style={styles.navBar}>
-        <ul className="tab tab-block" style={{ margin: 0, border: 'none' }}>
-          <li className={`tab-item c-hand ${activeTab === 1 ? 'active' : ''}`} onClick={() => setActiveTab(1)}>
-            <a style={activeTab === 1 ? styles.activeLink : styles.link}>XPath</a>
+        <ul style={styles.tabsList}>
+          <li style={styles.tabItem} onClick={() => setActiveTab(1)}>
+            <span style={activeTab === 1 ? styles.activeLink : styles.link}>XPath</span>
           </li>
-          <li className={`tab-item c-hand ${activeTab === 2 ? 'active' : ''}`} onClick={() => setActiveTab(2)}>
-            <a style={activeTab === 2 ? styles.activeLink : styles.link}>CSS</a>
+          <li style={styles.tabItem} onClick={() => setActiveTab(2)}>
+            <span style={activeTab === 2 ? styles.activeLink : styles.link}>CSS</span>
           </li>
-          <li className={`tab-item c-hand ${activeTab === 3 ? 'active' : ''}`} onClick={() => setActiveTab(3)}>
-            <a style={activeTab === 3 ? styles.activeLink : styles.link}>Axes</a>
+          <li style={styles.tabItem} onClick={() => setActiveTab(3)}>
+            <span style={activeTab === 3 ? styles.activeLink : styles.link}>Axes</span>
           </li>
-          <li className={`tab-item c-hand ${activeTab === 4 ? 'active' : ''}`} onClick={() => setActiveTab(4)}>
-            <a style={activeTab === 4 ? styles.activeLink : styles.link}>Tools</a>
+          <li style={styles.tabItem} onClick={() => setActiveTab(4)}>
+            <span style={activeTab === 4 ? styles.activeLink : styles.link}>Tools</span>
           </li>
-          <li className={`tab-item c-hand ${activeTab === 5 ? 'active' : ''}`} onClick={() => setActiveTab(5)}>
-            <a style={activeTab === 5 ? styles.activeLink : styles.link}>About</a>
-          </li>
-          <li className="tab-item c-hand" onClick={handleOpenSettings} style={{ padding: '0 8px', display: 'flex', alignItems: 'center' }}>
-            <span style={{ fontSize: '1.2rem', color: '#8b8efc' }} title="Settings">⚙</span>
+          <li style={styles.tabItem} onClick={() => setActiveTab(5)}>
+            <span style={activeTab === 5 ? styles.activeLink : styles.link}>About</span>
           </li>
         </ul>
+        <div style={styles.settingsBtn} onClick={handleOpenSettings} title="Settings">
+          ⚙
+        </div>
       </div>
 
       {/* Main Containers */}
@@ -461,30 +487,30 @@ const PanelApp: React.FC = () => {
         
         {/* XPath Tab */}
         {activeTab === 1 && (
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {!selectedElement || !selectedElement.xpathid || selectedElement.xpathid.length === 0 ? (
               <div style={styles.emptyState}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>🔍</div>
+                <div style={{ fontSize: '1.8rem', marginBottom: '4px' }}>🔍</div>
                 <div style={styles.emptyTitle}>Select an element in Elements tab</div>
                 <div style={styles.emptySubtitle}>LetXPath will display optimized XPaths & action snippets here.</div>
               </div>
             ) : (
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {/* Table Info if inside table */}
                 {selectedElement.webtabledetails && (
                   <div style={styles.tableCard}>
                     <div style={styles.tableHeader}>
-                      Table Details ({selectedElement.webtabledetails.totalTables} detected)
+                      Table Detected ({selectedElement.webtabledetails.totalTables} total)
                     </div>
                     <div style={styles.tableRow}>
                       <span style={styles.tableLabel}>Table XPath:</span>
-                      <code style={styles.tableCode} onClick={() => copyToClipboard(selectedElement.webtabledetails!.tableLocator, 'Table Locator copied!')}>
+                      <code style={styles.tableCode} title="Click to copy Table Locator" onClick={() => copyToClipboard(selectedElement.webtabledetails!.tableLocator, 'Table Locator copied!')}>
                         {selectedElement.webtabledetails.tableLocator}
                       </code>
                     </div>
                     <div style={styles.tableRow}>
-                      <span style={styles.tableLabel}>Row XPath:</span>
-                      <code style={styles.tableCode} onClick={() => copyToClipboard(selectedElement.webtabledetails!.tableData, 'Row Locator copied!')}>
+                      <span style={styles.tableLabel}>Selected Row XPath:</span>
+                      <code style={styles.tableCode} title="Click to copy Row Locator" onClick={() => copyToClipboard(selectedElement.webtabledetails!.tableData, 'Row Locator copied!')}>
                         {selectedElement.webtabledetails.tableData}
                       </code>
                     </div>
@@ -492,15 +518,15 @@ const PanelApp: React.FC = () => {
                 )}
 
                 {/* XPaths list */}
-                {selectedElement.xpathid.map((item, idx) => {
-                  const [priority, label, value] = item;
-                  return (
-                    <div key={idx} style={styles.locatorCard}>
-                      <div style={styles.cardMeta}>
-                        <span className="badge" style={styles.priorityBadge}>{priority}</span>
-                        <span style={styles.locatorLabel}>{label}</span>
-                      </div>
-                      <div style={styles.cardInputRow}>
+                <div style={styles.locatorList}>
+                  {selectedElement.xpathid.map((item, idx) => {
+                    const [priority, label, value] = item;
+                    return (
+                      <div key={idx} style={styles.locatorRow}>
+                        <div style={styles.labelBox}>
+                          <span style={styles.priorityBadge}>{priority}</span>
+                          <span style={styles.locatorLabel} title={label}>{label}</span>
+                        </div>
                         <code 
                           style={styles.codeSnippet} 
                           title="Click to copy locator" 
@@ -520,9 +546,9 @@ const PanelApp: React.FC = () => {
                           ))}
                         </select>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
@@ -530,43 +556,41 @@ const PanelApp: React.FC = () => {
 
         {/* CSS Tab */}
         {activeTab === 2 && (
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {!selectedElement || !selectedElement.cssPath || selectedElement.cssPath.length === 0 ? (
               <div style={styles.emptyState}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>🎨</div>
+                <div style={{ fontSize: '1.8rem', marginBottom: '4px' }}>🎨</div>
                 <div style={styles.emptyTitle}>Select an element in Elements tab</div>
                 <div style={styles.emptySubtitle}>LetXPath will display optimized CSS selectors here.</div>
               </div>
             ) : (
-              <div>
+              <div style={styles.locatorList}>
                 {selectedElement.cssPath.map((item, idx) => {
                   const [priority, label, value] = item;
                   return (
-                    <div key={idx} style={styles.locatorCard}>
-                      <div style={styles.cardMeta}>
-                        <span className="badge" style={styles.priorityBadge}>{priority}</span>
-                        <span style={styles.locatorLabel}>{label}</span>
+                    <div key={idx} style={styles.locatorRow}>
+                      <div style={styles.labelBox}>
+                        <span style={styles.priorityBadge}>{priority}</span>
+                        <span style={styles.locatorLabel} title={label}>{label}</span>
                       </div>
-                      <div style={styles.cardInputRow}>
-                        <code 
-                          style={styles.codeSnippet} 
-                          title="Click to copy CSS" 
-                          onClick={() => copyToClipboard(value, 'CSS Path copied!')}
-                        >
-                          {value}
-                        </code>
-                        <select 
-                          className="form-select select-sm" 
-                          style={styles.actionSelect}
-                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleActionSelect(e, 'CSS', value)}
-                          defaultValue="snippet"
-                        >
-                          <option value="snippet" disabled>Snippet</option>
-                          {getActionsForTag(selectedElement.tag, selectedElement.type).map(act => (
-                            act !== 'snippet' && <option key={act} value={act}>{act}</option>
-                          ))}
-                        </select>
-                      </div>
+                      <code 
+                        style={styles.codeSnippet} 
+                        title="Click to copy CSS" 
+                        onClick={() => copyToClipboard(value, 'CSS Path copied!')}
+                      >
+                        {value}
+                      </code>
+                      <select 
+                        className="form-select select-sm" 
+                        style={styles.actionSelect}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleActionSelect(e, 'CSS', value)}
+                        defaultValue="snippet"
+                      >
+                        <option value="snippet" disabled>Snippet</option>
+                        {getActionsForTag(selectedElement.tag, selectedElement.type).map(act => (
+                          act !== 'snippet' && <option key={act} value={act}>{act}</option>
+                        ))}
+                      </select>
                     </div>
                   );
                 })}
@@ -580,7 +604,7 @@ const PanelApp: React.FC = () => {
           <div>
             {!axesData ? (
               <div style={styles.emptyState}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>🔗</div>
+                <div style={{ fontSize: '1.8rem', marginBottom: '4px' }}>🔗</div>
                 <div style={styles.emptyTitle}>Axes-based dynamic locator</div>
                 <div style={styles.emptySubtitle}>
                   Right click on the page context menu and select <strong>Parent Element</strong>, then <strong>Child Element</strong>.
@@ -589,19 +613,19 @@ const PanelApp: React.FC = () => {
             ) : (
               <div style={styles.axesContainer}>
                 <div style={styles.axesResultBox}>
-                  <div style={{ fontSize: '0.8rem', color: '#999', marginBottom: '4px' }}>Resulting XPath:</div>
-                  <code style={styles.axesResultCode} onClick={() => copyToClipboard(axesXPathResult, 'Axes XPath copied!')}>
+                  <div style={{ fontSize: '9px', color: '#858585', marginBottom: '2px' }}>Resulting XPath:</div>
+                  <code style={styles.axesResultCode} title="Click to copy Axes XPath" onClick={() => copyToClipboard(axesXPathResult, 'Axes XPath copied!')}>
                     {axesXPathResult}
                   </code>
                 </div>
 
-                <div className="columns" style={{ marginTop: '16px' }}>
+                <div style={styles.axesColumns}>
                   {/* Src elements */}
-                  <div className="column col-6" style={{ borderRight: '1px solid #303438' }}>
+                  <div style={styles.axesColumn}>
                     <div style={styles.columnHeader}>Parent Locators</div>
                     {axesData.src.map((el, i) => (
                       <div key={i} style={styles.radioWrapper}>
-                        <label className="form-radio" style={{ color: '#fff', fontSize: '0.85rem' }}>
+                        <label className="form-radio" style={styles.radioLabel}>
                           <input 
                             type="radio" 
                             name="axesSrc" 
@@ -609,18 +633,19 @@ const PanelApp: React.FC = () => {
                             checked={selectedSrc === el[1]}
                             onChange={() => setSelectedSrc(el[1])}
                           />
-                          <i className="form-icon"></i>{i + 1}. {el[2]}
+                          <i className="form-icon" style={{ top: '2px' }}></i>
+                          <span style={{ marginLeft: '4px', verticalAlign: 'middle' }}>{i + 1}. {el[2]}</span>
                         </label>
                       </div>
                     ))}
                   </div>
 
                   {/* Dst elements */}
-                  <div className="column col-6">
+                  <div style={styles.axesColumn}>
                     <div style={styles.columnHeader}>Child Locators</div>
                     {axesData.dst.map((el, i) => (
                       <div key={i} style={styles.radioWrapper}>
-                        <label className="form-radio" style={{ color: '#fff', fontSize: '0.85rem' }}>
+                        <label className="form-radio" style={styles.radioLabel}>
                           <input 
                             type="radio" 
                             name="axesDst" 
@@ -628,7 +653,8 @@ const PanelApp: React.FC = () => {
                             checked={selectedDst === el[1]}
                             onChange={() => setSelectedDst(el[1])}
                           />
-                          <i className="form-icon"></i>{i + 1}. {el[2]}
+                          <i className="form-icon" style={{ top: '2px' }}></i>
+                          <span style={{ marginLeft: '4px', verticalAlign: 'middle' }}>{i + 1}. {el[2]}</span>
                         </label>
                       </div>
                     ))}
@@ -641,12 +667,12 @@ const PanelApp: React.FC = () => {
 
         {/* Tools Tab */}
         {activeTab === 4 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {/* Custom Search Box */}
             <div style={styles.toolCard}>
               <div style={styles.toolTitle}>Custom XPath Evaluator</div>
               <div style={styles.toolDesc}>Evaluate, test, and highlight custom XPaths on the active page.</div>
-              <div className="input-group" style={{ margin: '8px 0' }}>
+              <div style={{ display: 'flex', gap: '4px', alignItems: 'stretch' }}>
                 <input 
                   type="text" 
                   className="form-input" 
@@ -656,12 +682,12 @@ const PanelApp: React.FC = () => {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchVal(e.target.value)}
                   onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleCustomSearch()}
                 />
-                <button className="btn btn-primary" style={styles.btnFind} onClick={handleCustomSearch}>Find</button>
-                <button className="btn btn-link" style={styles.btnClear} onClick={handleClearHighlight}>Clear</button>
+                <button style={styles.btnFind} onClick={handleCustomSearch}>Find</button>
+                <button style={styles.btnClear} onClick={handleClearHighlight}>Clear</button>
               </div>
               {searchResult && (
                 <div style={searchResult.count > 0 ? styles.searchSuccess : styles.searchFail}>
-                  <strong>{searchResult.xpath}</strong>: {searchResult.count} matching elements found
+                  Matched elements: <strong>{searchResult.count}</strong>
                 </div>
               )}
             </div>
@@ -670,7 +696,7 @@ const PanelApp: React.FC = () => {
             <div style={styles.toolCard}>
               <div style={styles.toolTitle}>XPath to CSS Converter</div>
               <div style={styles.toolDesc}>Convert standard XPath queries directly into CSS selectors (Beta).</div>
-              <div className="input-group" style={{ margin: '8px 0' }}>
+              <div style={{ display: 'flex', gap: '4px', alignItems: 'stretch' }}>
                 <input 
                   type="text" 
                   className="form-input" 
@@ -680,12 +706,12 @@ const PanelApp: React.FC = () => {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConvertVal(e.target.value)}
                   onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleConvertXPath()}
                 />
-                <button className="btn btn-primary" style={styles.btnFind} onClick={handleConvertXPath}>Convert</button>
+                <button style={styles.btnFind} onClick={handleConvertXPath}>Convert</button>
               </div>
               {convertResult && (
                 <div style={styles.convertBox}>
-                  <div style={{ fontSize: '0.8rem', color: '#999', marginBottom: '4px' }}>CSS Selector Output:</div>
-                  <code style={styles.convertCode} onClick={() => copyToClipboard(convertResult, 'Converted CSS copied!')}>
+                  <div style={{ fontSize: '9px', color: '#858585', marginBottom: '2px' }}>CSS Selector Output:</div>
+                  <code style={styles.convertCode} title="Click to copy CSS Selector" onClick={() => copyToClipboard(convertResult, 'Converted CSS copied!')}>
                     {convertResult}
                   </code>
                 </div>
@@ -697,9 +723,12 @@ const PanelApp: React.FC = () => {
         {/* About Tab */}
         {activeTab === 5 && (
           <div style={styles.aboutCard}>
-            <h4 style={{ color: '#fff', margin: '0 0 10px 0', fontSize: '1.2rem', fontWeight: 600 }}>LetXPath By LetCode with Koushik</h4>
-            <p style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.4' }}>
-              LetXPath is an open-source, robust developer utility focused on simplifying element locator queries. It is free, always will be, and is built to optimize productivity for testing frameworks.
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+              <img src="../assets/32.png" width="16px" height="16px" alt="LetXPath logo" />
+              <h4 style={{ color: '#fff', margin: 0, fontSize: '11px', fontWeight: 600 }}>LetXPath By LetCode with Koushik</h4>
+            </div>
+            <p style={{ color: '#aaa', fontSize: '10px', lineHeight: '1.4', margin: '0 0 8px 0' }}>
+              LetXPath is a lightweight developer utility built to accelerate locator building for test automation.
             </p>
             <div style={styles.divider} />
             
@@ -709,8 +738,8 @@ const PanelApp: React.FC = () => {
               <a href="https://chromewebstore.google.com/detail/letxpath/bekehlnepmijedippfibbmbglglbmlgk/reviews" target="_blank" style={styles.aboutLink}>Rate Extension</a>
             </div>
 
-            <div style={{ marginTop: '20px', color: '#aaa', fontSize: '0.8rem' }}>
-              Designed and built by Koushik Chatterjee. Feel free to contribute or raise issues!
+            <div style={{ marginTop: '12px', color: '#777', fontSize: '9px' }}>
+              Designed and built by Koushik Chatterjee.
             </div>
           </div>
         )}
@@ -723,36 +752,79 @@ const PanelApp: React.FC = () => {
 const styles = {
   appContainer: {
     backgroundColor: '#181a1b',
-    color: '#fff',
+    color: '#cccccc',
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column' as const,
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    fontSize: '11px'
   },
   navBar: {
-    borderBottom: '1px solid #303438',
-    backgroundColor: '#202224',
-    position: 'sticky' as const,
-    top: 0,
-    zIndex: 100
+    borderBottom: '1px solid #2d2d2d',
+    backgroundColor: '#252526',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0 4px',
+    height: '26px',
+    userSelect: 'none' as const,
+    minHeight: '26px'
+  },
+  tabsList: {
+    display: 'flex',
+    listStyle: 'none',
+    margin: 0,
+    padding: 0,
+    height: '100%',
+    alignItems: 'stretch'
+  },
+  tabItem: {
+    display: 'flex',
+    alignItems: 'center',
+    cursor: 'pointer',
+    margin: 0,
+    padding: 0
   },
   link: {
-    color: '#aaa',
-    padding: '8px 12px',
-    fontSize: '0.85rem'
+    color: '#969696',
+    padding: '0 8px',
+    fontSize: '11px',
+    fontWeight: 'normal',
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    borderBottom: '2px solid transparent',
+    transition: 'color 0.2s, border-color 0.2s',
+    textDecoration: 'none'
   },
   activeLink: {
-    color: '#8b8efc',
-    fontWeight: 'bold',
-    padding: '8px 12px',
-    fontSize: '0.85rem',
-    borderBottom: '2px solid #8b8efc'
+    color: '#ffffff',
+    padding: '0 8px',
+    fontSize: '11px',
+    fontWeight: '500',
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    borderBottom: '2px solid #0e639c',
+    textDecoration: 'none'
+  },
+  settingsBtn: {
+    padding: '0 6px',
+    cursor: 'pointer',
+    fontSize: '12px',
+    color: '#858585',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    transition: 'color 0.2s'
   },
   contentBody: {
-    padding: '12px',
+    padding: '6px',
     flex: 1,
     display: 'flex',
-    flexDirection: 'column' as const
+    flexDirection: 'column' as const,
+    overflowY: 'auto' as const
   },
   emptyState: {
     display: 'flex',
@@ -760,231 +832,295 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center' as const,
-    color: '#999',
-    marginTop: '60px',
-    padding: '20px'
+    color: '#777',
+    marginTop: '40px',
+    padding: '12px'
   },
   emptyTitle: {
-    fontSize: '1rem',
+    fontSize: '11px',
     fontWeight: 'bold',
-    color: '#ddd',
-    marginBottom: '4px'
+    color: '#bbbbbb',
+    marginBottom: '2px'
   },
   emptySubtitle: {
-    fontSize: '0.8rem',
-    maxWidth: '240px'
+    fontSize: '10px',
+    maxWidth: '220px',
+    lineHeight: '1.3'
   },
-  locatorCard: {
-    backgroundColor: '#202224',
-    border: '1px solid #303438',
-    borderRadius: '6px',
-    padding: '10px',
-    marginBottom: '10px',
+  locatorList: {
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '6px'
+    gap: '2px'
   },
-  cardMeta: {
+  locatorRow: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px'
+    padding: '3px 4px',
+    borderBottom: '1px solid #252526',
+    gap: '4px',
+    backgroundColor: '#1e1e1e',
+    borderRadius: '2px'
+  },
+  labelBox: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '3px',
+    width: '84px',
+    minWidth: '84px',
+    overflow: 'hidden'
   },
   priorityBadge: {
-    backgroundColor: '#8b8efc',
-    color: '#181a1b',
-    fontSize: '0.7rem',
+    backgroundColor: '#37373d',
+    color: '#858585',
+    fontSize: '9px',
     fontWeight: 'bold',
-    borderRadius: '4px',
-    padding: '2px 6px'
+    borderRadius: '2px',
+    padding: '1px 3px',
+    display: 'inline-block',
+    textAlign: 'center' as const,
+    minWidth: '12px'
   },
   locatorLabel: {
-    fontSize: '0.75rem',
-    color: '#aaa',
-    fontWeight: '500'
-  },
-  cardInputRow: {
-    display: 'flex',
-    alignItems: 'stretch',
-    gap: '8px'
+    fontSize: '10px',
+    color: '#aaaaaa',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const
   },
   codeSnippet: {
     flex: 1,
-    backgroundColor: '#181a1b',
-    color: '#4ade80',
-    border: '1px solid #484c51',
-    borderRadius: '4px',
-    padding: '6px 10px',
-    fontSize: '0.8rem',
-    fontFamily: '"Oxygen Mono", monospace',
+    backgroundColor: '#151515',
+    color: '#4ec9b0', // VSCode teal color for selector strings
+    border: '1px solid #2d2d2d',
+    borderRadius: '2px',
+    padding: '2px 4px',
+    fontSize: '10px',
+    fontFamily: 'Consolas, Monaco, "Courier New", monospace',
     whiteSpace: 'nowrap' as const,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     cursor: 'pointer',
-    userSelect: 'none' as const
+    userSelect: 'all' as const
   },
   actionSelect: {
-    backgroundColor: '#2b2e31',
-    color: '#fff',
-    border: '1px solid #484c51',
-    borderRadius: '4px',
-    padding: '4px 8px',
-    fontSize: '0.8rem',
-    width: '100px'
+    backgroundColor: '#252526',
+    color: '#cccccc',
+    border: '1px solid #3c3c3c',
+    borderRadius: '2px',
+    padding: '1px 2px',
+    fontSize: '10px',
+    width: '64px',
+    cursor: 'pointer',
+    outline: 'none',
+    height: '18px'
   },
   toast: {
     position: 'fixed' as const,
-    bottom: '20px',
+    bottom: '12px',
     left: '50%',
     transform: 'translateX(-50%)',
     zIndex: 9999,
-    padding: '10px 20px',
-    borderRadius: '20px',
-    boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
-    border: '1px solid #8b8efc',
-    background: '#8b8efc',
-    color: '#181a1b',
+    padding: '4px 10px',
+    borderRadius: '4px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+    border: '1px solid #0e639c',
+    background: '#0e639c',
+    color: '#ffffff',
     fontWeight: 'bold',
-    fontSize: '0.8rem'
+    fontSize: '10px'
   },
   tableCard: {
-    backgroundColor: '#202224',
-    border: '1px solid #ffb86c',
-    borderRadius: '6px',
-    padding: '10px',
-    marginBottom: '12px'
+    backgroundColor: '#202020',
+    borderLeft: '3px solid #ffb86c',
+    padding: '4px 6px',
+    marginBottom: '4px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '2px',
+    borderRadius: '2px'
   },
   tableHeader: {
-    fontSize: '0.8rem',
+    fontSize: '10px',
     fontWeight: 'bold',
-    color: '#ffb86c',
-    marginBottom: '6px'
+    color: '#ffb86c'
   },
   tableRow: {
     display: 'flex',
-    flexDirection: 'column' as const,
-    marginBottom: '6px'
+    alignItems: 'center',
+    gap: '4px'
   },
   tableLabel: {
-    fontSize: '0.7rem',
-    color: '#aaa'
+    fontSize: '9px',
+    color: '#888',
+    width: '80px',
+    minWidth: '80px'
   },
   tableCode: {
-    backgroundColor: '#181a1b',
+    flex: 1,
+    backgroundColor: '#151515',
     color: '#ffb86c',
-    border: '1px solid #484c51',
-    borderRadius: '4px',
-    padding: '4px 8px',
-    fontSize: '0.75rem',
+    border: '1px solid #2d2d2d',
+    borderRadius: '2px',
+    padding: '2px 4px',
+    fontSize: '10px',
+    fontFamily: 'Consolas, Monaco, monospace',
     cursor: 'pointer',
-    marginTop: '2px',
     whiteSpace: 'nowrap' as const,
     overflow: 'hidden',
     textOverflow: 'ellipsis'
   },
   axesContainer: {
-    backgroundColor: '#202224',
-    border: '1px solid #303438',
-    borderRadius: '6px',
-    padding: '12px'
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '4px',
+    padding: '2px'
   },
   axesResultBox: {
-    backgroundColor: '#181a1b',
-    border: '1px solid #303438',
-    borderRadius: '4px',
-    padding: '8px',
-    marginBottom: '12px'
+    backgroundColor: '#151515',
+    border: '1px solid #2d2d2d',
+    borderRadius: '2px',
+    padding: '4px 6px'
   },
   axesResultCode: {
-    color: '#8b8efc',
-    fontSize: '0.85rem',
+    color: '#569cd6',
+    fontSize: '10px',
+    fontFamily: 'Consolas, Monaco, monospace',
     fontWeight: 'bold',
     cursor: 'pointer',
     wordBreak: 'break-all' as const
   },
+  axesColumns: {
+    display: 'flex',
+    gap: '4px',
+    marginTop: '2px'
+  },
+  axesColumn: {
+    flex: 1,
+    border: '1px solid #2d2d2d',
+    borderRadius: '2px',
+    padding: '4px',
+    backgroundColor: '#202020',
+    maxHeight: '160px',
+    overflowY: 'auto' as const
+  },
   columnHeader: {
-    fontSize: '0.8rem',
-    color: '#aaa',
+    fontSize: '9px',
+    color: '#888',
     fontWeight: 'bold',
-    marginBottom: '8px',
-    textTransform: 'uppercase' as const
+    marginBottom: '4px',
+    textTransform: 'uppercase' as const,
+    borderBottom: '1px solid #2d2d2d',
+    paddingBottom: '2px'
   },
   radioWrapper: {
-    margin: '6px 0'
+    margin: '2px 0'
+  },
+  radioLabel: {
+    color: '#cccccc',
+    fontSize: '10px',
+    display: 'flex',
+    alignItems: 'center',
+    cursor: 'pointer',
+    userSelect: 'none' as const
   },
   toolCard: {
-    backgroundColor: '#202224',
-    border: '1px solid #303438',
-    borderRadius: '6px',
-    padding: '12px'
+    backgroundColor: '#202020',
+    border: '1px solid #2d2d2d',
+    borderRadius: '2px',
+    padding: '6px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '4px'
   },
   toolTitle: {
-    fontSize: '0.9rem',
+    fontSize: '10px',
     fontWeight: 'bold',
-    color: '#fff'
+    color: '#ffffff'
   },
   toolDesc: {
-    fontSize: '0.75rem',
-    color: '#aaa',
-    marginBottom: '8px'
+    fontSize: '9px',
+    color: '#666',
+    marginBottom: '2px'
   },
   toolInput: {
-    backgroundColor: '#181a1b',
-    color: '#fff',
-    border: '1px solid #484c51',
-    fontSize: '0.8rem'
+    backgroundColor: '#151515',
+    color: '#cccccc',
+    border: '1px solid #2d2d2d',
+    borderRadius: '2px',
+    padding: '2px 4px',
+    fontSize: '10px',
+    outline: 'none',
+    flex: 1,
+    height: '20px'
   },
   btnFind: {
     border: 'none',
-    backgroundColor: '#8b8efc',
-    color: '#181a1b',
-    fontWeight: 'bold',
-    fontSize: '0.8rem'
+    backgroundColor: '#0e639c',
+    color: '#ffffff',
+    padding: '2px 6px',
+    fontSize: '10px',
+    borderRadius: '2px',
+    cursor: 'pointer',
+    fontWeight: '500',
+    height: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   btnClear: {
-    color: '#ff5555',
-    fontSize: '0.8rem'
+    border: 'none',
+    backgroundColor: 'transparent',
+    color: '#f44336',
+    padding: '2px 4px',
+    fontSize: '10px',
+    cursor: 'pointer',
+    height: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   searchSuccess: {
-    marginTop: '8px',
+    marginTop: '2px',
     color: '#4ade80',
-    fontSize: '0.8rem'
+    fontSize: '10px'
   },
   searchFail: {
-    marginTop: '8px',
-    color: '#ff5555',
-    fontSize: '0.8rem'
+    marginTop: '2px',
+    color: '#f44336',
+    fontSize: '10px'
   },
   convertBox: {
-    marginTop: '8px',
-    backgroundColor: '#181a1b',
-    border: '1px solid #303438',
-    padding: '8px',
-    borderRadius: '4px'
+    marginTop: '4px',
+    backgroundColor: '#151515',
+    border: '1px solid #2d2d2d',
+    padding: '4px',
+    borderRadius: '2px'
   },
   convertCode: {
     color: '#4ade80',
-    fontSize: '0.8rem',
+    fontSize: '10px',
+    fontFamily: 'Consolas, Monaco, monospace',
     cursor: 'pointer',
     wordBreak: 'break-all' as const
   },
   aboutCard: {
-    backgroundColor: '#202224',
-    border: '1px solid #303438',
-    borderRadius: '6px',
-    padding: '16px'
+    backgroundColor: '#202020',
+    border: '1px solid #2d2d2d',
+    borderRadius: '2px',
+    padding: '8px'
   },
   divider: {
     height: '1px',
-    backgroundColor: '#303438',
-    margin: '12px 0'
+    backgroundColor: '#2d2d2d',
+    margin: '6px 0'
   },
   linkRow: {
     display: 'flex',
-    gap: '12px'
+    gap: '8px'
   },
   aboutLink: {
-    color: '#8b8efc',
-    fontSize: '0.85rem',
+    color: '#3794ff',
+    fontSize: '10px',
     textDecoration: 'none'
   }
 };
