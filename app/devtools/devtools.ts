@@ -10,7 +10,7 @@ function updatePanel() {
         if (exceptionInfo) {
           // Exception info handled silently or logged
         }
-      }
+      },
     );
   }
 }
@@ -18,7 +18,7 @@ function updatePanel() {
 function onHidden() {
   isActive = false;
   chrome.devtools.panels.elements.onSelectionChanged.removeListener(
-    updatePanel
+    updatePanel,
   );
 }
 
@@ -26,12 +26,12 @@ chrome.devtools.panels.elements.createSidebarPane("LetXPath", (sideBar) => {
   sideBar.setPage(html);
 
   chrome.devtools.panels.elements.onSelectionChanged.addListener(updatePanel);
-  
+
   sideBar.onShown.addListener(() => {
     isActive = true;
     updatePanel();
   });
-  
+
   sideBar.onHidden.addListener(onHidden);
 });
 export {};

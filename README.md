@@ -15,10 +15,13 @@ LetXPath is an open-source project designed to help you find XPath and CSS selec
 3. **Dynamic XPaths**: Supports dynamic XPaths, including relationships like `following`, `following-sibling`, `preceding`, and `preceding-sibling`.
 4. **Axis-Based XPaths**: Creates XPaths based on axes.
 5. **User-Enhanced Axes**: Allows enhanced axes XPaths through user selection.
+6. **Playwright Isomorphic Engine**: Uses Microsoft Playwright's official isomorphic generator and parser logic (`asLocator`) to output native locators.
+7. **Universal Locator Evaluator**: Test, verify, and outline XPath, CSS, and Playwright locators inside the web page in real-time.
 
-### Code Snippets 🎓
+### Code Snippets & Locators 🎓
 1. **XPath with Driver Code**: Provides driver code snippets.
-2. **Supported Frameworks**: Currently supports Selenium (Java, Python, C#), Protractor JS, and Playwright (Node & Java).
+2. **Playwright Specific Locators**: Generates exact, native Playwright locators (e.g. `getByRole`, `getByText`) dynamically mapped across **JavaScript/TypeScript, Python, Java, and C#** targets.
+3. **Supported Frameworks**: Currently supports Selenium (Java, Python, C#), Protractor JS, and Playwright (Node, Java, Python, C#).
 
 ### Why Choose LetXPath? 🤔
 While there are many XPath tools available, LetXPath stands out by not only offering XPaths and snippets but also providing video tutorials on building the entire tool. It’s the only product that shows you how to create the tool itself.

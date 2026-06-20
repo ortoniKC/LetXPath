@@ -49,7 +49,7 @@ interface SelectedElement {
   attributes?: Record<string, string>;
   text?: string;
   labelText?: string;
-  playwrightLocators?: [number, string, string][];
+  playwrightLocators?: [number, string, string, string, string, string][];
 }
 
 interface AxesData {
@@ -82,7 +82,7 @@ interface DevToolsMessageRequest {
   attributes?: Record<string, string>;
   text?: string;
   labelText?: string;
-  playwrightLocators?: [number, string, string][];
+  playwrightLocators?: [number, string, string, string, string, string][];
 }
 
 const colorizeXPath = (xpath: string): React.ReactNode => {
@@ -245,6 +245,7 @@ const PanelApp: React.FC = () => {
 
   // Settings & toast
   const [toast, setToast] = useState<string | null>(null);
+  const [langID, setLangID] = useState<string>('playwrightJS');
 
   const tabId = typeof chrome !== 'undefined' && chrome.devtools && chrome.devtools.inspectedWindow
     ? chrome.devtools.inspectedWindow.tabId
@@ -326,6 +327,41 @@ const PanelApp: React.FC = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const loadLang = () => {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get(['langID'], (result) => {
+          if (result.langID) setLangID(result.langID);
+        });
+      } else {
+        const localLang = localStorage.getItem('langID');
+        if (localLang) setLangID(localLang);
+      }
+    };
+    loadLang();
+    const storageListener = (changes: any) => {
+      if (changes.langID) {
+        setLangID(changes.langID.newValue);
+      }
+    };
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
+      chrome.storage.onChanged.addListener(storageListener);
+    }
+    return () => {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
+        chrome.storage.onChanged.removeListener(storageListener);
+      }
+    };
+  }, []);
+
+  const getPlaywrightLanguageForLangID = (lang: string): 'javascript' | 'python' | 'java' | 'csharp' => {
+    if (lang === 'playwrightJS' || lang === 'protractorjs') return 'javascript';
+    if (lang === 'playwrightJava' || lang === 'javas') return 'java';
+    if (lang === 'py') return 'python';
+    if (lang === 'csharp') return 'csharp';
+    return 'javascript';
+  };
 
   // Update dynamic Axes result when selections change
   useEffect(() => {
@@ -578,6 +614,7 @@ const PanelApp: React.FC = () => {
   };
 
   const handleVerifyLocator = (locator: string) => {
+    setSearchVal(locator);
     sendMessageToCS({ request: 'cleanhighlight' });
     sendMessageToCS({ request: 'userSearchXP', data: locator });
   };
@@ -963,7 +1000,12 @@ const PanelApp: React.FC = () => {
             ) : (
               <div style={styles.locatorList}>
                 {(selectedElement.playwrightLocators || []).map((loc, idx) => {
-                  const [, label, value] = loc;
+                  const [, label, jsVal, pyVal, javaVal, csVal] = loc;
+                  const playLang = getPlaywrightLanguageForLangID(langID);
+                  let value = jsVal;
+                  if (playLang === 'python') value = pyVal;
+                  else if (playLang === 'java') value = javaVal;
+                  else if (playLang === 'csharp') value = csVal;
                   return (
                     <div key={idx} style={styles.locatorRow}>
                       <div style={styles.labelBox}>
@@ -978,7 +1020,7 @@ const PanelApp: React.FC = () => {
                       </code>
                       <button 
                         style={styles.btnVerifyInline}
-                        onClick={() => handleVerifyLocator(value)}
+                        onClick={() => handleVerifyLocator(jsVal)}
                         title="Verify and highlight element"
                       >
                         Find
@@ -986,7 +1028,7 @@ const PanelApp: React.FC = () => {
                       <select 
                         className="form-select select-sm" 
                         style={styles.actionSelect}
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handlePlaywrightActionSelect(e, value)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handlePlaywrightActionSelect(e, jsVal)}
                         defaultValue="snippet"
                       >
                         <option value="snippet" disabled>Snippet</option>

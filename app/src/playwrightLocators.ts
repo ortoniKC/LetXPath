@@ -1,3 +1,6 @@
+import { asLocator } from './playwright/locatorGenerators';
+import { escapeForTextSelector, escapeForAttributeSelector } from './playwright/stringUtils';
+
 function getByTextMatches(doc: Document, val: string, exact: boolean): HTMLElement[] {
   const all = Array.from(doc.getElementsByTagName('*')) as HTMLElement[];
   return all.filter(el => {
@@ -97,27 +100,34 @@ export function buildPlaywrightLocators(
   element: HTMLElement,
   xpathData: [number, string, string][],
   cssData: [number, string, string][]
-): [number, string, string][] {
-  const list: [number, string, string][] = [];
+): [number, string, string, string, string, string][] {
+  const list: [number, string, string, string, string, string][] = [];
   const doc = element.ownerDocument;
   const tag = element.tagName.toLowerCase();
   const type = element.getAttribute('type') || undefined;
+
+  const getLocators = (priority: number, label: string, selector: string) => {
+    const jsVal = asLocator('javascript', selector);
+    const pyVal = asLocator('python', selector);
+    const javaVal = asLocator('java', selector);
+    const csVal = asLocator('csharp', selector);
+    return [priority, label, jsVal, pyVal, javaVal, csVal] as [number, string, string, string, string, string];
+  };
 
   // 1. page.getByTestId
   const testIdAttrs = ['data-testid', 'data-test-id', 'data-test', 'testid'];
   for (const attr of testIdAttrs) {
     const testId = element.getAttribute(attr);
     if (testId) {
-      const escaped = testId.replace(/'/g, "\\'");
-      const selector = `[${attr}="${escaped}"]`;
+      const escapedVal = escapeForAttributeSelector(testId, true);
+      const selector = `[${attr}=${escapedVal}]`;
       const count = doc.querySelectorAll(selector).length;
       if (count === 1) {
-        list.push([1, `getByTestId ('${attr}')`, `page.getByTestId('${escaped}')`]);
+        list.push(getLocators(1, `getByTestId ('${attr}')`, `internal:testid=[data-testid=${escapedVal}]`));
       } else if (count > 1) {
-        // Disambiguate with index
         const idx = Array.from(doc.querySelectorAll(selector)).indexOf(element);
         if (idx !== -1) {
-          list.push([1.5, `getByTestId ('${attr}') [index]`, `page.getByTestId('${escaped}').nth(${idx})`]);
+          list.push(getLocators(1.5, `getByTestId ('${attr}') [index]`, `internal:testid=[data-testid=${escapedVal}] >> nth=${idx}`));
         }
       }
       break;
@@ -128,7 +138,6 @@ export function buildPlaywrightLocators(
   const role = getPlaywrightRole(tag, type);
   if (role) {
     const name = getAccessibleName(element);
-    const escapedName = name.replace(/'/g, "\\'");
     
     // Find matching elements for substring and exact name matches
     const substringRoleElements: HTMLElement[] = [];
@@ -150,17 +159,20 @@ export function buildPlaywrightLocators(
     }
 
     if (substringRoleElements.length === 1 && substringRoleElements[0] === element) {
-      if (escapedName) {
-        list.push([2, `getByRole ('${role}')`, `page.getByRole('${role}', { name: '${escapedName}' })`]);
+      if (name) {
+        const escapedName = escapeForAttributeSelector(name, false);
+        list.push(getLocators(2, `getByRole ('${role}')`, `internal:role=${role}[name=${escapedName}]`));
       } else {
-        list.push([2, `getByRole ('${role}')`, `page.getByRole('${role}')`]);
+        list.push(getLocators(2, `getByRole ('${role}')`, `internal:role=${role}`));
       }
     } else if (exactRoleElements.length === 1 && exactRoleElements[0] === element) {
-      list.push([2, `getByRole ('${role}') [exact]`, `page.getByRole('${role}', { name: '${escapedName}', exact: true })`]);
+      const escapedName = escapeForAttributeSelector(name, true);
+      list.push(getLocators(2, `getByRole ('${role}') [exact]`, `internal:role=${role}[name=${escapedName}]`));
     } else if (exactRoleElements.length > 1) {
       const idx = exactRoleElements.indexOf(element);
       if (idx !== -1) {
-        list.push([2.5, `getByRole ('${role}') [exact index]`, `page.getByRole('${role}', { name: '${escapedName}', exact: true }).nth(${idx})`]);
+        const escapedName = escapeForAttributeSelector(name, true);
+        list.push(getLocators(2.5, `getByRole ('${role}') [exact index]`, `internal:role=${role}[name=${escapedName}] >> nth=${idx}`));
       }
     }
   }
@@ -168,7 +180,6 @@ export function buildPlaywrightLocators(
   // 3. page.getByLabel
   const labelText = getElementLabelText(element);
   if (labelText) {
-    // Count labels with the same text
     let count = 0;
     const sameLabelElements: HTMLElement[] = [];
     const all = doc.getElementsByTagName('*');
@@ -181,13 +192,13 @@ export function buildPlaywrightLocators(
       }
     }
 
-    const escapedLabel = labelText.replace(/'/g, "\\'");
+    const escapedLabel = escapeForTextSelector(labelText, true);
     if (count === 1) {
-      list.push([3, 'getByLabel', `page.getByLabel('${escapedLabel}')`]);
+      list.push(getLocators(3, 'getByLabel', `internal:label=${escapedLabel}`));
     } else if (count > 1) {
       const idx = sameLabelElements.indexOf(element);
       if (idx !== -1) {
-        list.push([3.5, 'getByLabel [index]', `page.getByLabel('${escapedLabel}').nth(${idx})`]);
+        list.push(getLocators(3.5, 'getByLabel [index]', `internal:label=${escapedLabel} >> nth=${idx}`));
       }
     }
   }
@@ -195,15 +206,16 @@ export function buildPlaywrightLocators(
   // 4. page.getByPlaceholder
   const placeholder = element.getAttribute('placeholder');
   if (placeholder) {
-    const escaped = placeholder.replace(/'/g, "\\'");
+    const escaped = placeholder.replace(/"/g, '\\"');
     const selector = `[placeholder="${escaped}"]`;
     const count = doc.querySelectorAll(selector).length;
+    const escapedPlaceholder = escapeForAttributeSelector(placeholder, false);
     if (count === 1) {
-      list.push([4, 'getByPlaceholder', `page.getByPlaceholder('${escaped}')`]);
+      list.push(getLocators(4, 'getByPlaceholder', `internal:attr=[placeholder=${escapedPlaceholder}]`));
     } else if (count > 1) {
       const idx = Array.from(doc.querySelectorAll(selector)).indexOf(element);
       if (idx !== -1) {
-        list.push([4.5, 'getByPlaceholder [index]', `page.getByPlaceholder('${escaped}').nth(${idx})`]);
+        list.push(getLocators(4.5, 'getByPlaceholder [index]', `internal:attr=[placeholder=${escapedPlaceholder}] >> nth=${idx}`));
       }
     }
   }
@@ -211,20 +223,20 @@ export function buildPlaywrightLocators(
   // 5. page.getByText
   const text = element.textContent?.replace(/\s+/g, ' ').trim() || "";
   if (text && text.length > 1 && text.length < 80) {
-    const escaped = text.replace(/'/g, "\\'");
-    
-    // Find matching elements for substring and exact name matches
     const substringMatches = getByTextMatches(doc, text, false);
     const exactMatches = getByTextMatches(doc, text, true);
     
     if (substringMatches.length === 1 && substringMatches[0] === element) {
-      list.push([5, 'getByText', `page.getByText('${escaped}')`]);
+      const escapedText = escapeForTextSelector(text, false);
+      list.push(getLocators(5, 'getByText', `internal:text=${escapedText}`));
     } else if (exactMatches.length === 1 && exactMatches[0] === element) {
-      list.push([5, 'getByText [exact]', `page.getByText('${escaped}', { exact: true })`]);
+      const escapedText = escapeForTextSelector(text, true);
+      list.push(getLocators(5, 'getByText [exact]', `internal:text=${escapedText}`));
     } else if (exactMatches.length > 1) {
       const idx = exactMatches.indexOf(element);
       if (idx !== -1) {
-        list.push([5.5, 'getByText [exact index]', `page.getByText('${escaped}', { exact: true }).nth(${idx})`]);
+        const escapedText = escapeForTextSelector(text, true);
+        list.push(getLocators(5.5, 'getByText [exact index]', `internal:text=${escapedText} >> nth=${idx}`));
       }
     }
   }
@@ -232,15 +244,16 @@ export function buildPlaywrightLocators(
   // 6. page.getByAltText
   const alt = element.getAttribute('alt');
   if (alt) {
-    const escaped = alt.replace(/'/g, "\\'");
+    const escaped = alt.replace(/"/g, '\\"');
     const selector = `[alt="${escaped}"]`;
     const count = doc.querySelectorAll(selector).length;
+    const escapedAlt = escapeForAttributeSelector(alt, false);
     if (count === 1) {
-      list.push([6, 'getByAltText', `page.getByAltText('${escaped}')`]);
+      list.push(getLocators(6, 'getByAltText', `internal:attr=[alt=${escapedAlt}]`));
     } else if (count > 1) {
       const idx = Array.from(doc.querySelectorAll(selector)).indexOf(element);
       if (idx !== -1) {
-        list.push([6.5, 'getByAltText [index]', `page.getByAltText('${escaped}').nth(${idx})`]);
+        list.push(getLocators(6.5, 'getByAltText [index]', `internal:attr=[alt=${escapedAlt}] >> nth=${idx}`));
       }
     }
   }
@@ -248,15 +261,16 @@ export function buildPlaywrightLocators(
   // 7. page.getByTitle
   const title = element.getAttribute('title');
   if (title) {
-    const escaped = title.replace(/'/g, "\\'");
+    const escaped = title.replace(/"/g, '\\"');
     const selector = `[title="${escaped}"]`;
     const count = doc.querySelectorAll(selector).length;
+    const escapedTitle = escapeForAttributeSelector(title, false);
     if (count === 1) {
-      list.push([7, 'getByTitle', `page.getByTitle('${escaped}')`]);
+      list.push(getLocators(7, 'getByTitle', `internal:attr=[title=${escapedTitle}]`));
     } else if (count > 1) {
       const idx = Array.from(doc.querySelectorAll(selector)).indexOf(element);
       if (idx !== -1) {
-        list.push([7.5, 'getByTitle [index]', `page.getByTitle('${escaped}').nth(${idx})`]);
+        list.push(getLocators(7.5, 'getByTitle [index]', `internal:attr=[title=${escapedTitle}] >> nth=${idx}`));
       }
     }
   }
@@ -264,20 +278,17 @@ export function buildPlaywrightLocators(
   // 8. Fallback locator ID, CSS and XPath
   const id = element.getAttribute('id');
   if (id) {
-    const escaped = id.replace(/'/g, "\\'");
-    list.push([8, 'locator (ID)', `page.locator('#${escaped}')`]);
+    list.push(getLocators(8, 'locator (ID)', `#${id}`));
   }
 
   if (cssData && cssData.length > 0) {
     const cssVal = cssData[0][2];
-    const escaped = cssVal.replace(/'/g, "\\'");
-    list.push([9, 'locator (CSS)', `page.locator('${escaped}')`]);
+    list.push(getLocators(9, 'locator (CSS)', `css=${cssVal}`));
   }
 
   if (xpathData && xpathData.length > 0) {
     const xpathVal = xpathData[0][2];
-    const escaped = xpathVal.replace(/'/g, "\\'");
-    list.push([10, 'locator (XPath)', `page.locator('${escaped}')`]);
+    list.push(getLocators(10, 'locator (XPath)', `xpath=${xpathVal}`));
   }
 
   // Sort by priority (lowest number first)
