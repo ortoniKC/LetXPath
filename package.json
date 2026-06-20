@@ -1,6 +1,6 @@
 {
   "name": "letxpath",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Open-source project - XPath Finder",
   "main": "index.js",
   "type": "module",
