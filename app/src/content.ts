@@ -6,7 +6,6 @@ import {
   addIndexToXpath, 
   addIndexToAxesXpath, 
   frameXPath, 
-  addHighlighter, 
   clearHighlighter, 
   removeletxxpath 
 } from './utils';
@@ -19,6 +18,7 @@ import { handleTable } from './handleTable';
 import { getLongCssPath, getClassCSS, getXPathWithPosition } from './getCSS';
 import { getMethodOrVarText, getVariableAndMethodName } from './methodName';
 import { buildPlaywrightLocators } from './playwrightLocators';
+import { evaluatePlaywrightLocator } from './playwrightEvaluator';
 
 export function sendToDev(data: any): void {
   sendMessage({ request: "fromUtilsSelector", data: data });
@@ -74,24 +74,48 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
       state.webTableDetails = null;
       break;
     case "userSearchXP":
-      let val = message.data;
-      let customSnapshot: XPathResult | undefined;
+      let val = message.data.trim();
       let customCount = 0;
+      let matchedElements: HTMLElement[] = [];
+      let locatorType = "XPath";
+      
       try {
-        customSnapshot = state.elementOwnerDocument.evaluate(
-          val,
-          state.elementOwnerDocument,
-          null,
-          XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
-          null
-        );
-        customCount = customSnapshot.snapshotLength;
+        if (val.includes('getBy') || val.includes('locator(') || val.startsWith('page.')) {
+          locatorType = "Playwright";
+          matchedElements = evaluatePlaywrightLocator(val, state.elementOwnerDocument);
+          customCount = matchedElements.length;
+        } else {
+          // Try XPath first
+          try {
+            let customSnapshot = state.elementOwnerDocument.evaluate(
+              val,
+              state.elementOwnerDocument,
+              null,
+              XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+              null
+            );
+            customCount = customSnapshot.snapshotLength;
+            for (let idx = 0; idx < customCount; idx++) {
+              matchedElements.push(customSnapshot.snapshotItem(idx) as HTMLElement);
+            }
+          } catch (xpathError) {
+            // Fallback to CSS
+            locatorType = "CSS";
+            let cssElements = state.elementOwnerDocument.querySelectorAll(val);
+            customCount = cssElements.length;
+            matchedElements = Array.from(cssElements) as HTMLElement[];
+          }
+        }
       } catch (error) {
         customCount = 0;
+        matchedElements = [];
       }
-      let isXPathCorrect = customCount > 0 ? "XPath found" : "Wrong XPath";
-      if (customCount > 0 && customSnapshot) {
-        addHighlighter(customSnapshot);
+      
+      let isXPathCorrect = customCount > 0 ? `${locatorType} found` : `Wrong ${locatorType}`;
+      if (customCount > 0) {
+        for (const el of matchedElements) {
+          if (el) el.setAttribute("letcss", "1");
+        }
       }
       sendMessage({
         request: "customSearchResult",

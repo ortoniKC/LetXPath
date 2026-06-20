@@ -298,7 +298,11 @@ const PanelApp: React.FC = () => {
             if (req.data) setAxesXPathResult(req.data);
             break;
           case 'customSearchResult':
-            if (req.data) setSearchResult(req.data);
+            if (req.data) {
+              setSearchResult(req.data);
+              setToast(`${req.data.xpath}: ${req.data.count} element(s) matched`);
+              setTimeout(() => setToast(null), 3000);
+            }
             break;
           case 'conversion':
             if (req.output !== undefined) setConvertResult(req.output);
@@ -573,6 +577,11 @@ const PanelApp: React.FC = () => {
     }
   };
 
+  const handleVerifyLocator = (locator: string) => {
+    sendMessageToCS({ request: 'cleanhighlight' });
+    sendMessageToCS({ request: 'userSearchXP', data: locator });
+  };
+
   const handleClearHighlight = () => {
     setSearchVal('');
     setSearchResult(null);
@@ -798,6 +807,13 @@ const PanelApp: React.FC = () => {
                         >
                           {colorizeXPath(value)}
                         </code>
+                        <button 
+                          style={styles.btnVerifyInline}
+                          onClick={() => handleVerifyLocator(value)}
+                          title="Verify and highlight element"
+                        >
+                          Find
+                        </button>
                         <select 
                           className="form-select select-sm" 
                           style={styles.actionSelect}
@@ -843,6 +859,13 @@ const PanelApp: React.FC = () => {
                       >
                         {colorizeCSS(value)}
                       </code>
+                      <button 
+                        style={styles.btnVerifyInline}
+                        onClick={() => handleVerifyLocator(value)}
+                        title="Verify and highlight element"
+                      >
+                        Find
+                      </button>
                       <select 
                         className="form-select select-sm" 
                         style={styles.actionSelect}
@@ -953,6 +976,13 @@ const PanelApp: React.FC = () => {
                       >
                         {colorizePlaywright(value)}
                       </code>
+                      <button 
+                        style={styles.btnVerifyInline}
+                        onClick={() => handleVerifyLocator(value)}
+                        title="Verify and highlight element"
+                      >
+                        Find
+                      </button>
                       <select 
                         className="form-select select-sm" 
                         style={styles.actionSelect}
@@ -977,14 +1007,14 @@ const PanelApp: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {/* Custom Search Box */}
             <div style={styles.toolCard}>
-              <div style={styles.toolTitle}>Custom XPath Evaluator</div>
-              <div style={styles.toolDesc}>Evaluate, test, and highlight custom XPaths on the active page.</div>
+              <div style={styles.toolTitle}>Universal Locator Evaluator</div>
+              <div style={styles.toolDesc}>Evaluate, test, and highlight XPaths, CSS, and Playwright locators.</div>
               <div style={{ display: 'flex', gap: '4px', alignItems: 'stretch' }}>
                 <input 
                   type="text" 
                   className="form-input" 
                   style={styles.toolInput} 
-                  placeholder="Type your XPath (e.g. //input[@name='q'])"
+                  placeholder="Type locator (e.g. //input, #id, or page.getByRole('button'))"
                   value={searchVal}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchVal(e.target.value)}
                   onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleCustomSearch()}
@@ -1492,6 +1522,24 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  btnVerifyInline: {
+    border: 'none',
+    backgroundColor: '#0e639c',
+    color: '#ffffff',
+    padding: '1px 4px',
+    fontSize: '9px',
+    borderRadius: '2px',
+    cursor: 'pointer',
+    height: '18px',
+    width: '32px',
+    minWidth: '32px',
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: '4px',
+    fontWeight: '500' as any
   },
   searchSuccess: {
     marginTop: '2px',
