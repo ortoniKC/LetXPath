@@ -6,7 +6,6 @@ import {
   addIndexToXpath, 
   addIndexToAxesXpath, 
   frameXPath, 
-  clearHighlighter, 
   removeletxxpath 
 } from './utils';
 import { xPathToCss } from './conversion';
@@ -22,6 +21,15 @@ import { evaluatePlaywrightLocator } from './playwrightEvaluator';
 
 export function sendToDev(data: any): void {
   sendMessage({ request: "fromUtilsSelector", data: data });
+}
+
+function clearExistingHighlights(): void {
+  try {
+    const elements = Array.from(state.elementOwnerDocument.querySelectorAll("[letcss='1']"));
+    for (const el of elements) {
+      if (el) el.removeAttribute("letcss");
+    }
+  } catch (e) {}
 }
 
 // used to send/receive message with in extension
@@ -116,6 +124,9 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
         for (const el of matchedElements) {
           if (el) el.setAttribute("letcss", "1");
         }
+        setTimeout(() => {
+          clearExistingHighlights();
+        }, 3000);
       }
       sendMessage({
         request: "customSearchResult",
@@ -126,24 +137,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
       });
       break;
     case "cleanhighlight":
-      const removeCSS = "//*[@letcss='1']";
-      let cleanSnapshot: XPathResult | undefined;
-      let cleanCount = 0;
-      try {
-        cleanSnapshot = state.elementOwnerDocument.evaluate(
-          removeCSS,
-          state.elementOwnerDocument,
-          null,
-          XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
-          null
-        );
-        cleanCount = cleanSnapshot.snapshotLength;
-      } catch (error) {
-        cleanCount = 0;
-      }
-      if (cleanCount > 0 && cleanSnapshot) {
-        clearHighlighter(cleanSnapshot);
-      }
+      clearExistingHighlights();
       break;
     default:
       if (sendResponse) sendResponse(true);

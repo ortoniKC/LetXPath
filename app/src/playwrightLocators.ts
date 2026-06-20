@@ -1,4 +1,22 @@
-import { getNumberOfXPath } from './utils';
+function getByTextMatches(doc: Document, val: string, exact: boolean): HTMLElement[] {
+  const all = Array.from(doc.getElementsByTagName('*')) as HTMLElement[];
+  return all.filter(el => {
+    const text = el.textContent?.replace(/\s+/g, ' ').trim() || '';
+    const matches = exact 
+      ? text === val 
+      : text.toLowerCase().includes(val.toLowerCase());
+    if (!matches) return false;
+    
+    // Innermost matching element constraint:
+    // Exclude parent elements where child elements also match the text
+    return !Array.from(el.children).some(child => {
+      const childText = child.textContent?.replace(/\s+/g, ' ').trim() || '';
+      return exact 
+        ? childText === val 
+        : childText.toLowerCase().includes(val.toLowerCase());
+    });
+  });
+}
 
 // Helper to determine the Playwright ARIA role
 export const getPlaywrightRole = (tag: string, type?: string): string | null => {
@@ -110,37 +128,39 @@ export function buildPlaywrightLocators(
   const role = getPlaywrightRole(tag, type);
   if (role) {
     const name = getAccessibleName(element);
-    // Let's count elements with the same role and name on the page
-    let count = 0;
-    const sameRoleElements: HTMLElement[] = [];
+    const escapedName = name.replace(/'/g, "\\'");
+    
+    // Find matching elements for substring and exact name matches
+    const substringRoleElements: HTMLElement[] = [];
+    const exactRoleElements: HTMLElement[] = [];
+    
     const all = doc.getElementsByTagName('*');
     for (let i = 0; i < all.length; i++) {
       const el = all[i] as HTMLElement;
       const elRole = getPlaywrightRole(el.tagName, el.getAttribute('type') || undefined);
       if (elRole === role) {
         const elName = getAccessibleName(el);
+        if (elName.toLowerCase().includes(name.toLowerCase())) {
+          substringRoleElements.push(el);
+        }
         if (elName === name) {
-          sameRoleElements.push(el);
-          count++;
+          exactRoleElements.push(el);
         }
       }
     }
 
-    const escapedName = name.replace(/'/g, "\\'");
-    if (count === 1) {
+    if (substringRoleElements.length === 1 && substringRoleElements[0] === element) {
       if (escapedName) {
         list.push([2, `getByRole ('${role}')`, `page.getByRole('${role}', { name: '${escapedName}' })`]);
       } else {
         list.push([2, `getByRole ('${role}')`, `page.getByRole('${role}')`]);
       }
-    } else if (count > 1) {
-      const idx = sameRoleElements.indexOf(element);
+    } else if (exactRoleElements.length === 1 && exactRoleElements[0] === element) {
+      list.push([2, `getByRole ('${role}') [exact]`, `page.getByRole('${role}', { name: '${escapedName}', exact: true })`]);
+    } else if (exactRoleElements.length > 1) {
+      const idx = exactRoleElements.indexOf(element);
       if (idx !== -1) {
-        if (escapedName) {
-          list.push([2.5, `getByRole ('${role}') [index]`, `page.getByRole('${role}', { name: '${escapedName}' }).nth(${idx})`]);
-        } else {
-          list.push([2.5, `getByRole ('${role}') [index]`, `page.getByRole('${role}').nth(${idx})`]);
-        }
+        list.push([2.5, `getByRole ('${role}') [exact index]`, `page.getByRole('${role}', { name: '${escapedName}', exact: true }).nth(${idx})`]);
       }
     }
   }
@@ -189,34 +209,23 @@ export function buildPlaywrightLocators(
   }
 
   // 5. page.getByText
-  const text = element.textContent?.trim() || "";
+  const text = element.textContent?.replace(/\s+/g, ' ').trim() || "";
   if (text && text.length > 1 && text.length < 80) {
     const escaped = text.replace(/'/g, "\\'");
-    let count = 0;
-    try {
-      const xpath = `//*[normalize-space(text())='${escaped}']`;
-      const num = getNumberOfXPath(xpath);
-      count = num !== undefined ? num : 0;
-    } catch (e) {}
-
-    if (count === 1) {
+    
+    // Find matching elements for substring and exact name matches
+    const substringMatches = getByTextMatches(doc, text, false);
+    const exactMatches = getByTextMatches(doc, text, true);
+    
+    if (substringMatches.length === 1 && substringMatches[0] === element) {
       list.push([5, 'getByText', `page.getByText('${escaped}')`]);
-    } else if (count > 1) {
-      // Find index of this node among elements with the same text
-      try {
-        const xpath = `//*[normalize-space(text())='${escaped}']`;
-        const res = doc.evaluate(xpath, doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-        let idx = -1;
-        for (let i = 0; i < res.snapshotLength; i++) {
-          if (res.snapshotItem(i) === element) {
-            idx = i;
-            break;
-          }
-        }
-        if (idx !== -1) {
-          list.push([5.5, 'getByText [index]', `page.getByText('${escaped}').nth(${idx})`]);
-        }
-      } catch (e) {}
+    } else if (exactMatches.length === 1 && exactMatches[0] === element) {
+      list.push([5, 'getByText [exact]', `page.getByText('${escaped}', { exact: true })`]);
+    } else if (exactMatches.length > 1) {
+      const idx = exactMatches.indexOf(element);
+      if (idx !== -1) {
+        list.push([5.5, 'getByText [exact index]', `page.getByText('${escaped}', { exact: true }).nth(${idx})`]);
+      }
     }
   }
 

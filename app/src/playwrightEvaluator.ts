@@ -127,23 +127,38 @@ export function evaluatePlaywrightLocator(locatorStr: string, doc: Document): HT
       const all = Array.from(doc.querySelectorAll('input, textarea, select, button')) as HTMLElement[];
       stepMatches = all.filter(el => getElementLabelText(el) === val);
     } else if (method === 'getByText') {
-      const val = parseStringArg(args);
+      let val = '';
+      let exact = false;
+      const firstComma = args.indexOf(',');
+      if (firstComma === -1) {
+        val = parseStringArg(args);
+      } else {
+        val = parseStringArg(args.substring(0, firstComma));
+        const optionsStr = args.substring(firstComma + 1);
+        exact = /exact\s*:\s*true/.test(optionsStr);
+      }
+
       const all = Array.from(doc.getElementsByTagName('*')) as HTMLElement[];
       stepMatches = all.filter(el => {
         const text = el.textContent?.replace(/\s+/g, ' ').trim() || '';
-        const matches = text === val || text.includes(val);
+        const matches = exact 
+          ? text === val 
+          : text.toLowerCase().includes(val.toLowerCase());
         if (!matches) return false;
         
         // Innermost (leaf-most) matching element constraint:
         // Exclude parent containers where children also match the query
         return !Array.from(el.children).some(child => {
           const childText = child.textContent?.replace(/\s+/g, ' ').trim() || '';
-          return childText === val || childText.includes(val);
+          return exact 
+            ? childText === val 
+            : childText.toLowerCase().includes(val.toLowerCase());
         });
       });
     } else if (method === 'getByRole') {
       let roleVal = '';
       let nameVal: string | null = null;
+      let exact = false;
       
       const firstCommaIdx = args.indexOf(',');
       if (firstCommaIdx === -1) {
@@ -151,6 +166,7 @@ export function evaluatePlaywrightLocator(locatorStr: string, doc: Document): HT
       } else {
         roleVal = parseStringArg(args.substring(0, firstCommaIdx));
         const optionsStr = args.substring(firstCommaIdx + 1);
+        exact = /exact\s*:\s*true/.test(optionsStr);
         const nameMatch = optionsStr.match(/name\s*:\s*(['"])([\s\S]*?)\1/);
         if (nameMatch) {
           nameVal = nameMatch[2].replace(/\\'/g, "'").replace(/\\"/g, '"');
@@ -163,7 +179,9 @@ export function evaluatePlaywrightLocator(locatorStr: string, doc: Document): HT
         if (role !== roleVal) return false;
         if (nameVal !== null) {
           const accName = getAccessibleName(el);
-          return accName === nameVal || accName.includes(nameVal);
+          return exact 
+            ? accName === nameVal 
+            : accName.toLowerCase().includes(nameVal.toLowerCase());
         }
         return true;
       });
