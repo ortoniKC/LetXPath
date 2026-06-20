@@ -49,6 +49,7 @@ interface SelectedElement {
   attributes?: Record<string, string>;
   text?: string;
   labelText?: string;
+  playwrightLocators?: [number, string, string][];
 }
 
 interface AxesData {
@@ -81,6 +82,7 @@ interface DevToolsMessageRequest {
   attributes?: Record<string, string>;
   text?: string;
   labelText?: string;
+  playwrightLocators?: [number, string, string][];
 }
 
 const colorizeXPath = (xpath: string): React.ReactNode => {
@@ -145,22 +147,7 @@ const colorizeCSS = (css: string): React.ReactNode => {
   });
 };
 
-const getPlaywrightRole = (tag: string, type?: string): string | null => {
-  const t = tag.toLowerCase();
-  if (t === 'button') return 'button';
-  if (t === 'a') return 'link';
-  if (t === 'h1' || t === 'h2' || t === 'h3' || t === 'h4' || t === 'h5' || t === 'h6') return 'heading';
-  if (t === 'input') {
-    const typeLower = type?.toLowerCase();
-    if (typeLower === 'checkbox') return 'checkbox';
-    if (typeLower === 'radio') return 'radio';
-    if (typeLower === 'button' || typeLower === 'submit' || typeLower === 'reset') return 'button';
-    return 'textbox';
-  }
-  if (t === 'textarea') return 'textbox';
-  if (t === 'select') return 'combobox';
-  return null;
-};
+
 
 const getPlaywrightActions = (tag: string, type?: string): string[] => {
   const t = tag.toLowerCase();
@@ -215,113 +202,7 @@ const getPlaywrightSnippet = (action: string, locator: string): string => {
   }
 };
 
-const generatePlaywrightLocators = (el: SelectedElement): { label: string; value: string }[] => {
-  const locators: { label: string; value: string }[] = [];
-  if (!el) return locators;
 
-  const tag = el.tag?.toLowerCase() || "";
-  const type = el.type?.toLowerCase() || "";
-  const attrs = el.attributes || {};
-  const text = el.text || "";
-  const labelText = el.labelText || "";
-
-  // 1. page.getByTestId
-  const testIdAttrs = ['data-testid', 'data-test-id', 'data-test', 'testid'];
-  for (const attr of testIdAttrs) {
-    if (attrs[attr]) {
-      locators.push({
-        label: `getByTestId ('${attr}')`,
-        value: `page.getByTestId('${attrs[attr]}')`
-      });
-      break;
-    }
-  }
-
-  // 2. page.getByRole
-  const role = getPlaywrightRole(tag, type);
-  if (role) {
-    let nameVal = attrs['aria-label'] || attrs['title'] || labelText || text;
-    nameVal = nameVal.trim().replace(/\s+/g, ' ');
-    if (nameVal) {
-      if (nameVal.length > 50) nameVal = nameVal.slice(0, 50) + "...";
-      locators.push({
-        label: `getByRole ('${role}')`,
-        value: `page.getByRole('${role}', { name: '${nameVal.replace(/'/g, "\\'")}' })`
-      });
-    } else {
-      locators.push({
-        label: `getByRole ('${role}')`,
-        value: `page.getByRole('${role}')`
-      });
-    }
-  }
-
-  // 3. page.getByLabel
-  if (labelText) {
-    locators.push({
-      label: 'getByLabel',
-      value: `page.getByLabel('${labelText.replace(/'/g, "\\'")}')`
-    });
-  }
-
-  // 4. page.getByPlaceholder
-  if (attrs['placeholder']) {
-    locators.push({
-      label: 'getByPlaceholder',
-      value: `page.getByPlaceholder('${attrs['placeholder'].replace(/'/g, "\\'")}')`
-    });
-  }
-
-  // 5. page.getByText
-  if (text && text.length > 1 && text.length < 80) {
-    locators.push({
-      label: 'getByText',
-      value: `page.getByText('${text.replace(/'/g, "\\'")}')`
-    });
-  }
-
-  // 6. page.getByAltText
-  if (attrs['alt']) {
-    locators.push({
-      label: 'getByAltText',
-      value: `page.getByAltText('${attrs['alt'].replace(/'/g, "\\'")}')`
-    });
-  }
-
-  // 7. page.getByTitle
-  if (attrs['title']) {
-    locators.push({
-      label: 'getByTitle',
-      value: `page.getByTitle('${attrs['title'].replace(/'/g, "\\'")}')`
-    });
-  }
-
-  // Fallbacks: page.locator with unique ID, unique class, or optimized XPath/CSS
-  if (attrs['id']) {
-    locators.push({
-      label: "locator (ID)",
-      value: `page.locator('#${attrs['id']}')`
-    });
-  }
-
-  if (el.cssPath && el.cssPath.length > 0) {
-    const bestCss = el.cssPath[0][2];
-    locators.push({
-      label: "locator (CSS)",
-      value: `page.locator('${bestCss.replace(/'/g, "\\'")}')`
-    });
-  }
-
-  if (el.xpathid && el.xpathid.length > 0) {
-    const bestXpath = el.xpathid[0][2];
-    locators.push({
-      label: "locator (XPath)",
-      value: `page.locator('${bestXpath.replace(/'/g, "\\'")}')`
-    });
-  }
-
-  return locators;
-};
 
 const colorizePlaywright = (locator: string): React.ReactNode => {
   const tokenRegex = /('(?:\\'|[^'])*'|"(?:\\"|[^"])*"|\bpage\b|\bgetBy[a-zA-Z]+\b|\blocator\b|\bname\b|\{|\}|\(|\)|:|,)/g;
@@ -397,7 +278,8 @@ const PanelApp: React.FC = () => {
                 webtabledetails: req.webtabledetails,
                 attributes: req.attributes,
                 text: req.text,
-                labelText: req.labelText
+                labelText: req.labelText,
+                playwrightLocators: req.playwrightLocators
               });
               // Default activeTab to 1 if we get element updates
               setActiveTab(1);
@@ -1057,31 +939,34 @@ const PanelApp: React.FC = () => {
               </div>
             ) : (
               <div style={styles.locatorList}>
-                {generatePlaywrightLocators(selectedElement).map((loc, idx) => (
-                  <div key={idx} style={styles.locatorRow}>
-                    <div style={styles.labelBox}>
-                      <span style={styles.locatorLabel} title={loc.label}>{loc.label}</span>
+                {(selectedElement.playwrightLocators || []).map((loc, idx) => {
+                  const [, label, value] = loc;
+                  return (
+                    <div key={idx} style={styles.locatorRow}>
+                      <div style={styles.labelBox}>
+                        <span style={styles.locatorLabel} title={label}>{label}</span>
+                      </div>
+                      <code 
+                        style={styles.codeSnippet} 
+                        title="Click to copy Playwright Locator" 
+                        onClick={() => copyToClipboard(value, 'Playwright locator copied!')}
+                      >
+                        {colorizePlaywright(value)}
+                      </code>
+                      <select 
+                        className="form-select select-sm" 
+                        style={styles.actionSelect}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handlePlaywrightActionSelect(e, value)}
+                        defaultValue="snippet"
+                      >
+                        <option value="snippet" disabled>Snippet</option>
+                        {getPlaywrightActions(selectedElement.tag, selectedElement.type).map(act => (
+                          <option key={act} value={act}>{act}</option>
+                        ))}
+                      </select>
                     </div>
-                    <code 
-                      style={styles.codeSnippet} 
-                      title="Click to copy Playwright Locator" 
-                      onClick={() => copyToClipboard(loc.value, 'Playwright locator copied!')}
-                    >
-                      {colorizePlaywright(loc.value)}
-                    </code>
-                    <select 
-                      className="form-select select-sm" 
-                      style={styles.actionSelect}
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handlePlaywrightActionSelect(e, loc.value)}
-                      defaultValue="snippet"
-                    >
-                      <option value="snippet" disabled>Snippet</option>
-                      {getPlaywrightActions(selectedElement.tag, selectedElement.type).map(act => (
-                        <option key={act} value={act}>{act}</option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

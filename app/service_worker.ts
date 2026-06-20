@@ -21,7 +21,7 @@ async function sendMessageTotab(tabId: number, msg: any) {
   }
 }
 
-function getXPath(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
+function getXPath(_info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
   const msg = { request: "context_menu_click" };
   if (tab.id !== undefined) {
     sendMessageTotab(tab.id, msg);
@@ -41,7 +41,7 @@ function sendToContentScript(request: any) {
   }
 }
 
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (message, _sender, sendResponse) {
   if (
     ["parseAxes", "userSearchXP", "dotheconversion", "cleanhighlight"].includes(
       message.request

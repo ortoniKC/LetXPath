@@ -23,6 +23,13 @@ export function getMethodOrVarText(element: HTMLElement): string {
                     if (inputElement.name.length > 1) {
                         return inputElement.name;
                     }
+                    if (inputElement.placeholder.length > 1) {
+                        return inputElement.placeholder;
+                    }
+                    if (inputElement.title.length > 1) {
+                        return inputElement.title;
+                    }
+                    return inputElement.textContent?.trim() || '';
                 case 'IMG':
                     const imgInInput = element as unknown as HTMLImageElement;
                     if (imgInInput.alt.length > 1) {
@@ -31,6 +38,13 @@ export function getMethodOrVarText(element: HTMLElement): string {
                     if (imgInInput.name.length > 1) {
                         return imgInInput.name;
                     }
+                    if (inputElement.placeholder.length > 1) {
+                        return inputElement.placeholder;
+                    }
+                    if (inputElement.title.length > 1) {
+                        return inputElement.title;
+                    }
+                    return inputElement.textContent?.trim() || '';
                 case 'search':
                     if (inputElement.placeholder.length > 1) {
                         return inputElement.placeholder;
@@ -74,6 +88,7 @@ export function getMethodOrVarText(element: HTMLElement): string {
                     if (inputElement.name.length > 1) {
                         return inputElement.name;
                     }
+                    return inputElement.type;
                 case 'submit':
                     if (inputElement.value.length > 1) {
                         return inputElement.value;
@@ -81,6 +96,7 @@ export function getMethodOrVarText(element: HTMLElement): string {
                     if (inputElement.name.length > 1) {
                         return inputElement.name;
                     }
+                    return inputElement.type;
                 case 'password':
                     if (inputElement.name.length > 1) {
                         return inputElement.name;

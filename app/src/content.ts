@@ -18,6 +18,7 @@ import { getParent, addPreviousSibling } from './parentElements';
 import { handleTable } from './handleTable';
 import { getLongCssPath, getClassCSS, getXPathWithPosition } from './getCSS';
 import { getMethodOrVarText, getVariableAndMethodName } from './methodName';
+import { buildPlaywrightLocators } from './playwrightLocators';
 
 export function sendToDev(data: any): void {
   sendMessage({ request: "fromUtilsSelector", data: data });
@@ -63,8 +64,8 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
             });
           }
         }
-        break;
       } catch (error) {}
+      break;
     case "context_menu_click":
       if (state.targetElemt) {
         parseAnchorXP(state.targetElemt);
@@ -209,6 +210,9 @@ export function parseDOM(targetElement: HTMLElement) {
         labelText = labelText.slice(0, 80) + "...";
       }
 
+      // Generate Playwright specific locators using the Playwright repository priority strategy
+      const pwLocators = buildPlaywrightLocators(targetElement, state.XPATHDATA, state.CSSPATHDATA);
+
       let domInfo = {
         request: "send_to_dev",
         cssPath: state.CSSPATHDATA,
@@ -223,7 +227,8 @@ export function parseDOM(targetElement: HTMLElement) {
         atrributesArray: state.atrributesArray,
         attributes: attrs,
         text: textContent,
-        labelText: labelText
+        labelText: labelText,
+        playwrightLocators: pwLocators
       };
       
       sendMessage(domInfo);

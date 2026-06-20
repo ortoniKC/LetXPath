@@ -48,10 +48,10 @@ export function doRecord(event: MouseEvent): void {
     }
 }
 
-function mouseOver(event: MouseEvent): void {
+function mouseOver(_event: MouseEvent): void {
     // legacy hover highlight placeholder
 }
 
-function mouseOut(event: MouseEvent): void {
+function mouseOut(_event: MouseEvent): void {
     // legacy hover highlight placeholder
 }

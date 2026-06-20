@@ -6,7 +6,7 @@ function updatePanel() {
     chrome.devtools.inspectedWindow.eval(
       "parseDOM($0)",
       { useContentScriptContext: true },
-      (result, exceptionInfo) => {
+      (_result, exceptionInfo) => {
         if (exceptionInfo) {
           // Exception info handled silently or logged
         }

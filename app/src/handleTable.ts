@@ -18,10 +18,8 @@ export function handleTable(ele: HTMLElement): void {
     }
     let tag = table.tagName.toLowerCase();
     let tableElementFound = '';
-    let count: number | undefined;
     if (table.hasAttribute('id')) {
         tableElementFound = `//${tag}[@id='${table.id}']`;
-        count = getNumberOfXPath(tableElementFound);
     }
     else if (table.hasAttribute('class')) {
         let length = table.classList.length;
@@ -31,12 +29,10 @@ export function handleTable(ele: HTMLElement): void {
         else {
             tableElementFound = `//${tag}[@class='${table.className}']`;
         }
-        count = getNumberOfXPath(tableElementFound);
     }
     else if (table.hasAttribute('name')) {
         const nameAttr = table.getAttribute('name');
         tableElementFound = `//${tag}[@name='${nameAttr}']`;
-        count = getNumberOfXPath(tableElementFound);
     }
     let tablePath: string | null = '';
     let ev = evaluateXPathExpression(tableElementFound);
