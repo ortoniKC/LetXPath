@@ -27,7 +27,7 @@ export function filterAttributesFromElement(item: Attr): boolean {
 export function addIndexToXpath(allXpathAttr: string): string | null | undefined {
     try {
         let index = 0;
-        let doc = state.elementOwnerDocument.evaluate(allXpathAttr, state.elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
+        const doc = state.elementOwnerDocument.evaluate(allXpathAttr, state.elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
         let next = doc.iterateNext() as HTMLElement | null;
         try {
             while (next && index <= state.maxIndex) {
@@ -38,9 +38,9 @@ export function addIndexToXpath(allXpathAttr: string): string | null | undefined
                 next = doc.iterateNext() as HTMLElement | null;
             }
         } catch (error) { }
-        let indexedXpath = `(${allXpathAttr})[${index}]`;
+        const indexedXpath = `(${allXpathAttr})[${index}]`;
         if (index <= state.maxIndex) {
-            let c = getNumberOfXPath(indexedXpath);
+            const c = getNumberOfXPath(indexedXpath);
             if (c !== undefined && c > 0) {
                 return indexedXpath;
             }
@@ -53,7 +53,7 @@ export function addIndexToXpath(allXpathAttr: string): string | null | undefined
 export function addIndexToAxesXpath(allXpathAttr: string): string | null | undefined {
     try {
         let index = 0;
-        let doc = state.elementOwnerDocument.evaluate(allXpathAttr, state.elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
+        const doc = state.elementOwnerDocument.evaluate(allXpathAttr, state.elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
         let next = doc.iterateNext() as HTMLElement | null;
         try {
             while (next && index <= state.maxIndex) {
@@ -64,9 +64,9 @@ export function addIndexToAxesXpath(allXpathAttr: string): string | null | undef
                 next = doc.iterateNext() as HTMLElement | null;
             }
         } catch (error) { }
-        let indexedXpath = `(${allXpathAttr})[${index}]`;
+        const indexedXpath = `(${allXpathAttr})[${index}]`;
         if (index <= state.maxIndex) {
-            let c = getNumberOfXPath(indexedXpath);
+            const c = getNumberOfXPath(indexedXpath);
             if (c !== undefined && c > 0) {
                 return indexedXpath;
             }
@@ -95,7 +95,7 @@ export function removeletxxpath(element: HTMLElement): void {
 export function frameXPath(hasFrame: HTMLIFrameElement): string | undefined {
     if (hasFrame != undefined) {
         let id: string | undefined, src: string | undefined, name: string | undefined;
-        let attr = hasFrame.attributes;
+        const attr = hasFrame.attributes;
         for (let i = 0; i < attr.length; i++) {
             switch (attr[i].name) {
                 case "id":
@@ -111,7 +111,7 @@ export function frameXPath(hasFrame: HTMLIFrameElement): string | undefined {
                     break;
             }
         }
-        let frametag = hasFrame.tagName.toLowerCase();
+        const frametag = hasFrame.tagName.toLowerCase();
         if (id != undefined) {
             return `//${frametag}[@id='${id}']`;
         }

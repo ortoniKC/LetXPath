@@ -2,10 +2,10 @@ import { state } from './state';
 import { getNumberOfXPath, evaluateXPathExpression, checkIDNameClassHref } from './utils';
 
 export function handleTable(ele: HTMLElement): void {
-    let orgEle = ele;
-    let no_of_tables = state.elementOwnerDocument.getElementsByTagName('table').length;
+    const orgEle = ele;
+    const no_of_tables = state.elementOwnerDocument.getElementsByTagName('table').length;
     // find if its table is unique
-    let table = ele.closest('table') as HTMLElement | null;
+    const table = ele.closest('table') as HTMLElement | null;
     if (!table) return;
     table.setAttribute('letxpath', 'letxpathtable');
     let has = checkIDNameClassHref(table, false);
@@ -16,13 +16,13 @@ export function handleTable(ele: HTMLElement): void {
             if (!has) parent = parent.parentElement;
         }
     }
-    let tag = table.tagName.toLowerCase();
+    const tag = table.tagName.toLowerCase();
     let tableElementFound = '';
     if (table.hasAttribute('id')) {
         tableElementFound = `//${tag}[@id='${table.id}']`;
     }
     else if (table.hasAttribute('class')) {
-        let length = table.classList.length;
+        const length = table.classList.length;
         if (length > 1) {
             tableElementFound = `//${tag}[contains(@class,'${table.classList[0]} ${table.classList[1]}')]`;
         }
@@ -35,7 +35,7 @@ export function handleTable(ele: HTMLElement): void {
         tableElementFound = `//${tag}[@name='${nameAttr}']`;
     }
     let tablePath: string | null = '';
-    let ev = evaluateXPathExpression(tableElementFound);
+    const ev = evaluateXPathExpression(tableElementFound);
     if (ev && ev.singleNodeValue != null) {
         const node = ev.singleNodeValue as HTMLElement;
         if (node.hasAttribute('letxpath')) {
@@ -46,16 +46,16 @@ export function handleTable(ele: HTMLElement): void {
         }
     }
     if (tablePath) {
-        let evTable = evaluateXPathExpression(tablePath);
-        let tableNode = evTable?.singleNodeValue as HTMLElement | null;
+        const evTable = evaluateXPathExpression(tablePath);
+        const tableNode = evTable?.singleNodeValue as HTMLElement | null;
         if (tableNode) {
             tableNode.removeAttribute('letxpath');
         }
         // find no.of rows
         // get no.of rows in xpath
-        let data = getLongTableRow(orgEle, tablePath);
+        const data = getLongTableRow(orgEle, tablePath);
         // pass details
-        let details = {
+        const details = {
             tableLocator: tablePath,
             totalTables: no_of_tables,
             tableData: data
@@ -65,7 +65,7 @@ export function handleTable(ele: HTMLElement): void {
 
     function getTableXpath(locator: string): string | null {
         let tablePath = `${locator}//table`;
-        let evaluated = evaluateXPathExpression(tablePath);
+        const evaluated = evaluateXPathExpression(tablePath);
         if (evaluated && evaluated.singleNodeValue != null) {
             const node = evaluated.singleNodeValue as HTMLElement;
             if (node.hasAttribute('letxpath'))
@@ -79,7 +79,7 @@ export function handleTable(ele: HTMLElement): void {
         }
         else {
             tablePath = `${locator}/following::table`;
-            let evaluated = evaluateXPathExpression(tablePath);
+            const evaluated = evaluateXPathExpression(tablePath);
             if (evaluated && evaluated.singleNodeValue != null) {
                 const node = evaluated.singleNodeValue as HTMLElement;
                 if (node.hasAttribute('letxpath'))
@@ -97,7 +97,7 @@ export function handleTable(ele: HTMLElement): void {
 }
 
 export function getLongTableRow(ele: HTMLElement, tablePath: string): string {
-    var rowsPath: string[] = [];
+    const rowsPath: string[] = [];
     let current: HTMLElement | null = ele;
     while (current && current.nodeType === 1) {
         let tag = current.tagName.toLowerCase();
@@ -120,9 +120,9 @@ export function getLongTableRow(ele: HTMLElement, tablePath: string): string {
 
 export function addTableIndexToXpath(allXpathAttr: string): string | null | undefined {
     try {
-        var index = 0;
-        let doc = state.elementOwnerDocument.evaluate(allXpathAttr, state.elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
-        var next = doc.iterateNext() as HTMLElement | null;
+        let index = 0;
+        const doc = state.elementOwnerDocument.evaluate(allXpathAttr, state.elementOwnerDocument, null, XPathResult.ANY_TYPE, null);
+        let next = doc.iterateNext() as HTMLElement | null;
         try {
             while (next) {
                 index++;
@@ -131,8 +131,8 @@ export function addTableIndexToXpath(allXpathAttr: string): string | null | unde
             }
         }
         catch (error) { }
-        let indexedXpath = `(${allXpathAttr})[${index}]`;
-        let c = getNumberOfXPath(indexedXpath);
+        const indexedXpath = `(${allXpathAttr})[${index}]`;
+        const c = getNumberOfXPath(indexedXpath);
         if (c !== undefined && c > 0) { return indexedXpath; } else return null;
     } catch (error) { }
 }

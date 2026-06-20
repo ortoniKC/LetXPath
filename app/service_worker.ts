@@ -8,7 +8,7 @@ function toggle() {
     chrome.contextMenus.update(
       "LetXPath",
       { title: "Select Parent" },
-      () => {}
+      () => {},
     );
   }
 }
@@ -21,7 +21,10 @@ async function sendMessageTotab(tabId: number, msg: any) {
   }
 }
 
-function getXPath(_info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
+function getXPath(
+  _info: chrome.contextMenus.OnClickData,
+  tab: chrome.tabs.Tab,
+) {
   const msg = { request: "context_menu_click" };
   if (tab.id !== undefined) {
     sendMessageTotab(tab.id, msg);
@@ -44,7 +47,7 @@ function sendToContentScript(request: any) {
 chrome.runtime.onMessage.addListener(function (message, _sender, sendResponse) {
   if (
     ["parseAxes", "userSearchXP", "dotheconversion", "cleanhighlight"].includes(
-      message.request
+      message.request,
     )
   ) {
     sendToContentScript(message);
@@ -64,7 +67,7 @@ function handleInstall(details: chrome.runtime.InstalledDetails) {
       type: "basic",
     });
   }
-  
+
   // Clean up and recreate context menu
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({

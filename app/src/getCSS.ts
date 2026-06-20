@@ -6,11 +6,11 @@ export const checkforInt = (id: string): boolean => {
 };
 
 export function getLongCssPath(ele: HTMLElement): string {
-    var cssPath: string[] = [];
+    const cssPath: string[] = [];
     let current: HTMLElement | null = ele;
     while (current && current.nodeType === 1) {
         let tag = current.tagName.toLowerCase();
-        let id = current.id;
+        const id = current.id;
         if (id && !checkforInt(id)) {
             tag += `#${current.id}`;
             cssPath.unshift(tag);
@@ -31,7 +31,7 @@ export function getLongCssPath(ele: HTMLElement): string {
 
 export function getClassCSS(ele: HTMLElement): void {
     let clscss = (ele.className).replace(/ /g, '.').replace(/\.\.+/g, '.');
-    let spl = clscss.split('.');
+    const spl = clscss.split('.');
     if (!(spl.length > 3)) {
         clscss = `${ele.tagName.toLowerCase()}.${clscss}`;
         if (ele.ownerDocument.querySelectorAll(clscss).length == 1) {
@@ -46,15 +46,15 @@ export function getCSS(element: HTMLElement, tagName: string): void {
         if (!filterAttributesFromElement(item)) {
             switch (item.name) {
                 case 'id':
-                    let id = `${tagName}#${item.value}`;
+                    const id = `${tagName}#${item.value}`;
                     state.CSSPATHDATA.push([0, 'Css', id]);
                     break;
                 case 'class':
-                    let classN = `${tagName}.${item.value}`;
+                    const classN = `${tagName}.${item.value}`;
                     state.CSSPATHDATA.push([0, 'Css', classN]);
                     break;
                 default:
-                    let attribuitesBased = `${tagName}[${item.name}='${item.value}']`;
+                    const attribuitesBased = `${tagName}[${item.name}='${item.value}']`;
                     state.CSSPATHDATA.push([0, 'Css', attribuitesBased]);
                     break;
             }
@@ -77,7 +77,7 @@ export function extractElefromNode(ele: HTMLElement, array: string[]): number | 
 }
 
 export function getXPathWithPosition(ele: HTMLElement): string {
-    let rowsPath: string[] = [];
+    const rowsPath: string[] = [];
     let current: HTMLElement | null = ele;
     while (current && current.nodeType === 1) {
         let tag = current.tagName.toLowerCase();

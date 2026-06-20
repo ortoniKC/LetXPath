@@ -2,11 +2,11 @@ import { state } from './state';
 import { filterAttributesFromElement, addIndexToXpath, getNumberOfXPath, evaluateXPathExpression, checkIDNameClassHref } from './utils';
 
 export function getParentId(element: HTMLElement, tagName: string): string | null {
-    let clicketItemId = element.id;
-    let re = new RegExp('\\d{' + state.maxId + ',}', 'g');
-    let matches = re.test(clicketItemId);
+    const clicketItemId = element.id;
+    const re = new RegExp('\\d{' + state.maxId + ',}', 'g');
+    const matches = re.test(clicketItemId);
     if ((clicketItemId != null) && (clicketItemId.length > 0) && matches == false) {
-        let temp = `//${tagName}[@id='${clicketItemId}']`;
+        const temp = `//${tagName}[@id='${clicketItemId}']`;
         return temp;
     } else
         return null;
@@ -15,9 +15,9 @@ export function getParentId(element: HTMLElement, tagName: string): string | nul
 export function getParentName(element: HTMLElement, tagName: string): string | null {
     const clickedItemName = element.getAttribute('name');
     if (clickedItemName && clickedItemName.length > 0) {
-        let matches = clickedItemName.match(/\d{3,}/g);
+        const matches = clickedItemName.match(/\d{3,}/g);
         if (matches == null) {
-            let tempName = `//${tagName}[@name='${clickedItemName}']`;
+            const tempName = `//${tagName}[@name='${clickedItemName}']`;
             return tempName;
         }
     }
@@ -25,15 +25,15 @@ export function getParentName(element: HTMLElement, tagName: string): string | n
 }
 
 export function getParentClassName(element: HTMLElement, tagName: string): string | null {
-    let clickedItemClass = element.className;
+    const clickedItemClass = element.className;
     if (typeof clickedItemClass !== 'string') return null;
-    let splitClass = clickedItemClass.trim().split(" ");
+    const splitClass = clickedItemClass.trim().split(" ");
     if (splitClass.length > 2) {
-        let cl = `${splitClass[0]} ${splitClass[1]}`;
-        let temp = `//${tagName}[contains(@class,'${cl}')]`;
+        const cl = `${splitClass[0]} ${splitClass[1]}`;
+        const temp = `//${tagName}[contains(@class,'${cl}')]`;
         return temp;
     } else if (!((clickedItemClass === "") || (clickedItemClass === undefined))) {
-        let tempClass = `//${tagName}[@class='${clickedItemClass}']`;
+        const tempClass = `//${tagName}[@class='${clickedItemClass}']`;
         return tempClass;
     } else
         return null;
@@ -43,7 +43,7 @@ export function addPreviousSibling(preSib: HTMLElement, tagName: string): void {
     try {
         let classHasSpace = false;
         let temp: string | null = null;
-        let previousSiblingTagName = preSib.tagName.toLowerCase();
+        const previousSiblingTagName = preSib.tagName.toLowerCase();
         if (previousSiblingTagName != "script") {
             Array.prototype.slice.call(preSib.attributes).forEach(function (item: Attr) {
                 if (!(filterAttributesFromElement(item))) {
@@ -51,9 +51,9 @@ export function addPreviousSibling(preSib: HTMLElement, tagName: string): void {
                     switch (item.name) {
                         case 'id':
                             if (preSib.hasAttribute('id')) {
-                                let id = preSib.id;
-                                let re = new RegExp('\\d{' + state.maxId + ',}', 'g');
-                                let matches = re.test(id);
+                                const id = preSib.id;
+                                const re = new RegExp('\\d{' + state.maxId + ',}', 'g');
+                                const matches = re.test(id);
                                 if ((id != null) && (id.length > 0) && matches == false) {
                                     tempvalue = id;
                                 }
@@ -62,7 +62,7 @@ export function addPreviousSibling(preSib: HTMLElement, tagName: string): void {
                         case 'class':
                             if (preSib.hasAttribute('class')) {
                                 tempvalue = preSib.className;
-                                let splClass = tempvalue.trim().split(" ");
+                                const splClass = tempvalue.trim().split(" ");
                                 if (splClass.length > 2) {
                                     tempvalue = `contains(@class,'${splClass[0]} ${splClass[1]}')`;
                                     classHasSpace = true;
@@ -87,7 +87,7 @@ export function addPreviousSibling(preSib: HTMLElement, tagName: string): void {
                             if (getNumberOfXPath(temp) == 1 && evaluated && evaluated.singleNodeValue && (evaluated.singleNodeValue as HTMLElement).attributes.getNamedItem('letxxpath') != null) {
                                 state.XPATHDATA.push([8, 'Following sibling XPath', temp]);
                             } else {
-                                let t = addIndexToXpath(`//${previousSiblingTagName}[${tempvalue}]/following-sibling::${tagName}`);
+                                const t = addIndexToXpath(`//${previousSiblingTagName}[${tempvalue}]/following-sibling::${tagName}`);
                                 if (t != undefined) {
                                     state.XPATHDATA.push([8, 'Following sibling XPath', t]);
                                 } else
@@ -102,7 +102,7 @@ export function addPreviousSibling(preSib: HTMLElement, tagName: string): void {
                             if (getNumberOfXPath(temp) == 1 && evaluated && evaluated.singleNodeValue && (evaluated.singleNodeValue as HTMLElement).attributes.getNamedItem('letxxpath') != null) {
                                 state.XPATHDATA.push([8, 'Following sibling XPath', temp]);
                             } else {
-                                let t = addIndexToXpath(`//${previousSiblingTagName}[@${item.name}='${tempvalue}']/following-sibling::${tagName}`);
+                                const t = addIndexToXpath(`//${previousSiblingTagName}[@${item.name}='${tempvalue}']/following-sibling::${tagName}`);
                                 if (t != undefined) {
                                     state.XPATHDATA.push([8, 'Following sibling XPath', t]);
                                 } else
@@ -118,9 +118,9 @@ export function addPreviousSibling(preSib: HTMLElement, tagName: string): void {
                 let tag = '';
                 let bo = false;
                 if (preSib.parentNode) {
-                    let child = preSib.parentNode.children;
+                    const child = preSib.parentNode.children;
                     for (let i = 0; i < child.length; i++) {
-                        let text = child[i].textContent;
+                        const text = child[i].textContent;
                         if (text && text.trim() != '') {
                             labelText = text;
                             tag = child[i].tagName.toLowerCase();
@@ -137,7 +137,7 @@ export function addPreviousSibling(preSib: HTMLElement, tagName: string): void {
                 } else {
                     temp1 = `//${tag}[text()='${labelText}']/following-sibling::${tagName}[1]`;
                 }
-                let c = getNumberOfXPath(temp1);
+                const c = getNumberOfXPath(temp1);
                 temp1 = `//${tag}[text()='${labelText}']/following-sibling::${tagName}`;
                 if (c == 0) {
                     return;
@@ -146,7 +146,7 @@ export function addPreviousSibling(preSib: HTMLElement, tagName: string): void {
                 if (c == 1 && evaluatedTemp1 && evaluatedTemp1.singleNodeValue && (evaluatedTemp1.singleNodeValue as HTMLElement).attributes.getNamedItem('letxxpath') != null) {
                     state.XPATHDATA.push([8, 'Following sibling XPath', temp1]);
                 } else if ((c != undefined) || (c != null)) {
-                    let xp = addIndexToXpath(temp1);
+                    const xp = addIndexToXpath(temp1);
                     if (xp != undefined) {
                         state.XPATHDATA.push([8, 'Following sibling XPath', xp]);
                     }
@@ -166,8 +166,8 @@ export function getParent(element: HTMLElement, tagName: string): void {
         if (parent) bo = checkIDNameClassHref(parent, bo);
     }
     if (!parent) return;
-    let attributeElement = parent.attributes;
-    let tag = parent.tagName.toLowerCase();
+    const attributeElement = parent.attributes;
+    const tag = parent.tagName.toLowerCase();
     let parentId: string | null = null;
     let parentClass: string | null = null;
     let parentName: string | null = null;
@@ -185,7 +185,7 @@ export function getParent(element: HTMLElement, tagName: string): void {
                     parentName = getParentName(parent!, tag);
                     break;
                 default:
-                    let temp = item.value;
+                    const temp = item.value;
                     if (temp != '') {
                         others = `//${tag}[@${item.name}='${temp}']`;
                     }
@@ -208,7 +208,7 @@ export function getParent(element: HTMLElement, tagName: string): void {
     
     function getParentXp(parentXPath: string, targetTagName: string, locator: string) {
         let tem = `${parentXPath}//${targetTagName}[1]`;
-        let checkTem = evaluateXPathExpression(tem);
+        const checkTem = evaluateXPathExpression(tem);
         let c = getNumberOfXPath(tem);
         if (c == 0) {
             return;
@@ -225,9 +225,9 @@ export function getParent(element: HTMLElement, tagName: string): void {
                     }
                     if (c && c >= 1) {
                         try {
-                            let te = addIndexToXpath(tem);
+                            const te = addIndexToXpath(tem);
                             if (te) {
-                                let checkTe = evaluateXPathExpression(te);
+                                const checkTe = evaluateXPathExpression(te);
                                 if (checkTe && checkTe.singleNodeValue && (checkTe.singleNodeValue as HTMLElement).getAttribute('letxxpath') === "letX") {
                                     state.XPATHDATA.push([9, `Parent ${locator} XPath`, te]);
                                 }
@@ -238,7 +238,7 @@ export function getParent(element: HTMLElement, tagName: string): void {
             } catch (e) { }
         } else if (c && c > 1) {
             tem = `${parentXPath}//${targetTagName}`;
-            let t = addIndexToXpath(tem);
+            const t = addIndexToXpath(tem);
             if (t != undefined && t != null) {
                 state.XPATHDATA.push([9, `Parent ${locator} XPath`, t]);
             }

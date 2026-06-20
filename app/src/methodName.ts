@@ -1,7 +1,7 @@
 import { state } from './state';
 
 export function getMethodOrVarText(element: HTMLElement): string {
-    let ele = element.nodeName;
+    const ele = element.nodeName;
     switch (ele) {
         case "INPUT":
             const inputElement = element as HTMLInputElement;
@@ -147,7 +147,7 @@ export function getMethodOrVarText(element: HTMLElement): string {
             }
             return getParentTextForVariable(element);
         default:
-            let text = element.textContent?.trim() || '';
+            const text = element.textContent?.trim() || '';
             if (text.length >= 2) {
                 return text;
             }
@@ -168,8 +168,8 @@ export function getParentTextForVariable(element: HTMLElement): string {
     try {
         let i: number, j: number;
         let ep = element.parentNode as HTMLElement | null;
-        var child: HTMLCollection;
-        var setBool = false;
+        let child: HTMLCollection;
+        let setBool = false;
         if (element.previousElementSibling) {
             ep = (element.previousElementSibling.textContent && element.previousElementSibling.textContent.length >= 2) 
                 ? (element.previousElementSibling as HTMLElement) 
@@ -181,7 +181,7 @@ export function getParentTextForVariable(element: HTMLElement): string {
                 setBool = false;
                 for (i = 0; i < child.length; i++) {
                     const childNode = child[i] as HTMLElement;
-                    let innerChildLen = childNode.children.length;
+                    const innerChildLen = childNode.children.length;
                     if (innerChildLen >= 1) {
                         for (j = 0; j < innerChildLen; j++) {
                             const innerChild = childNode.children[j] as HTMLElement;
@@ -211,7 +211,7 @@ export function getParentTextForVariable(element: HTMLElement): string {
 }
 
 export function getVariableAndMethodName(str: string): void {
-    let split = str.trim().split(' ');
+    const split = str.trim().split(' ');
     let temp = '';
     let i = 0;
     if (split.length >= 2) {

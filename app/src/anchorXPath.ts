@@ -4,38 +4,36 @@ import { sendMessage } from './content';
 
 export function getAnchorXPath(getsingleXPath: any, tagArr: string[], dupArray: any[], element: HTMLElement): void {
   if (dupArray.length == 0) {
-    let r = evaluateXPathExpression("//*[@letxxpath='letX']");
-    let a = r?.singleNodeValue as HTMLElement | null;
+    const r = evaluateXPathExpression("//*[@letxxpath='letX']");
+    const a = r?.singleNodeValue as HTMLElement | null;
     if (a) {
       a.removeAttribute("letxxpath");
     }
   }
   if (dupArray.length == 1) {
-    let r = evaluateXPathExpression("//*[@letaxes='letX']");
-    let a = r?.singleNodeValue as HTMLElement | null;
+    const r = evaluateXPathExpression("//*[@letaxes='letX']");
+    const a = r?.singleNodeValue as HTMLElement | null;
     if (a) {
       a.removeAttribute("letaxes");
     }
   }
   dupArray.push(getsingleXPath);
-  let length = dupArray.length;
+  const length = dupArray.length;
   if (length == 2) {
-    let srcArrayXP: any[] = [];
-    let dstArrayXP: any[] = [];
+    const srcArrayXP: any[] = [];
+    const dstArrayXP: any[] = [];
     let firstElement = dupArray[0][0][2];
-    if (firstElement.startsWith("//") || firstElement.startsWith("(")) {
-      firstElement = firstElement;
-    } else {
-      let a = dupArray[0];
+    if (!(firstElement.startsWith("//") || firstElement.startsWith("("))) {
+      const a = dupArray[0];
       for (let index = 0; index < a.length; index++) {
-        let c = dupArray[0][index][2];
+        const c = dupArray[0][index][2];
         if (c.startsWith("//") || c.startsWith("(")) {
           firstElement = dupArray[0][index][2];
           break;
         }
       }
     }
-    let secondElement = `*[@letxxpath='letX']`;
+    const secondElement = `*[@letxxpath='letX']`;
     if (getNumberOfXPath(`${firstElement}/following::${secondElement}`) == 1) {
       state.setPreOrFol = "/following::";
     } else if (
@@ -45,20 +43,18 @@ export function getAnchorXPath(getsingleXPath: any, tagArr: string[], dupArray: 
     } else {
       state.setPreOrFol = null;
     }
-    let sxp = dupArray[0];
-    let dxp = dupArray[1];
+    const sxp = dupArray[0];
+    const dxp = dupArray[1];
     extractXPathFormArray(sxp, srcArrayXP, tagArr[0]);
     extractXPathFormArray(dxp, dstArrayXP, tagArr[1]);
     let defaultXP = `//${srcArrayXP[0][1]}${state.setPreOrFol}${dstArrayXP[0][1]}`;
-    let defaultCount = getNumberOfXPath(defaultXP);
+    const defaultCount = getNumberOfXPath(defaultXP);
     if (defaultCount == 0 || defaultCount == undefined) {
       defaultXP = "Pattern not matched, Please try other combinations";
-    } else if (defaultCount == 1) {
-      defaultXP = defaultXP;
     } else if (defaultCount > 1) {
       defaultXP = addIndexToXpath(defaultXP) || defaultXP;
     }
-    let dom = {
+    const dom = {
       webtabledetails: state.webTableDetails,
       anchor: true,
       proOrFol: state.setPreOrFol,
@@ -76,8 +72,8 @@ export function getAnchorXPath(getsingleXPath: any, tagArr: string[], dupArray: 
   
   function extractXPathFormArray(sxp: any, anchorArr: any[], tag: string) {
     for (const key in sxp) {
-      let xpathNumber = sxp[key][0];
-      let xpathValue = sxp[key][1];
+      const xpathNumber = sxp[key][0];
+      const xpathValue = sxp[key][1];
       let xpathData = sxp[key][2];
       switch (xpathNumber) {
         case 1:
@@ -103,7 +99,7 @@ export function getAnchorXPath(getsingleXPath: any, tagArr: string[], dupArray: 
               anchorArr.push([0, xpathData, xpathValue]);
             }
           } else {
-            let temp = `${tag}[text()[normalize-space()='${xpathData}']]`;
+            const temp = `${tag}[text()[normalize-space()='${xpathData}']]`;
             anchorArr.push([0, temp, xpathValue]);
           }
           break;
@@ -137,7 +133,7 @@ export function getAnchorXPath(getsingleXPath: any, tagArr: string[], dupArray: 
         anchorArr.push([number, xpathData, xpathValue]);
       }
     } else {
-      let temp = `${tag}[@${attr}='${xpathData}']`;
+      const temp = `${tag}[@${attr}='${xpathData}']`;
       anchorArr.push([number, temp, xpathValue]);
     }
   }

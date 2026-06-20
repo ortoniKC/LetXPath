@@ -15,7 +15,7 @@ export function getTextBasedXPath(element: HTMLElement, tagName: string): string
         handleComplexText(element, tagName, textContent)
     ].filter(Boolean) as string[];
 
-    for (let xpath of xpaths) {
+    for (const xpath of xpaths) {
         if (validateXPath(xpath)) return xpath;
     }
 
@@ -37,7 +37,7 @@ export function handleLinkText(element: HTMLElement, textContent: string): strin
         }
     }
 
-    for (let xpath of xpaths) {
+    for (const xpath of xpaths) {
         if (validateXPath(xpath)) return xpath;
     }
 
@@ -56,7 +56,7 @@ export function handleComplexText(element: HTMLElement, tagName: string, textCon
         }
     }
 
-    for (let xpath of xpaths) {
+    for (const xpath of xpaths) {
         if (validateXPath(xpath)) return xpath;
     }
 

@@ -12,7 +12,7 @@ export function stopRecord(): void {
     state.elementOwnerDocument.removeEventListener("mouseover", mouseOver, true);
     state.elementOwnerDocument.removeEventListener("mouseout", mouseOut, true);
 
-    let values = {
+    const values = {
         date: Date.now().toString(),
         xpath: state.recordArray,
         xpathPOM: state.recordArrayPOM,

@@ -3,7 +3,7 @@ import { state } from './state';
 export function searchAll(): void {
     if (state.searchXPathArray && state.searchXPathArray.length > 0) {
         state.variableName = state.searchXPathArray[0][0];
-        let xpathValue = state.searchXPathArray[0][3];
+        const xpathValue = state.searchXPathArray[0][3];
         let str = gen(state.searchXPathArray[0][2], xpathValue, state.variableName, false);
         state.recordArray.push(str);
         str = gen(state.searchXPathArray[0][2], xpathValue, state.variableName, true);

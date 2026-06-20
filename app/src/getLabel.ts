@@ -5,7 +5,7 @@ import { evaluateXPathExpression, getNumberOfXPath, addIndexToXpath } from './ut
 export function findLabel(element: HTMLElement, tagName: string): void {
     let label: string | undefined = undefined;
     let span: string | undefined = undefined;
-    let ele = `//*[@letxxpath='letX']`;
+    const ele = `//*[@letxxpath='letX']`;
     try {
         label = getLabelText(ele, tagName);
     } catch (error) { }
@@ -14,14 +14,14 @@ export function findLabel(element: HTMLElement, tagName: string): void {
     } catch (error) { }
     try {
         if (label === undefined && span === undefined) {
-            let xp = getParentText(element, tagName);
+            const xp = getParentText(element, tagName);
             if (xp) {
-                let temp = xp;
-                let evaluated = evaluateXPathExpression(xp);
+                const temp = xp;
+                const evaluated = evaluateXPathExpression(xp);
                 if (evaluated && evaluated.singleNodeValue && (evaluated.singleNodeValue as HTMLElement).attributes.getNamedItem('letxxpath') != null) {
                     state.XPATHDATA.push([6, 'Text based following XPath', temp]);
                 } else {
-                    let indexed = addIndexToXpath(temp);
+                    const indexed = addIndexToXpath(temp);
                     if (indexed != null) {
                         state.XPATHDATA.push([6, 'Text based following XPath', indexed]);
                     }
@@ -34,11 +34,11 @@ export function findLabel(element: HTMLElement, tagName: string): void {
 export function getParentText(element: HTMLElement, tagName: string): string | null {
     let ep = element.parentNode?.parentNode as HTMLElement | null;
     if (!ep) return null;
-    let child = ep.children;
+    const child = ep.children;
     let tagN: string | null = null;
     let setBool = false;
     for (let i = 0; i < child.length; i++) {
-        let innerChildLen = child[i].children.length;
+        const innerChildLen = child[i].children.length;
         for (let j = 0; j < innerChildLen; j++) {
             const innerChild = child[i].children[j] as HTMLElement;
             if (innerChild.textContent && innerChild.textContent.length > 1) {
@@ -52,24 +52,24 @@ export function getParentText(element: HTMLElement, tagName: string): string | n
             break;
     }
     if (!ep || !tagN) return null;
-    let text = getTextBasedXPath(ep, tagN.toLowerCase());
+    const text = getTextBasedXPath(ep, tagN.toLowerCase());
     if (!text) return null;
-    let temp = `${text}/following::${tagName}`;
-    let count = getNumberOfXPath(temp);
+    const temp = `${text}/following::${tagName}`;
+    const count = getNumberOfXPath(temp);
     if (count == 1) {
-        let xp = `${text}/following::${tagName}[1]`;
+        const xp = `${text}/following::${tagName}[1]`;
         return xp;
     } else if (count !== undefined && count > 1) {
-        let xp = `${text}/following::${tagName}`;
-        let indexed = addIndexToXpath(xp);
+        const xp = `${text}/following::${tagName}`;
+        const indexed = addIndexToXpath(xp);
         return indexed || xp;
     } else
         return null;
 }
 
 export function getLabelText(ele: string, tagName: string): string | undefined {
-    let labelNode = `${ele}/preceding::label[1]`;
-    let checkLabelType = evaluateXPathExpression(labelNode);
+    const labelNode = `${ele}/preceding::label[1]`;
+    const checkLabelType = evaluateXPathExpression(labelNode);
     try {
         if (checkLabelType && checkLabelType.singleNodeValue && typeof (checkLabelType.singleNodeValue.textContent) === 'string') {
             return getLabel(labelNode, tagName);
@@ -80,8 +80,8 @@ export function getLabelText(ele: string, tagName: string): string | undefined {
 }
 
 export function getSpanText(ele: string, tagName: string): string | undefined {
-    let spanNode = `${ele}/preceding::span[1]`;
-    let checkSpanType = evaluateXPathExpression(spanNode);
+    const spanNode = `${ele}/preceding::span[1]`;
+    const checkSpanType = evaluateXPathExpression(spanNode);
     try {
         if (checkSpanType && checkSpanType.singleNodeValue && typeof (checkSpanType.singleNodeValue.textContent) === 'string') {
             return getLabel(spanNode, tagName);
@@ -92,25 +92,25 @@ export function getSpanText(ele: string, tagName: string): string | undefined {
 }
 
 export function getLabel(node: string, tagName: string): string | undefined {
-    let c = getNumberOfXPath(node);
+    const c = getNumberOfXPath(node);
     if (c !== undefined && c > 0) {
-        let label = evaluateXPathExpression(node);
-        let newEle = label?.singleNodeValue as HTMLElement | null;
+        const label = evaluateXPathExpression(node);
+        const newEle = label?.singleNodeValue as HTMLElement | null;
         if (newEle) {
-            let labelTag = newEle.tagName.toLowerCase();
-            let labelText = getTextBasedXPath(newEle, labelTag);
+            const labelTag = newEle.tagName.toLowerCase();
+            const labelText = getTextBasedXPath(newEle, labelTag);
             if (labelText) {
-                let newLabelXpath = labelText + '/' + 'following::' + tagName;
+                const newLabelXpath = labelText + '/' + 'following::' + tagName;
                 if (getNumberOfXPath(newLabelXpath) == 1) {
-                    let newLabel = evaluateXPathExpression(newLabelXpath);
+                    const newLabel = evaluateXPathExpression(newLabelXpath);
                     if (newLabel && newLabel.singleNodeValue && (newLabel.singleNodeValue as HTMLElement).attributes.getNamedItem('letxxpath') != null) {
                         state.XPATHDATA.push([6, 'Text based following XPath', newLabelXpath]);
                         return newLabelXpath;
                     }
                 } else {
-                    let labelTextWithIndex = addIndexToXpath(newLabelXpath);
+                    const labelTextWithIndex = addIndexToXpath(newLabelXpath);
                     if (labelTextWithIndex) {
-                        let newLabel = evaluateXPathExpression(labelTextWithIndex);
+                        const newLabel = evaluateXPathExpression(labelTextWithIndex);
                         if (newLabel && newLabel.singleNodeValue && (newLabel.singleNodeValue as HTMLElement).attributes.getNamedItem('letxxpath') != null) {
                             state.XPATHDATA.push([6, 'Text based following XPath', labelTextWithIndex]);
                             return labelTextWithIndex;

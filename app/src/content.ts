@@ -37,15 +37,15 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
       break;
     case "parseAxes":
       try {
-        let value = message.data;
-        let axesSnapshot = state.elementOwnerDocument.evaluate(
+        const value = message.data;
+        const axesSnapshot = state.elementOwnerDocument.evaluate(
           value,
           state.elementOwnerDocument,
           null,
           XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
           null
         );
-        let axesCount = axesSnapshot.snapshotLength;
+        const axesCount = axesSnapshot.snapshotLength;
         if (axesCount == 0 || axesCount == undefined) {
           sendMessage({
             request: "axes",
@@ -54,7 +54,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
         } else if (axesCount == 1) {
           sendMessage({ request: "axes", data: value });
         } else if (axesCount > 1) {
-          let ex = addIndexToAxesXpath(value);
+          const ex = addIndexToAxesXpath(value);
           if (ex != null) {
             sendMessage({ request: "axes", data: ex });
           } else {
@@ -74,7 +74,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
       state.webTableDetails = null;
       break;
     case "userSearchXP":
-      let val = message.data.trim();
+      const val = message.data.trim();
       let customCount = 0;
       let matchedElements: HTMLElement[] = [];
       let locatorType = "XPath";
@@ -87,7 +87,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
         } else {
           // Try XPath first
           try {
-            let customSnapshot = state.elementOwnerDocument.evaluate(
+            const customSnapshot = state.elementOwnerDocument.evaluate(
               val,
               state.elementOwnerDocument,
               null,
@@ -101,7 +101,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
           } catch (xpathError) {
             // Fallback to CSS
             locatorType = "CSS";
-            let cssElements = state.elementOwnerDocument.querySelectorAll(val);
+            const cssElements = state.elementOwnerDocument.querySelectorAll(val);
             customCount = cssElements.length;
             matchedElements = Array.from(cssElements) as HTMLElement[];
           }
@@ -111,7 +111,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
         matchedElements = [];
       }
       
-      let isXPathCorrect = customCount > 0 ? `${locatorType} found` : `Wrong ${locatorType}`;
+      const isXPathCorrect = customCount > 0 ? `${locatorType} found` : `Wrong ${locatorType}`;
       if (customCount > 0) {
         for (const el of matchedElements) {
           if (el) el.setAttribute("letcss", "1");
@@ -126,7 +126,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
       });
       break;
     case "cleanhighlight":
-      let removeCSS = "//*[@letcss='1']";
+      const removeCSS = "//*[@letcss='1']";
       let cleanSnapshot: XPathResult | undefined;
       let cleanCount = 0;
       try {
@@ -195,7 +195,7 @@ export function parseDOM(targetElement: HTMLElement) {
       }
 
       // Get raw attributes for Playwright locator generation
-      let attrs: Record<string, string> = {};
+      const attrs: Record<string, string> = {};
       if (targetElement.attributes) {
         for (let i = 0; i < targetElement.attributes.length; i++) {
           const attr = targetElement.attributes[i];
@@ -237,7 +237,7 @@ export function parseDOM(targetElement: HTMLElement) {
       // Generate Playwright specific locators using the Playwright repository priority strategy
       const pwLocators = buildPlaywrightLocators(targetElement, state.XPATHDATA, state.CSSPATHDATA);
 
-      let domInfo = {
+      const domInfo = {
         request: "send_to_dev",
         cssPath: state.CSSPATHDATA,
         webtabledetails: state.webTableDetails,
@@ -292,9 +292,9 @@ export function buildXpath(element: HTMLElement, boolAnchor: number, _utils: boo
     });
     throw new TypeError("shadow dom not yet supported");
   }
-  let removeletX = `//*[@letxxpath='letX']`;
+  const removeletX = `//*[@letxxpath='letX']`;
   try {
-    let re = evaluateXPathExpression(removeletX);
+    const re = evaluateXPathExpression(removeletX);
     if (re && re.singleNodeValue != null) {
       (re.singleNodeValue as HTMLElement).removeAttribute("letxxpath");
     }
@@ -304,7 +304,7 @@ export function buildXpath(element: HTMLElement, boolAnchor: number, _utils: boo
   element.setAttribute("letxxpath", "letX");
   // generate method and varible name
   try {
-    let name = getMethodOrVarText(element);
+    const name = getMethodOrVarText(element);
     getVariableAndMethodName(name);
     
     state.methodName = state.methodName && state.methodName.length >= 2 && state.methodName.length < 25
@@ -340,7 +340,7 @@ export function buildXpath(element: HTMLElement, boolAnchor: number, _utils: boo
   }
   
   // To get tag name
-  let tagName = currentElement.tagName.toLowerCase();
+  const tagName = currentElement.tagName.toLowerCase();
   state.tag = tagName;
   if (currentElement.hasAttribute("type")) {
     state.type = currentElement.getAttribute('type');
@@ -352,15 +352,15 @@ export function buildXpath(element: HTMLElement, boolAnchor: number, _utils: boo
 
   // Find no.of frames available, then generate XPath or index for that
   try {
-    let fr = document.querySelectorAll("iframe");
+    const fr = document.querySelectorAll("iframe");
     if (fr.length > 0) {
       state.frameXPATH = frameXPath(fr[0] as HTMLIFrameElement) || null;
     }
   } catch (error) {}
 
   // To get all attribuites
-  let attributeElement = currentElement.attributes;
-  let preiousSiblingElement = currentElement.previousElementSibling as HTMLElement | null;
+  const attributeElement = currentElement.attributes;
+  const preiousSiblingElement = currentElement.previousElementSibling as HTMLElement | null;
 
   // To iterate all attributes xpath
   try {
@@ -408,8 +408,8 @@ export function buildXpath(element: HTMLElement, boolAnchor: number, _utils: boo
   } catch (error) {}
 
   try {
-    let css = getLongCssPath(currentElement);
-    let csslen = css.split(">");
+    const css = getLongCssPath(currentElement);
+    const csslen = css.split(">");
     if (csslen.length < 5) {
       state.CSSPATHDATA.push([11, "Closest ID CSS", css]);
     }
@@ -438,7 +438,7 @@ export function xpathFollowingSibling(preiousSiblingElement: HTMLElement, tagNam
 
 // Get Text based XPath
 export function xpathText(element: HTMLElement, tagName: string) {
-  let getTextXPathEle = getTextBasedXPath(element, tagName);
+  const getTextXPathEle = getTextBasedXPath(element, tagName);
   if (!(getTextXPathEle === null || getTextXPathEle === undefined)) {
     state.XPATHDATA.push([6, "Text based XPath", getTextXPathEle]);
   }
@@ -449,7 +449,7 @@ export function getNameXPath(element: HTMLElement, tagName: string): string | nu
   let nameBasedXpath = null;
   const nameAttr = element.getAttribute('name');
   if (!nameAttr) return null;
-  let matches = nameAttr.match(/\d{3,}/g);
+  const matches = nameAttr.match(/\d{3,}/g);
   if (
     !(
       nameAttr === "" ||
@@ -457,9 +457,9 @@ export function getNameXPath(element: HTMLElement, tagName: string): string | nu
       matches != null
     )
   ) {
-    let tempName = "[@name='" + nameAttr + "']";
+    const tempName = "[@name='" + nameAttr + "']";
     let tem = `//*${tempName}`;
-    let count = getNumberOfXPath(tem);
+    const count = getNumberOfXPath(tem);
     if (count == 1) {
       state.XPATHDATA.push([102, "Unique Name", nameAttr]);
       state.CSSPATHDATA.push([
@@ -479,13 +479,13 @@ export function getNameXPath(element: HTMLElement, tagName: string): string | nu
 export function getClassXPath(element: HTMLElement, tagName: string): string | null | undefined {
   getClassCSS(element);
   let classBasedXpath = null;
-  let clickedItemClass = element.className;
+  const clickedItemClass = element.className;
   if (typeof clickedItemClass !== 'string') return null;
-  let splitClass = clickedItemClass.trim().split(" ");
+  const splitClass = clickedItemClass.trim().split(" ");
   if (splitClass.length > 2) {
-    let cl = `${splitClass[0]} ${splitClass[1]}`;
+    const cl = `${splitClass[0]} ${splitClass[1]}`;
     let temp = `//${tagName}[contains(@class,'${cl}')]`;
-    let count = getNumberOfXPath(temp);
+    const count = getNumberOfXPath(temp);
     if (count == 0) {
       return null;
     }
@@ -501,16 +501,16 @@ export function getClassXPath(element: HTMLElement, tagName: string): string | n
     return temp;
   }
   if (!(clickedItemClass === "" || clickedItemClass === undefined)) {
-    let tempClass = `//*[@class='${clickedItemClass}']`;
-    let count = getNumberOfXPath(tempClass);
-    let spl = clickedItemClass.trim().split(" ");
+    const tempClass = `//*[@class='${clickedItemClass}']`;
+    const count = getNumberOfXPath(tempClass);
+    const spl = clickedItemClass.trim().split(" ");
     if (count == 1 && spl.length == 1) {
       state.XPATHDATA.push([3, "Unique Class Atrribute", clickedItemClass]);
       state.CSSPATHDATA.push([3, "Unique Class Atrribute", "." + clickedItemClass]);
       return null;
     } else {
       classBasedXpath = `//${tagName}[@class='${clickedItemClass}']`;
-      let count = getNumberOfXPath(classBasedXpath);
+      const count = getNumberOfXPath(classBasedXpath);
       if (count == 0) {
         return null;
       } else if (count == 1) {
@@ -525,13 +525,13 @@ export function getClassXPath(element: HTMLElement, tagName: string): string | n
 
 export function getIDXPath(element: HTMLElement, tagName: string): string | null | undefined {
   let idBasedXpath = null;
-  let clicketItemId = element.id;
-  let re = new RegExp("\\d{" + state.maxId + ",}", "g");
-  let matches = re.test(clicketItemId);
+  const clicketItemId = element.id;
+  const re = new RegExp("\\d{" + state.maxId + ",}", "g");
+  const matches = re.test(clicketItemId);
   if (clicketItemId != null && clicketItemId.length > 0 && matches == false) {
-    let tempId = "[@id='" + clicketItemId + "']";
+    const tempId = "[@id='" + clicketItemId + "']";
     idBasedXpath = "//" + "*" + tempId;
-    let count = getNumberOfXPath(idBasedXpath);
+    const count = getNumberOfXPath(idBasedXpath);
     if (count == 0) {
       return null;
     } else if (count == 1) {
@@ -559,29 +559,29 @@ export function addAllXpathAttributesBased(attribute: NamedNodeMap, tagName: str
 
     switch (item.name) {
       case "id":
-        let id = getIDXPath(element, tagName);
+        const id = getIDXPath(element, tagName);
         if (id != null) {
           state.XPATHDATA.push([1, "Unique ID", id]);
           state.CSSPATHDATA.push([1, "Unique ID", `#${id}`]);
         }
         break;
       case "class":
-        let className = getClassXPath(element, tagName);
+        const className = getClassXPath(element, tagName);
         if (className != null) {
           state.XPATHDATA.push([3, "Class based XPath", className]);
         }
         break;
       case "name":
-        let name = getNameXPath(element, tagName);
+        const name = getNameXPath(element, tagName);
         if (name != null) {
           state.XPATHDATA.push([2, "Name based XPath", name]);
         }
         break;
       default:
-        let temp = item.value;
+        const temp = item.value;
         if (temp !== "") {
-          let allXpathAttr = `//${tagName}[@${item.name}='${temp}']`;
-          let xpathResult = getNumberOfXPath(allXpathAttr);
+          const allXpathAttr = `//${tagName}[@${item.name}='${temp}']`;
+          const xpathResult = getNumberOfXPath(allXpathAttr);
           if (xpathResult == 1) {
             state.XPATHDATA.push([4, `${item.name}`, allXpathAttr]);
             state.CSSPATHDATA.push([
@@ -590,7 +590,7 @@ export function addAllXpathAttributesBased(attribute: NamedNodeMap, tagName: str
               `${tagName}[${item.name}='${temp}']`,
             ]);
           } else {
-            let indexedXPath = addIndexToXpath(allXpathAttr);
+            const indexedXPath = addIndexToXpath(allXpathAttr);
             if (indexedXPath !== undefined && indexedXPath !== null) {
               state.XPATHDATA.push([4, `${item.name}`, indexedXPath]);
             }
