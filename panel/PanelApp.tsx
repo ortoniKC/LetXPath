@@ -1241,7 +1241,7 @@ const styles = {
     padding: '2px'
   },
   axesResultBox: {
-    backgroundColor: 'transparent',
+    backgroundColor: '#151515',
     border: '1px solid #2d2d2d',
     borderRadius: '2px',
     padding: '4px 6px'
@@ -1252,7 +1252,9 @@ const styles = {
     fontFamily: 'Consolas, Monaco, monospace',
     fontWeight: 'bold',
     cursor: 'pointer',
-    wordBreak: 'break-all' as const
+    wordBreak: 'break-all' as const,
+    background: 'none',
+    padding: 0
   },
   axesColumns: {
     display: 'flex',
@@ -1366,7 +1368,9 @@ const styles = {
     fontSize: '10px',
     fontFamily: 'Consolas, Monaco, monospace',
     cursor: 'pointer',
-    wordBreak: 'break-all' as const
+    wordBreak: 'break-all' as const,
+    background: 'none',
+    padding: 0
   },
   aboutCard: {
     backgroundColor: '#202020',
