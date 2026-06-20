@@ -1241,7 +1241,7 @@ const styles = {
     padding: '2px'
   },
   axesResultBox: {
-    backgroundColor: '#151515',
+    backgroundColor: 'transparent',
     border: '1px solid #2d2d2d',
     borderRadius: '2px',
     padding: '4px 6px'
