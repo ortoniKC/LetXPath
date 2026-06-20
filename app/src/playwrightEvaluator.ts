@@ -108,10 +108,8 @@ export function evaluatePlaywrightLocator(locatorStr: string, doc: Document): HT
     } else if (method === 'getByTestId') {
       const val = parseStringArg(args);
       const testIdAttrs = ['data-testid', 'data-test-id', 'data-test', 'testid'];
-      const all = Array.from(doc.getElementsByTagName('*')) as HTMLElement[];
-      stepMatches = all.filter(el => {
-        return testIdAttrs.some(attr => el.getAttribute(attr) === val);
-      });
+      const selector = testIdAttrs.map(attr => `[${attr}="${val.replace(/"/g, '\\"')}"]`).join(', ');
+      stepMatches = Array.from(doc.querySelectorAll(selector)) as HTMLElement[];
     } else if (method === 'getByPlaceholder') {
       const val = parseStringArg(args);
       const selector = `[placeholder="${val.replace(/"/g, '\\"')}"]`;
@@ -126,14 +124,22 @@ export function evaluatePlaywrightLocator(locatorStr: string, doc: Document): HT
       stepMatches = Array.from(doc.querySelectorAll(selector)) as HTMLElement[];
     } else if (method === 'getByLabel') {
       const val = parseStringArg(args);
-      const all = Array.from(doc.getElementsByTagName('*')) as HTMLElement[];
+      const all = Array.from(doc.querySelectorAll('input, textarea, select, button')) as HTMLElement[];
       stepMatches = all.filter(el => getElementLabelText(el) === val);
     } else if (method === 'getByText') {
       const val = parseStringArg(args);
       const all = Array.from(doc.getElementsByTagName('*')) as HTMLElement[];
       stepMatches = all.filter(el => {
         const text = el.textContent?.replace(/\s+/g, ' ').trim() || '';
-        return text === val || text.includes(val);
+        const matches = text === val || text.includes(val);
+        if (!matches) return false;
+        
+        // Innermost (leaf-most) matching element constraint:
+        // Exclude parent containers where children also match the query
+        return !Array.from(el.children).some(child => {
+          const childText = child.textContent?.replace(/\s+/g, ' ').trim() || '';
+          return childText === val || childText.includes(val);
+        });
       });
     } else if (method === 'getByRole') {
       let roleVal = '';
