@@ -46,6 +46,9 @@ interface SelectedElement {
   variablename?: string;
   methodname?: string;
   webtabledetails?: WebTableDetails | null;
+  attributes?: Record<string, string>;
+  text?: string;
+  labelText?: string;
 }
 
 interface AxesData {
@@ -75,6 +78,9 @@ interface DevToolsMessageRequest {
   variablename?: string;
   methodname?: string;
   webtabledetails?: WebTableDetails | null;
+  attributes?: Record<string, string>;
+  text?: string;
+  labelText?: string;
 }
 
 const colorizeXPath = (xpath: string): React.ReactNode => {
@@ -139,6 +145,207 @@ const colorizeCSS = (css: string): React.ReactNode => {
   });
 };
 
+const getPlaywrightRole = (tag: string, type?: string): string | null => {
+  const t = tag.toLowerCase();
+  if (t === 'button') return 'button';
+  if (t === 'a') return 'link';
+  if (t === 'h1' || t === 'h2' || t === 'h3' || t === 'h4' || t === 'h5' || t === 'h6') return 'heading';
+  if (t === 'input') {
+    const typeLower = type?.toLowerCase();
+    if (typeLower === 'checkbox') return 'checkbox';
+    if (typeLower === 'radio') return 'radio';
+    if (typeLower === 'button' || typeLower === 'submit' || typeLower === 'reset') return 'button';
+    return 'textbox';
+  }
+  if (t === 'textarea') return 'textbox';
+  if (t === 'select') return 'combobox';
+  return null;
+};
+
+const getPlaywrightActions = (tag: string, type?: string): string[] => {
+  const t = tag.toLowerCase();
+  const typ = type?.toLowerCase() || "";
+  const baseActions = ['click', 'hover', 'focus', 'toBeVisible', 'toBeHidden', 'toHaveText'];
+  
+  if (t === 'select') {
+    return ['selectOption', ...baseActions];
+  }
+  if (t === 'input') {
+    if (typ === 'checkbox' || typ === 'radio') {
+      return ['check', 'uncheck', ...baseActions];
+    }
+    return ['fill', 'type', ...baseActions];
+  }
+  if (t === 'textarea') {
+    return ['fill', 'type', ...baseActions];
+  }
+  return baseActions;
+};
+
+const getPlaywrightSnippet = (action: string, locator: string): string => {
+  switch (action) {
+    case 'click':
+      return `await ${locator}.click();`;
+    case 'fill':
+      return `await ${locator}.fill('text');`;
+    case 'type':
+      return `await ${locator}.pressSequentially('text');`;
+    case 'hover':
+      return `await ${locator}.hover();`;
+    case 'focus':
+      return `await ${locator}.focus();`;
+    case 'check':
+      return `await ${locator}.check();`;
+    case 'uncheck':
+      return `await ${locator}.uncheck();`;
+    case 'selectOption':
+      return `await ${locator}.selectOption('value');`;
+    case 'dblclick':
+      return `await ${locator}.dblclick();`;
+    case 'toBeVisible':
+      return `await expect(${locator}).toBeVisible();`;
+    case 'toBeHidden':
+      return `await expect(${locator}).toBeHidden();`;
+    case 'toHaveText':
+      return `await expect(${locator}).toHaveText('value');`;
+    case 'toHaveValue':
+      return `await expect(${locator}).toHaveValue('value');`;
+    default:
+      return `await ${locator}.click();`;
+  }
+};
+
+const generatePlaywrightLocators = (el: SelectedElement): { label: string; value: string }[] => {
+  const locators: { label: string; value: string }[] = [];
+  if (!el) return locators;
+
+  const tag = el.tag?.toLowerCase() || "";
+  const type = el.type?.toLowerCase() || "";
+  const attrs = el.attributes || {};
+  const text = el.text || "";
+  const labelText = el.labelText || "";
+
+  // 1. page.getByTestId
+  const testIdAttrs = ['data-testid', 'data-test-id', 'data-test', 'testid'];
+  for (const attr of testIdAttrs) {
+    if (attrs[attr]) {
+      locators.push({
+        label: `getByTestId ('${attr}')`,
+        value: `page.getByTestId('${attrs[attr]}')`
+      });
+      break;
+    }
+  }
+
+  // 2. page.getByRole
+  const role = getPlaywrightRole(tag, type);
+  if (role) {
+    let nameVal = attrs['aria-label'] || attrs['title'] || labelText || text;
+    nameVal = nameVal.trim().replace(/\s+/g, ' ');
+    if (nameVal) {
+      if (nameVal.length > 50) nameVal = nameVal.slice(0, 50) + "...";
+      locators.push({
+        label: `getByRole ('${role}')`,
+        value: `page.getByRole('${role}', { name: '${nameVal.replace(/'/g, "\\'")}' })`
+      });
+    } else {
+      locators.push({
+        label: `getByRole ('${role}')`,
+        value: `page.getByRole('${role}')`
+      });
+    }
+  }
+
+  // 3. page.getByLabel
+  if (labelText) {
+    locators.push({
+      label: 'getByLabel',
+      value: `page.getByLabel('${labelText.replace(/'/g, "\\'")}')`
+    });
+  }
+
+  // 4. page.getByPlaceholder
+  if (attrs['placeholder']) {
+    locators.push({
+      label: 'getByPlaceholder',
+      value: `page.getByPlaceholder('${attrs['placeholder'].replace(/'/g, "\\'")}')`
+    });
+  }
+
+  // 5. page.getByText
+  if (text && text.length > 1 && text.length < 80) {
+    locators.push({
+      label: 'getByText',
+      value: `page.getByText('${text.replace(/'/g, "\\'")}')`
+    });
+  }
+
+  // 6. page.getByAltText
+  if (attrs['alt']) {
+    locators.push({
+      label: 'getByAltText',
+      value: `page.getByAltText('${attrs['alt'].replace(/'/g, "\\'")}')`
+    });
+  }
+
+  // 7. page.getByTitle
+  if (attrs['title']) {
+    locators.push({
+      label: 'getByTitle',
+      value: `page.getByTitle('${attrs['title'].replace(/'/g, "\\'")}')`
+    });
+  }
+
+  // Fallbacks: page.locator with unique ID, unique class, or optimized XPath/CSS
+  if (attrs['id']) {
+    locators.push({
+      label: "locator (ID)",
+      value: `page.locator('#${attrs['id']}')`
+    });
+  }
+
+  if (el.cssPath && el.cssPath.length > 0) {
+    const bestCss = el.cssPath[0][2];
+    locators.push({
+      label: "locator (CSS)",
+      value: `page.locator('${bestCss.replace(/'/g, "\\'")}')`
+    });
+  }
+
+  if (el.xpathid && el.xpathid.length > 0) {
+    const bestXpath = el.xpathid[0][2];
+    locators.push({
+      label: "locator (XPath)",
+      value: `page.locator('${bestXpath.replace(/'/g, "\\'")}')`
+    });
+  }
+
+  return locators;
+};
+
+const colorizePlaywright = (locator: string): React.ReactNode => {
+  const tokenRegex = /('(?:\\'|[^'])*'|"(?:\\"|[^"])*"|\bpage\b|\bgetBy[a-zA-Z]+\b|\blocator\b|\bname\b|\{|\}|\(|\)|:|,)/g;
+  const tokens = locator.split(tokenRegex);
+  return tokens.map((token, idx) => {
+    if (!token) return null;
+    let color = '#d4d4d4';
+    if (token.startsWith("'") || token.startsWith('"')) {
+      color = '#ce9178'; // string
+    } else if (token === 'page') {
+      color = '#9cdcfe'; // object variable
+    } else if (token.startsWith('getBy') || token === 'locator') {
+      color = '#dcdcaa'; // function name
+    } else if (token === 'name') {
+      color = '#9cdcfe'; // property key
+    } else if (['{', '}', '(', ')'].includes(token)) {
+      color = '#ffd700'; // brackets
+    } else if ([':', ','].includes(token)) {
+      color = '#b5cea8'; // operators/separators
+    }
+    return <span key={idx} style={{ color }}>{token}</span>;
+  });
+};
+
 const PanelApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState<number>(1);
   const [selectedElement, setSelectedElement] = useState<SelectedElement | null>(null);
@@ -187,7 +394,10 @@ const PanelApp: React.FC = () => {
                 type: req.type,
                 variablename: req.variablename,
                 methodname: req.methodname,
-                webtabledetails: req.webtabledetails
+                webtabledetails: req.webtabledetails,
+                attributes: req.attributes,
+                text: req.text,
+                labelText: req.labelText
               });
               // Default activeTab to 1 if we get element updates
               setActiveTab(1);
@@ -444,6 +654,14 @@ const PanelApp: React.FC = () => {
     e.target.value = 'snippet';
   };
 
+  const handlePlaywrightActionSelect = (e: React.ChangeEvent<HTMLSelectElement>, locator: string) => {
+    const action = e.target.value;
+    if (action === 'snippet') return;
+    const code = getPlaywrightSnippet(action, locator);
+    copyToClipboard(code, 'Playwright snippet copied!');
+    e.target.value = 'snippet';
+  };
+
   const getActionsForTag = (tag: string, inputType: string): string[] => {
     if (tag === 'textarea') return ACTION_LABELS.textarea;
     if (tag === 'input') {
@@ -633,10 +851,13 @@ const PanelApp: React.FC = () => {
             <span style={activeTab === 3 ? styles.activeLink : styles.link}>Axes</span>
           </li>
           <li style={styles.tabItem} onClick={() => setActiveTab(4)}>
-            <span style={activeTab === 4 ? styles.activeLink : styles.link}>Tools</span>
+            <span style={activeTab === 4 ? styles.activeLink : styles.link}>Playwright</span>
           </li>
           <li style={styles.tabItem} onClick={() => setActiveTab(5)}>
-            <span style={activeTab === 5 ? styles.activeLink : styles.link}>About</span>
+            <span style={activeTab === 5 ? styles.activeLink : styles.link}>Tools</span>
+          </li>
+          <li style={styles.tabItem} onClick={() => setActiveTab(6)}>
+            <span style={activeTab === 6 ? styles.activeLink : styles.link}>About</span>
           </li>
         </ul>
         <div style={styles.settingsBtn} onClick={handleOpenSettings} title="Settings">
@@ -825,8 +1046,49 @@ const PanelApp: React.FC = () => {
           </div>
         )}
 
-        {/* Tools Tab */}
+        {/* Playwright Tab */}
         {activeTab === 4 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {!selectedElement || !selectedElement.tag ? (
+              <div style={styles.emptyState}>
+                <div style={{ fontSize: '1.8rem', marginBottom: '4px' }}>🎭</div>
+                <div style={styles.emptyTitle}>Select an element in Elements tab</div>
+                <div style={styles.emptySubtitle}>LetXPath will display Playwright-recommended locators here.</div>
+              </div>
+            ) : (
+              <div style={styles.locatorList}>
+                {generatePlaywrightLocators(selectedElement).map((loc, idx) => (
+                  <div key={idx} style={styles.locatorRow}>
+                    <div style={styles.labelBox}>
+                      <span style={styles.locatorLabel} title={loc.label}>{loc.label}</span>
+                    </div>
+                    <code 
+                      style={styles.codeSnippet} 
+                      title="Click to copy Playwright Locator" 
+                      onClick={() => copyToClipboard(loc.value, 'Playwright locator copied!')}
+                    >
+                      {colorizePlaywright(loc.value)}
+                    </code>
+                    <select 
+                      className="form-select select-sm" 
+                      style={styles.actionSelect}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handlePlaywrightActionSelect(e, loc.value)}
+                      defaultValue="snippet"
+                    >
+                      <option value="snippet" disabled>Snippet</option>
+                      {getPlaywrightActions(selectedElement.tag, selectedElement.type).map(act => (
+                        <option key={act} value={act}>{act}</option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tools Tab */}
+        {activeTab === 5 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {/* Custom Search Box */}
             <div style={styles.toolCard}>
@@ -881,7 +1143,7 @@ const PanelApp: React.FC = () => {
         )}
 
         {/* About Tab */}
-        {activeTab === 5 && (
+        {activeTab === 6 && (
           <div style={styles.aboutCard}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
               <img src="../assets/32.png" width="20px" height="20px" alt="LetXPath logo" style={{ borderRadius: '4px' }} />

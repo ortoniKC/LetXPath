@@ -168,6 +168,47 @@ export function parseDOM(targetElement: HTMLElement) {
           state.XPATHDATA = [];
         }
       }
+
+      // Get raw attributes for Playwright locator generation
+      let attrs: Record<string, string> = {};
+      if (targetElement.attributes) {
+        for (let i = 0; i < targetElement.attributes.length; i++) {
+          const attr = targetElement.attributes[i];
+          if (attr.name !== 'letxxpath' && attr.name !== 'letcss') {
+            attrs[attr.name] = attr.value;
+          }
+        }
+      }
+
+      // Get truncated text content
+      let textContent = targetElement.textContent?.trim() || "";
+      if (textContent.length > 80) {
+        textContent = textContent.slice(0, 80) + "...";
+      }
+
+      // Find associated label text
+      let labelText: string = "";
+      if (targetElement.id) {
+        const associatedLabel = targetElement.ownerDocument.querySelector(`label[for="${targetElement.id}"]`);
+        if (associatedLabel) {
+          labelText = associatedLabel.textContent?.trim() || "";
+        }
+      }
+      if (!labelText) {
+        const precedingLabel = targetElement.previousElementSibling;
+        if (precedingLabel && precedingLabel.tagName === 'LABEL') {
+          labelText = precedingLabel.textContent?.trim() || "";
+        } else {
+          const closestLabel = targetElement.closest('label');
+          if (closestLabel) {
+            labelText = closestLabel.textContent?.trim() || "";
+          }
+        }
+      }
+      if (labelText.length > 80) {
+        labelText = labelText.slice(0, 80) + "...";
+      }
+
       let domInfo = {
         request: "send_to_dev",
         cssPath: state.CSSPATHDATA,
@@ -180,6 +221,9 @@ export function parseDOM(targetElement: HTMLElement) {
         methodname: state.methodName,
         anchor: false,
         atrributesArray: state.atrributesArray,
+        attributes: attrs,
+        text: textContent,
+        labelText: labelText
       };
       
       sendMessage(domInfo);
