@@ -18,6 +18,7 @@ import { getLongCssPath, getClassCSS, getXPathWithPosition } from './getCSS';
 import { getMethodOrVarText, getVariableAndMethodName } from './methodName';
 import { buildPlaywrightLocators } from './playwrightLocators';
 import { evaluatePlaywrightLocator } from './playwrightEvaluator';
+import { startRecording, stopRecord } from './record';
 
 export function sendToDev(data: any): void {
   sendMessage({ request: "fromUtilsSelector", data: data });
@@ -138,6 +139,12 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
       break;
     case "cleanhighlight":
       clearExistingHighlights();
+      break;
+    case "start_recording":
+      startRecording();
+      break;
+    case "stop_recording":
+      stopRecord();
       break;
     default:
       if (sendResponse) sendResponse(true);
@@ -603,4 +610,23 @@ export function addAllXpathAttributesBased(attribute: NamedNodeMap, tagName: str
 
 // Register frame context on startup
 sendMessage({ request: "register_frame" }).catch(() => {});
+
+// Initialize recording state and register listener
+if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+  chrome.storage.local.get(['isRecordingActive'], (result) => {
+    if (result.isRecordingActive) {
+      startRecording();
+    }
+  });
+  
+  chrome.storage.onChanged.addListener((changes) => {
+    if (changes.isRecordingActive) {
+      if (changes.isRecordingActive.newValue) {
+        startRecording();
+      } else {
+        stopRecord();
+      }
+    }
+  });
+}
 
