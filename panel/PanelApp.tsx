@@ -342,6 +342,23 @@ const PanelApp: React.FC = () => {
   >(new Map());
   const searchValRef = useRef<string>("");
 
+  const [editedCode, setEditedCode] = useState<string>("");
+  const [isAutoSyncActive, setIsAutoSyncActive] = useState<boolean>(true);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const lineNumbersRef = useRef<HTMLDivElement>(null);
+
+
+  const handleEditorScroll = () => {
+    if (textareaRef.current && lineNumbersRef.current) {
+      lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+  };
+
+  const handleEditorChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditedCode(e.target.value);
+    setIsAutoSyncActive(false);
+  };
+
   const addFrameId = (frameId: number) => {
     setRegisteredFrameIds((prev) => {
       if (prev.has(frameId)) return prev;
@@ -465,93 +482,195 @@ const PanelApp: React.FC = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const generateRecordedScript = (
+  const getProtractor = (codeType: string, val: string): string => {
+    switch (codeType) {
+      case "CSS":
+        return `element(by.css("${val}"))`;
+      case "Unique Class Atrribute":
+        return `element(by.className("${val}"))`;
+      case "Unique TagName":
+        return `element(by.tagName("${val}"))`;
+      case "Link Text":
+        return `element(by.linkText("${val}"))`;
+      case "Unique ID":
+        return `element(by.id("${val}"))`;
+      case "Unique Name":
+        return `element(by.name("${val}"))`;
+      case "Unique PartialLinkText":
+        return `element(by.partialLinkText("${val}"))`;
+      default:
+        return `element(by.xpath("${val}"))`;
+    }
+  };
+
+  function getCustomSnippet(
+    actionType: string,
+    codeType: string,
+    val: string,
+    variable: string,
+    method: string,
+    templates: ChromeStorageResult,
+  ): string {
+    let locatorValue = "";
+    const customLang = templates.customLang || "javacs";
+
+    if (customLang === "jscs") {
+      locatorValue = getProtractor(codeType, val);
+    } else {
+      switch (codeType) {
+        case "CSS":
+          locatorValue = `@FindBy(css = "${val}")\n`;
+          break;
+        case "Unique Class Atrribute":
+          locatorValue = `@FindBy(className = "${val}")\n`;
+          break;
+        case "Unique TagName":
+          locatorValue = `@FindBy(tagName = "${val}")\n`;
+          break;
+        case "Link Text":
+          locatorValue = `@FindBy(linkText = "${val}")\n`;
+          break;
+        case "Unique ID":
+          locatorValue = `@FindBy(id = "${val}")\n`;
+          break;
+        case "Unique Name":
+          locatorValue = `@FindBy(name = "${val}")\n`;
+          break;
+        case "Unique PartialLinkText":
+          locatorValue = `@FindBy(partialLinkText = "${val}")\n`;
+          break;
+        default:
+          locatorValue = `@FindBy(xpath = "${val}")\n`;
+          break;
+      }
+    }
+
+    let template = "";
+    switch (actionType) {
+      case "click":
+        template =
+          templates.clickvalue !== undefined && templates.clickvalue !== ""
+            ? templates.clickvalue
+            : DEFAULT_TEMPLATES[customLang].click;
+        break;
+      case "sendKeys":
+        template =
+          templates.sendvalue !== undefined && templates.sendvalue !== ""
+            ? templates.sendvalue
+            : DEFAULT_TEMPLATES[customLang].send;
+        break;
+      case "getText":
+        template =
+          templates.textvalue !== undefined && templates.textvalue !== ""
+            ? templates.textvalue
+            : DEFAULT_TEMPLATES[customLang].text;
+        break;
+      case "getAttribute":
+        template =
+          templates.attrvalue !== undefined && templates.attrvalue !== ""
+            ? templates.attrvalue
+            : DEFAULT_TEMPLATES[customLang].attr;
+        break;
+      default:
+        return "";
+    }
+
+    let result = template;
+    if (result.includes("${lc}"))
+      result = result.replaceAll("${lc}", locatorValue);
+    if (result.includes("${vn}")) result = result.replaceAll("${vn}", variable);
+    if (result.includes("${mn}")) result = result.replaceAll("${mn}", method);
+
+    return result.trim();
+  }
+
+  function generateRecordedScript(
     steps: any[],
     initialUrl: string,
     currentLang: string,
-  ): string => {
+  ): string {
     const formattedSteps = steps
       .map((step) => {
         if (currentLang === "playwrightJS") {
           const locator = step.playwrightLocator;
           const call = locator.startsWith("page.")
             ? locator
-            : `page.locator('${locator}')`;
+            : "page.locator('" + locator + "')";
           if (step.action === "click") {
-            return `  await ${call}.click();`;
+            return "  await " + call + ".click();";
           } else if (step.action === "fill") {
-            return `  await ${call}.fill('${step.value || ""}');`;
+            return "  await " + call + ".fill('" + (step.value || "") + "');";
           } else if (step.action === "select") {
-            return `  await ${call}.selectOption('${step.value || ""}');`;
+            return "  await " + call + ".selectOption('" + (step.value || "") + "');";
           } else if (step.action === "assert_visible") {
-            return `  await expect(${call}).toBeVisible();`;
+            return "  await expect(" + call + ").toBeVisible();";
           }
         } else if (currentLang === "playwrightJava") {
           const locator = step.playwrightLocator;
           const call = locator.startsWith("page.")
             ? locator
-            : `page.locator("${locator}")`;
+            : "page.locator(\"" + locator + "\")";
           if (step.action === "click") {
-            return `    ${call}.click();`;
+            return "    " + call + ".click();";
           } else if (step.action === "fill") {
-            return `    ${call}.fill("${step.value || ""}");`;
+            return "    " + call + ".fill(\"" + (step.value || "") + "\");";
           } else if (step.action === "select") {
-            return `    ${call}.selectOption("${step.value || ""}");`;
+            return "    " + call + ".selectOption(\"" + (step.value || "") + "\");";
           } else if (step.action === "assert_visible") {
-            return `    assertThat(${call}).isVisible();`;
+            return "    assertThat(" + call + ").isVisible();";
           }
         } else if (currentLang === "javas") {
           const xpath = step.xpathLocator;
           if (step.action === "click") {
-            return `    driver.findElement(By.xpath("${xpath}")).click();`;
+            return "    driver.findElement(By.xpath(\"" + xpath + "\")).click();";
           } else if (step.action === "fill") {
-            return `    driver.findElement(By.xpath("${xpath}")).sendKeys("${step.value || ""}");`;
+            return "    driver.findElement(By.xpath(\"" + xpath + "\")).sendKeys(\"" + (step.value || "") + "\");";
           } else if (step.action === "select") {
-            return `    new Select(driver.findElement(By.xpath("${xpath}"))).selectByValue("${step.value || ""}");`;
+            return "    new Select(driver.findElement(By.xpath(\"" + xpath + "\"))).selectByValue(\"" + (step.value || "") + "\");";
           } else if (step.action === "assert_visible") {
-            return `    assertTrue(driver.findElement(By.xpath("${xpath}")).isDisplayed());`;
+            return "    assertTrue(driver.findElement(By.xpath(\"" + xpath + "\")).isDisplayed());";
           }
         } else if (currentLang === "py") {
           const xpath = step.xpathLocator;
           if (step.action === "click") {
-            return `    driver.find_element(By.XPATH, "${xpath}").click()`;
+            return "    driver.find_element(By.XPATH, \"" + xpath + "\").click()";
           } else if (step.action === "fill") {
-            return `    driver.find_element(By.XPATH, "${xpath}").send_keys("${step.value || ""}")`;
+            return "    driver.find_element(By.XPATH, \"" + xpath + "\").send_keys(\"" + (step.value || "") + "\")";
           } else if (step.action === "select") {
-            return `    Select(driver.find_element(By.XPATH, "${xpath}")).select_by_value("${step.value || ""}")`;
+            return "    Select(driver.find_element(By.XPATH, \"" + xpath + "\")).select_by_value(\"" + (step.value || "") + "\")";
           } else if (step.action === "assert_visible") {
-            return `    assert driver.find_element(By.XPATH, "${xpath}").is_displayed()`;
+            return "    assert driver.find_element(By.XPATH, \"" + xpath + "\").is_displayed()";
           }
         } else if (currentLang === "csharp") {
           const xpath = step.xpathLocator;
           if (step.action === "click") {
-            return `    driver.FindElement(By.XPath("${xpath}")).Click();`;
+            return "    driver.FindElement(By.XPath(\"" + xpath + "\")).Click();";
           } else if (step.action === "fill") {
-            return `    driver.FindElement(By.XPath("${xpath}")).SendKeys("${step.value || ""}");`;
+            return "    driver.FindElement(By.XPath(\"" + xpath + "\")).SendKeys(\"" + (step.value || "") + "\");";
           } else if (step.action === "select") {
-            return `    new SelectElement(driver.FindElement(By.XPath("${xpath}"))).SelectByValue("${step.value || ""}");`;
+            return "    new SelectElement(driver.FindElement(By.XPath(\"" + xpath + "\"))).SelectByValue(\"" + (step.value || "") + "\");";
           } else if (step.action === "assert_visible") {
-            return `    Assert.IsTrue(driver.FindElement(By.XPath("${xpath}")).Displayed);`;
+            return "    Assert.IsTrue(driver.FindElement(By.XPath(\"" + xpath + "\")).Displayed);";
           }
         } else if (currentLang === "protractorjs") {
           const xpath = step.xpathLocator;
           if (step.action === "click") {
-            return `    await element(by.xpath('${xpath}')).click();`;
+            return "    await element(by.xpath('" + xpath + "')).click();";
           } else if (step.action === "fill") {
-            return `    await element(by.xpath('${xpath}')).sendKeys('${step.value || ""}');`;
+            return "    await element(by.xpath('" + xpath + "')).sendKeys('" + (step.value || "") + "');";
           } else if (step.action === "assert_visible") {
-            return `    expect(await element(by.xpath('${xpath}')).isDisplayed()).toBe(true);`;
+            return "    expect(await element(by.xpath('" + xpath + "')).isDisplayed()).toBe(true);";
           }
         } else if (currentLang === "cypress") {
-          const locator = step.cypressLocator || `cy.xpath('${step.xpathLocator}')`;
+          const locator = step.cypressLocator || ("cy.xpath('" + step.xpathLocator + "')");
           if (step.action === "click") {
-            return `  ${locator}.click();`;
+            return "  " + locator + ".click();";
           } else if (step.action === "fill") {
-            return `  ${locator}.type('${step.value || ""}');`;
+            return "  " + locator + ".type('" + (step.value || "") + "');";
           } else if (step.action === "select") {
-            return `  ${locator}.select('${step.value || ""}');`;
+            return "  " + locator + ".select('" + (step.value || "") + "');";
           } else if (step.action === "assert_visible") {
-            return `  ${locator}.should('be.visible');`;
+            return "  " + locator + ".should('be.visible');";
           }
         } else if (currentLang === "custom") {
           const variable = step.variableName || "ele";
@@ -570,7 +689,7 @@ const PanelApp: React.FC = () => {
               )
             );
           } else if (step.action === "assert_visible") {
-            return `    // Assert visibility of element: ${xpath}`;
+            return "    // Assert visibility of element: " + xpath;
           } else {
             return (
               "    " +
@@ -590,25 +709,33 @@ const PanelApp: React.FC = () => {
       .filter((line) => line !== "")
       .join("\n");
 
-    if (currentLang === "playwrightJS") {
-      return `import { test, expect } from '@playwright/test';\n\ntest('recorded test', async ({ page }) => {\n  await page.goto('${initialUrl}');\n${formattedSteps}\n});`;
-    } else if (currentLang === "playwrightJava") {
-      return `import com.microsoft.playwright.*;\n\npublic class RecordedTest {\n  public static void main(String[] args) {\n    try (Playwright playwright = Playwright.create()) {\n      Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));\n      Page page = browser.newPage();\n      page.navigate("${initialUrl}");\n${formattedSteps}\n    }\n  }\n}`;
-    } else if (currentLang === "javas") {
-      return `import org.openqa.selenium.By;\nimport org.openqa.selenium.WebDriver;\nimport org.openqa.selenium.chrome.ChromeDriver;\nimport org.openqa.selenium.support.ui.Select;\n\npublic class RecordedTest {\n  public static void main(String[] args) {\n    WebDriver driver = new ChromeDriver();\n    driver.get("${initialUrl}");\n${formattedSteps}\n    driver.quit();\n  }\n}`;
-    } else if (currentLang === "py") {
-      return `from selenium import webdriver\nfrom selenium.webdriver.common.by import By\nfrom selenium.webdriver.support.ui import Select\n\ndriver = webdriver.Chrome()\ndriver.get("${initialUrl}")\n${formattedSteps}\ndriver.quit()`;
-    } else if (currentLang === "csharp") {
-      return `using OpenQA.Selenium;\nusing OpenQA.Selenium.Chrome;\nusing OpenQA.Selenium.Support.UI;\n\nclass RecordedTest {\n  static void Main() {\n    IWebDriver driver = new ChromeDriver();\n    driver.Navigate().GoToUrl("${initialUrl}");\n${formattedSteps}\n    driver.Quit();\n  }\n}`;
-    } else if (currentLang === "protractorjs") {
-      return `import { browser, element, by } from 'protractor';\n\ndescribe('Recorded Test', () => {\n  it('should execute recorded actions', async () => {\n    await browser.get('${initialUrl}');\n${formattedSteps}\n  });\n});`;
-    } else if (currentLang === "cypress") {
-      return `describe('Recorded Test', () => {\n  it('should execute recorded actions', () => {\n    cy.visit('${initialUrl}');\n${formattedSteps}\n  });\n});`;
-    } else if (currentLang === "custom") {
-      return `// Custom Framework Recorded Script\n// Start URL: ${initialUrl}\n\n${formattedSteps}`;
+    switch (currentLang) {
+      case "playwrightJS":
+        return "import { test, expect } from '@playwright/test';\n\ntest('recorded test', async ({ page }) => {\n  await page.goto('" + initialUrl + "');\n" + formattedSteps + "\n});";
+      case "playwrightJava":
+        return "import com.microsoft.playwright.*;\n\npublic class RecordedTest {\n  public static void main(String[] args) {\n    try (Playwright playwright = Playwright.create()) {\n      Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));\n      Page page = browser.newPage();\n      page.navigate(\"" + initialUrl + "\");\n" + formattedSteps + "\n    }\n  }\n}";
+      case "javas":
+        return "import org.openqa.selenium.By;\nimport org.openqa.selenium.WebDriver;\nimport org.openqa.selenium.chrome.ChromeDriver;\nimport org.openqa.selenium.support.ui.Select;\n\npublic class RecordedTest {\n  public static void main(String[] args) {\n    WebDriver driver = new ChromeDriver();\n    driver.get(\"" + initialUrl + "\");\n" + formattedSteps + "\n    driver.quit();\n  }\n}";
+      case "py":
+        return "from selenium import webdriver\nfrom selenium.webdriver.common.by import By\nfrom selenium.webdriver.support.ui import Select\n\ndriver = webdriver.Chrome()\ndriver.get(\"" + initialUrl + "\")\n" + formattedSteps + "\ndriver.quit()";
+      case "csharp":
+        return "using OpenQA.Selenium;\nusing OpenQA.Selenium.Chrome;\nusing OpenQA.Selenium.Support.UI;\n\nclass RecordedTest {\n  static void Main() {\n    IWebDriver driver = new ChromeDriver();\n    driver.Navigate().GoToUrl(\"" + initialUrl + "\");\n" + formattedSteps + "\n    driver.Quit();\n  }\n}";
+      case "protractorjs":
+        return "import { browser, element, by } from 'protractor';\n\ndescribe('Recorded Test', () => {\n  it('should execute recorded actions', async () => {\n    await browser.get('" + initialUrl + "');\n" + formattedSteps + "\n  });\n});";
+      case "cypress":
+        return "describe('Recorded Test', () => {\n  it('should execute recorded actions', () => {\n    cy.visit('" + initialUrl + "');\n" + formattedSteps + "\n  });\n});";
+      case "custom":
+        return "// Custom Framework Recorded Script\n// Start URL: " + initialUrl + "\n\n" + formattedSteps;
+      default:
+        return formattedSteps;
     }
-    return formattedSteps;
-  };
+  }
+
+  useEffect(() => {
+    if (isAutoSyncActive) {
+      setEditedCode(generateRecordedScript(recordedSteps, recordingUrl, langID));
+    }
+  }, [recordedSteps, recordingUrl, langID, isAutoSyncActive]);
 
   const handleTabChange = (tabIndex: number) => {
     setActiveTab(tabIndex);
@@ -1038,26 +1165,7 @@ const PanelApp: React.FC = () => {
     }
   };
 
-  const getProtractor = (codeType: string, val: string): string => {
-    switch (codeType) {
-      case "CSS":
-        return `element(by.css("${val}"))`;
-      case "Unique Class Atrribute":
-        return `element(by.className("${val}"))`;
-      case "Unique TagName":
-        return `element(by.tagName("${val}"))`;
-      case "Link Text":
-        return `element(by.linkText("${val}"))`;
-      case "Unique ID":
-        return `element(by.id("${val}"))`;
-      case "Unique Name":
-        return `element(by.name("${val}"))`;
-      case "Unique PartialLinkText":
-        return `element(by.partialLinkText("${val}"))`;
-      default:
-        return `element(by.xpath("${val}"))`;
-    }
-  };
+
 
   const getSeleniumPython = (codeType: string, val: string): string => {
     switch (codeType) {
@@ -1080,85 +1188,25 @@ const PanelApp: React.FC = () => {
     }
   };
 
-  const getCustomSnippet = (
-    actionType: string,
-    codeType: string,
-    val: string,
-    variable: string,
-    method: string,
-    templates: ChromeStorageResult,
-  ): string => {
-    let locatorValue = "";
-    const customLang = templates.customLang || "javacs";
-
-    if (customLang === "jscs") {
-      locatorValue = getProtractor(codeType, val);
-    } else {
-      switch (codeType) {
-        case "CSS":
-          locatorValue = `@FindBy(css = "${val}")\n`;
-          break;
-        case "Unique Class Atrribute":
-          locatorValue = `@FindBy(className = "${val}")\n`;
-          break;
-        case "Unique TagName":
-          locatorValue = `@FindBy(tagName = "${val}")\n`;
-          break;
-        case "Link Text":
-          locatorValue = `@FindBy(linkText = "${val}")\n`;
-          break;
-        case "Unique ID":
-          locatorValue = `@FindBy(id = "${val}")\n`;
-          break;
-        case "Unique Name":
-          locatorValue = `@FindBy(name = "${val}")\n`;
-          break;
-        case "Unique PartialLinkText":
-          locatorValue = `@FindBy(partialLinkText = "${val}")\n`;
-          break;
-        default:
-          locatorValue = `@FindBy(xpath = "${val}")\n`;
-          break;
-      }
-    }
-
-    let template = "";
-    switch (actionType) {
-      case "click":
-        template =
-          templates.clickvalue !== undefined && templates.clickvalue !== ""
-            ? templates.clickvalue
-            : DEFAULT_TEMPLATES[customLang].click;
-        break;
-      case "sendKeys":
-        template =
-          templates.sendvalue !== undefined && templates.sendvalue !== ""
-            ? templates.sendvalue
-            : DEFAULT_TEMPLATES[customLang].send;
-        break;
-      case "getText":
-        template =
-          templates.textvalue !== undefined && templates.textvalue !== ""
-            ? templates.textvalue
-            : DEFAULT_TEMPLATES[customLang].text;
-        break;
-      case "getAttribute":
-        template =
-          templates.attrvalue !== undefined && templates.attrvalue !== ""
-            ? templates.attrvalue
-            : DEFAULT_TEMPLATES[customLang].attr;
-        break;
+  const getCypress = (codeType: string, val: string): string => {
+    switch (codeType) {
+      case "CSS":
+        return `cy.get("${val}")`;
+      case "Unique Class Atrribute":
+        return `cy.get(".${val}")`;
+      case "Unique TagName":
+        return `cy.get("${val}")`;
+      case "Link Text":
+        return `cy.contains("${val}")`;
+      case "Unique ID":
+        return `cy.get("#${val}")`;
+      case "Unique Name":
+        return `cy.get("[name='${val}']")`;
+      case "Unique PartialLinkText":
+        return `cy.contains("${val}")`;
       default:
-        return "";
+        return `cy.xpath("${val}")`;
     }
-
-    let result = template;
-    if (result.includes("${lc}"))
-      result = result.replaceAll("${lc}", locatorValue);
-    if (result.includes("${vn}")) result = result.replaceAll("${vn}", variable);
-    if (result.includes("${mn}")) result = result.replaceAll("${mn}", method);
-
-    return result.trim();
   };
 
   const getSnippetCode = (
@@ -1190,6 +1238,9 @@ const PanelApp: React.FC = () => {
       case "protractorjs":
         str = getProtractor(codeType, val);
         break;
+      case "cypress":
+        str = getCypress(codeType, val);
+        break;
       case "custom":
         return getCustomSnippet(
           actionType,
@@ -1213,21 +1264,27 @@ const PanelApp: React.FC = () => {
           ? '.fill("");'
           : lang === "py"
             ? '.send_keys("")'
-            : '.sendKeys("");';
+            : lang === "cypress"
+              ? '.type("");'
+              : '.sendKeys("");';
         break;
       case "getAttribute":
         str += lang.startsWith("playwright")
           ? '.getAttribute("value");'
           : lang === "py"
             ? '.get_attribute("value")'
-            : '.getAttribute("value");';
+            : lang === "cypress"
+              ? '.invoke("attr", "value");'
+              : '.getAttribute("value");';
         break;
       case "getText":
         str += lang.startsWith("playwright")
           ? ".textContent();"
           : lang === "py"
             ? ".get_text()"
-            : ".getText();";
+            : lang === "cypress"
+              ? '.invoke("text");'
+              : ".getText();";
         break;
       default:
         break;
@@ -2300,59 +2357,142 @@ const PanelApp: React.FC = () => {
                     position: "relative",
                     display: "flex",
                     flexDirection: "column",
+                    gap: "6px",
                   }}
                 >
-                  <textarea
-                    readOnly
-                    value={generateRecordedScript(
-                      recordedSteps,
-                      recordingUrl,
-                      langID,
-                    )}
+                  {/* Editor Header / Toolbar */}
+                  <div
                     style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      backgroundColor: "#1a1a1a",
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                      border: "1px solid #2d2d2d",
+                    }}
+                  >
+                    {/* Status Badge */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span
+                        style={{
+                          width: "6px",
+                          height: "6px",
+                          borderRadius: "50%",
+                          backgroundColor: isAutoSyncActive ? "#4ade80" : "#ff9800",
+                          display: "inline-block",
+                        }}
+                      />
+                      <span style={{ fontSize: "10px", color: "#ccc", fontWeight: 600 }}>
+                        {isAutoSyncActive ? "Live Syncing" : "Manual Edit Mode"}
+                      </span>
+                    </div>
+
+                    {/* Editor Mode Control */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      {!isAutoSyncActive && (
+                        <button
+                          style={{
+                            backgroundColor: "#0e639c",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "3px",
+                            padding: "2px 6px",
+                            fontSize: "10px",
+                            cursor: "pointer",
+                            fontWeight: 600,
+                            marginRight: "4px",
+                          }}
+                          onClick={() => {
+                            setEditedCode(generateRecordedScript(recordedSteps, recordingUrl, langID));
+                            setIsAutoSyncActive(true);
+                          }}
+                          title="Revert manual edits and resume auto-sync with recorded steps"
+                        >
+                          Sync & Reset
+                        </button>
+                      )}
+                      <label className="form-switch" style={{ color: "#fff", display: "inline-flex", alignItems: "center", cursor: "pointer", margin: 0 }}>
+                        <input
+                          type="checkbox"
+                          checked={isAutoSyncActive}
+                          onChange={(e) => setIsAutoSyncActive(e.target.checked)}
+                        />
+                        <i className="form-icon"></i>
+                        <span style={{ fontSize: "10px", marginLeft: "4px" }}>Auto Sync</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Side-by-side Editor with Line Numbers */}
+                  <div
+                    style={{
+                      display: "flex",
                       flex: 1,
-                      backgroundColor: "#141414",
-                      color: "#4ade80",
+                      backgroundColor: "#1e1e1e",
                       border: "1px solid #2d2d2d",
                       borderRadius: "4px",
-                      padding: "6px",
-                      fontFamily: "monospace",
-                      fontSize: "9px",
-                      resize: "none",
-                      outline: "none",
                       minHeight: "260px",
+                      position: "relative",
+                      overflow: "hidden",
                     }}
-                  />
-                  <div
-                    style={{ display: "flex", gap: "4px", marginTop: "6px" }}
                   >
+                    {/* Line Numbers Column */}
+                    <div
+                      ref={lineNumbersRef}
+                      style={{
+                        padding: "6px 8px",
+                        backgroundColor: "#1a1a1a",
+                        color: "#6e7681",
+                        textAlign: "right",
+                        fontFamily: "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
+                        fontSize: "10px",
+                        lineHeight: "1.6",
+                        userSelect: "none",
+                        borderRight: "1px solid #2d2d2d",
+                        overflow: "hidden",
+                        whiteSpace: "pre",
+                        minWidth: "24px",
+                      }}
+                    >
+                      {editedCode.split("\n").map((_, idx) => idx + 1).join("\n")}
+                    </div>
+                    
+                    {/* Textarea Editor */}
+                    <textarea
+                      ref={textareaRef}
+                      value={editedCode}
+                      onChange={handleEditorChange}
+                      onScroll={handleEditorScroll}
+                      style={{
+                        flex: 1,
+                        backgroundColor: "#1e1e1e",
+                        color: "#9cdcfe",
+                        border: "none",
+                        padding: "6px 8px",
+                        fontFamily: "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
+                        fontSize: "10px",
+                        lineHeight: "1.6",
+                        resize: "none",
+                        outline: "none",
+                        overflowY: "auto",
+                        whiteSpace: "pre",
+                      }}
+                      placeholder="/* Type or record steps to see script code */"
+                    />
+                  </div>
+
+                  {/* Copy / Download Footer */}
+                  <div style={{ display: "flex", gap: "4px", marginTop: "6px" }}>
                     <button
                       style={{ ...styles.btnFind, flex: 1 }}
-                      onClick={() =>
-                        copyToClipboard(
-                          generateRecordedScript(
-                            recordedSteps,
-                            recordingUrl,
-                            langID,
-                          ),
-                          "Script copied to clipboard!",
-                        )
-                      }
+                      onClick={() => copyToClipboard(editedCode, "Script copied to clipboard!")}
                     >
                       Copy Script
                     </button>
                     <button
                       style={{ ...styles.btnClear, flex: 1 }}
-                      onClick={() =>
-                        handleDownloadScript(
-                          generateRecordedScript(
-                            recordedSteps,
-                            recordingUrl,
-                            langID,
-                          ),
-                          langID,
-                        )
-                      }
+                      onClick={() => handleDownloadScript(editedCode, langID)}
                     >
                       Download
                     </button>

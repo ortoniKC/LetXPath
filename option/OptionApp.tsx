@@ -131,6 +131,8 @@ const OptionApp: React.FC = () => {
         return `driver.FindElement(By.Xpath("locator value"));`;
       case 'protractorjs':
         return `element(by.xpath("locator value"));`;
+      case 'cypress':
+        return `cy.get("locator value");`;
       case 'custom':
         return `Custom Framework Dynamic Snippets (Template: ${customLang === 'jscs' ? 'JS/TS' : 'Java/POM'})`;
       default:
@@ -183,6 +185,7 @@ const OptionApp: React.FC = () => {
                     <option value="py">Selenium Python</option>
                     <option value="csharp">Selenium C#</option>
                     <option value="protractorjs">Protractor (Angular)</option>
+                    <option value="cypress">Cypress</option>
                     <option value="custom">Custom Framework Templates</option>
                   </select>
                 </div>
