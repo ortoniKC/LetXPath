@@ -153,7 +153,7 @@ export function getXPathWithPosition(ele: HTMLElement): string {
     } else {
       let prevSib: Element | null = current;
       let position = 1;
-      while (prevSib && (prevSib = prevSib.previousElementSibling) && position < 5) {
+      while (prevSib && (prevSib = prevSib.previousElementSibling)) {
         if (prevSib.tagName.toLowerCase() == tag) position++;
       }
       tag += `[${position}]`;

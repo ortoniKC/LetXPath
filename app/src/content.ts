@@ -1,4 +1,5 @@
 import { state } from "./state";
+import { escapeXpathString } from "./xpathUtils";
 import {
   evaluateXPathExpression,
   getNumberOfXPath,
@@ -183,7 +184,7 @@ export function buildSelectedFields(targetElement: HTMLElement) {
   state.elementOwnerDocument = targetElement.ownerDocument;
   if (targetElement != null) {
     try {
-      state.maxIndex = 5;
+      state.maxIndex = 20;
       if (targetElement.getAttribute("type") !== "hidden") {
         buildXpath(targetElement, 0, true);
       }
@@ -200,7 +201,7 @@ export function parseDOM(targetElement: HTMLElement) {
     if (targetElement != null) {
       state.elementOwnerDocument = targetElement.ownerDocument;
       try {
-        state.maxIndex = 5;
+        state.maxIndex = 20;
         buildXpath(targetElement, 0, false);
       } catch (error: any) {
         if (error.message === "shadow dom not yet supported") {
@@ -495,12 +496,16 @@ export function getNameXPath(element: HTMLElement, tagName: string): string | nu
   if (!nameAttr) return null;
   const matches = nameAttr.match(/\d{3,}/g);
   if (!(nameAttr === "" || nameAttr === undefined || matches != null)) {
-    const tempName = "[@name='" + nameAttr + "']";
+    const tempName = "[@name=" + escapeXpathString(nameAttr) + "]";
     let tem = `//*${tempName}`;
     const count = getNumberOfXPath(tem);
     if (count == 1) {
       state.XPATHDATA.push([102, "Unique Name", nameAttr]);
-      state.CSSPATHDATA.push([3, "Unique Name", `${tagName}[name='${nameAttr}']`]);
+      state.CSSPATHDATA.push([
+        3,
+        "Unique Name",
+        `${tagName}[name='${nameAttr.replace(/'/g, "\\'")}']`,
+      ]);
     } else if (count !== undefined && count > 1) {
       tem = `//${tagName}${tempName}`;
       nameBasedXpath = addIndexToXpath(tem);
@@ -518,7 +523,7 @@ export function getClassXPath(element: HTMLElement, tagName: string): string | n
   const splitClass = clickedItemClass.trim().split(" ");
   if (splitClass.length > 2) {
     const cl = `${splitClass[0]} ${splitClass[1]}`;
-    let temp = `//${tagName}[contains(@class,'${cl}')]`;
+    let temp = `//${tagName}[contains(@class,${escapeXpathString(cl)})]`;
     const count = getNumberOfXPath(temp);
     if (count == 0) {
       return null;
@@ -535,7 +540,7 @@ export function getClassXPath(element: HTMLElement, tagName: string): string | n
     return temp;
   }
   if (!(clickedItemClass === "" || clickedItemClass === undefined)) {
-    const tempClass = `//*[@class='${clickedItemClass}']`;
+    const tempClass = `//*[@class=${escapeXpathString(clickedItemClass)}]`;
     const count = getNumberOfXPath(tempClass);
     const spl = clickedItemClass.trim().split(" ");
     if (count == 1 && spl.length == 1) {
@@ -543,7 +548,7 @@ export function getClassXPath(element: HTMLElement, tagName: string): string | n
       state.CSSPATHDATA.push([3, "Unique Class Atrribute", "." + clickedItemClass]);
       return null;
     } else {
-      classBasedXpath = `//${tagName}[@class='${clickedItemClass}']`;
+      classBasedXpath = `//${tagName}[@class=${escapeXpathString(clickedItemClass)}]`;
       const count = getNumberOfXPath(classBasedXpath);
       if (count == 0) {
         return null;
@@ -563,7 +568,7 @@ export function getIDXPath(element: HTMLElement, tagName: string): string | null
   const re = new RegExp("\\d{" + state.maxId + ",}", "g");
   const matches = re.test(clicketItemId);
   if (clicketItemId != null && clicketItemId.length > 0 && matches == false) {
-    const tempId = "[@id='" + clicketItemId + "']";
+    const tempId = "[@id=" + escapeXpathString(clicketItemId) + "]";
     idBasedXpath = "//" + "*" + tempId;
     const count = getNumberOfXPath(idBasedXpath);
     if (count == 0) {
@@ -625,14 +630,15 @@ export function addAllXpathAttributesBased(
       default:
         const temp = item.value;
         if (temp !== "") {
-          const allXpathAttr = `//${tagName}[@${item.name}='${temp}']`;
+          const escapedVal = escapeXpathString(temp);
+          const allXpathAttr = `//${tagName}[@${item.name}=${escapedVal}]`;
           const xpathResult = getNumberOfXPath(allXpathAttr);
           if (xpathResult == 1) {
             state.XPATHDATA.push([priority, `${item.name}`, allXpathAttr]);
             state.CSSPATHDATA.push([
               priority,
               `${item.name}`,
-              `${tagName}[${item.name}='${temp}']`,
+              `${tagName}[${item.name}='${temp.replace(/'/g, "\\'")}']`,
             ]);
           } else {
             const indexedXPath = addIndexToXpath(allXpathAttr);

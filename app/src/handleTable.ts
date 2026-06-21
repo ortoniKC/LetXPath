@@ -1,5 +1,6 @@
 import { state } from "./state";
 import { getNumberOfXPath, evaluateXPathExpression, checkIDNameClassHref } from "./utils";
+import { escapeXpathString } from "./xpathUtils";
 
 export function handleTable(ele: HTMLElement): void {
   const orgEle = ele;
@@ -19,17 +20,18 @@ export function handleTable(ele: HTMLElement): void {
   const tag = table.tagName.toLowerCase();
   let tableElementFound = "";
   if (table.hasAttribute("id")) {
-    tableElementFound = `//${tag}[@id='${table.id}']`;
+    tableElementFound = `//${tag}[@id=${escapeXpathString(table.id)}]`;
   } else if (table.hasAttribute("class")) {
     const length = table.classList.length;
     if (length > 1) {
-      tableElementFound = `//${tag}[contains(@class,'${table.classList[0]} ${table.classList[1]}')]`;
+      const clsEsc = escapeXpathString(`${table.classList[0]} ${table.classList[1]}`);
+      tableElementFound = `//${tag}[contains(@class,${clsEsc})]`;
     } else {
-      tableElementFound = `//${tag}[@class='${table.className}']`;
+      tableElementFound = `//${tag}[@class=${escapeXpathString(table.className)}]`;
     }
   } else if (table.hasAttribute("name")) {
-    const nameAttr = table.getAttribute("name");
-    tableElementFound = `//${tag}[@name='${nameAttr}']`;
+    const nameAttr = table.getAttribute("name") || "";
+    tableElementFound = `//${tag}[@name=${escapeXpathString(nameAttr)}]`;
   }
   let tablePath: string | null = "";
   const ev = evaluateXPathExpression(tableElementFound);

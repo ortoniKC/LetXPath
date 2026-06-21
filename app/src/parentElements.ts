@@ -6,13 +6,14 @@ import {
   evaluateXPathExpression,
   checkIDNameClassHref,
 } from "./utils";
+import { escapeXpathString } from "./xpathUtils";
 
 export function getParentId(element: HTMLElement, tagName: string): string | null {
   const clicketItemId = element.id;
   const re = new RegExp("\\d{" + state.maxId + ",}", "g");
   const matches = re.test(clicketItemId);
   if (clicketItemId != null && clicketItemId.length > 0 && matches == false) {
-    const temp = `//${tagName}[@id='${clicketItemId}']`;
+    const temp = `//${tagName}[@id=${escapeXpathString(clicketItemId)}]`;
     return temp;
   } else return null;
 }
@@ -22,7 +23,7 @@ export function getParentName(element: HTMLElement, tagName: string): string | n
   if (clickedItemName && clickedItemName.length > 0) {
     const matches = clickedItemName.match(/\d{3,}/g);
     if (matches == null) {
-      const tempName = `//${tagName}[@name='${clickedItemName}']`;
+      const tempName = `//${tagName}[@name=${escapeXpathString(clickedItemName)}]`;
       return tempName;
     }
   }
@@ -106,7 +107,8 @@ export function addPreviousSibling(preSib: HTMLElement, tagName: string): void {
               }
             }
           } else if (tempvalue != null) {
-            temp = `//${previousSiblingTagName}[@${item.name}='${tempvalue}']/following-sibling::${tagName}[1]`;
+            const escapedVal = escapeXpathString(tempvalue);
+            temp = `//${previousSiblingTagName}[@${item.name}=${escapedVal}]/following-sibling::${tagName}[1]`;
             if (temp.startsWith("//")) {
               const evaluated = evaluateXPathExpression(temp);
               if (
@@ -119,7 +121,7 @@ export function addPreviousSibling(preSib: HTMLElement, tagName: string): void {
                 state.XPATHDATA.push([8, "Following sibling XPath", temp]);
               } else {
                 const t = addIndexToXpath(
-                  `//${previousSiblingTagName}[@${item.name}='${tempvalue}']/following-sibling::${tagName}`,
+                  `//${previousSiblingTagName}[@${item.name}=${escapedVal}]/following-sibling::${tagName}`,
                 );
                 if (t != undefined) {
                   state.XPATHDATA.push([8, "Following sibling XPath", t]);
@@ -149,13 +151,23 @@ export function addPreviousSibling(preSib: HTMLElement, tagName: string): void {
           labelText = labelText.replace(/[\r\n\x0B\x0C\u0085\u2028\u2029]+/g, " ");
           bo = true;
         }
+
+        const escapedText = escapeXpathString(labelText);
         if (bo && labelText.trim().length > 1) {
-          temp1 = `//${tag}[text()[normalize-space()='${labelText.trim()}']]/following-sibling::${tagName}[1]`;
+          const trimmedEscaped = escapeXpathString(labelText.trim());
+          temp1 = `//${tag}[text()[normalize-space()=${trimmedEscaped}]]/following-sibling::${tagName}[1]`;
         } else {
-          temp1 = `//${tag}[text()='${labelText}']/following-sibling::${tagName}[1]`;
+          temp1 = `//${tag}[text()=${escapedText}]/following-sibling::${tagName}[1]`;
         }
         const c = getNumberOfXPath(temp1);
-        temp1 = `//${tag}[text()='${labelText}']/following-sibling::${tagName}`;
+
+        if (bo && labelText.trim().length > 1) {
+          const trimmedEscaped = escapeXpathString(labelText.trim());
+          temp1 = `//${tag}[text()[normalize-space()=${trimmedEscaped}]]/following-sibling::${tagName}`;
+        } else {
+          temp1 = `//${tag}[text()=${escapedText}]/following-sibling::${tagName}`;
+        }
+
         if (c == 0) {
           return;
         }
