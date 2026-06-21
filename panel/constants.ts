@@ -1,5 +1,7 @@
 import { TemplateGroup } from "./types";
 
+export const APPVERSION = "3.0.2";
+
 export const ACTION_LABELS = {
   textarea: ["snippet", "getAttribute", "sendKeys"],
   input: {

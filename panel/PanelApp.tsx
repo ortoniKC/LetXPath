@@ -23,6 +23,7 @@ import {
   generateRecordedScript,
   getActionsForTag,
 } from "./helpers";
+import { APPVERSION } from "./constants";
 
 const PanelApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState<number>(1);
@@ -33,7 +34,8 @@ const PanelApp: React.FC = () => {
 
   useEffect(() => {
     if (stepsContainerRef.current) {
-      stepsContainerRef.current.scrollTop = stepsContainerRef.current.scrollHeight;
+      stepsContainerRef.current.scrollTop =
+        stepsContainerRef.current.scrollHeight;
     }
   }, [recordedSteps.length]);
 
@@ -222,7 +224,9 @@ const PanelApp: React.FC = () => {
 
   useEffect(() => {
     if (isAutoSyncActive) {
-      setEditedCode(generateRecordedScript(recordedSteps, recordingUrl, langID, templates));
+      setEditedCode(
+        generateRecordedScript(recordedSteps, recordingUrl, langID, templates),
+      );
     }
   }, [recordedSteps, recordingUrl, langID, isAutoSyncActive, templates]);
 
@@ -253,7 +257,10 @@ const PanelApp: React.FC = () => {
           chrome.tabs.sendMessage(tabId, msg, { frameId }, () => {
             const err = chrome.runtime.lastError;
             if (err) {
-              console.warn(`Message send failed to frame ${frameId}:`, err.message);
+              console.warn(
+                `Message send failed to frame ${frameId}:`,
+                err.message,
+              );
               removeFrameId(frameId);
             }
           });
@@ -590,8 +597,6 @@ const PanelApp: React.FC = () => {
     document.body.removeChild(el);
   };
 
-
-
   const getSnippetCode = (
     actionType: string,
     codeType: string,
@@ -748,8 +753,6 @@ const PanelApp: React.FC = () => {
     copyToClipboard(code, "Playwright snippet copied!");
     e.target.value = "snippet";
   };
-
-
 
   // Open Options page
   const handleOpenSettings = () => {
@@ -1004,7 +1007,8 @@ const PanelApp: React.FC = () => {
                   Select an element in Elements tab
                 </div>
                 <div style={styles.emptySubtitle}>
-                  Ortoni Studio will display optimized XPaths & action snippets here.
+                  Ortoni Studio will display optimized XPaths & action snippets
+                  here.
                 </div>
               </div>
             ) : (
@@ -1299,7 +1303,8 @@ const PanelApp: React.FC = () => {
                   Select an element in Elements tab
                 </div>
                 <div style={styles.emptySubtitle}>
-                  Ortoni Studio will display Playwright-recommended locators here.
+                  Ortoni Studio will display Playwright-recommended locators
+                  here.
                 </div>
               </div>
             ) : (
@@ -1364,12 +1369,20 @@ const PanelApp: React.FC = () => {
 
         {/* Cypress Tab */}
         {activeTab === 5 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {!selectedElement || !selectedElement.cypressLocators || selectedElement.cypressLocators.length === 0 ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            {!selectedElement ||
+            !selectedElement.cypressLocators ||
+            selectedElement.cypressLocators.length === 0 ? (
               <div style={styles.emptyState}>
-                <div style={{ fontSize: '1.8rem', marginBottom: '4px' }}>🌲</div>
-                <div style={styles.emptyTitle}>Select an element in Elements tab</div>
-                <div style={styles.emptySubtitle}>Ortoni Studio will display Cypress-recommended locators here.</div>
+                <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>
+                  🌲
+                </div>
+                <div style={styles.emptyTitle}>
+                  Select an element in Elements tab
+                </div>
+                <div style={styles.emptySubtitle}>
+                  Ortoni Studio will display Cypress-recommended locators here.
+                </div>
               </div>
             ) : (
               <div style={styles.locatorList}>
@@ -1378,42 +1391,57 @@ const PanelApp: React.FC = () => {
                   return (
                     <div key={idx} style={styles.locatorRow}>
                       <div style={styles.labelBox}>
-                        <span style={styles.locatorLabel} title={label}>{label}</span>
+                        <span style={styles.locatorLabel} title={label}>
+                          {label}
+                        </span>
                       </div>
-                      <code 
-                        style={styles.codeSnippet} 
-                        title="Click to copy Cypress Locator" 
-                        onClick={() => copyToClipboard(value, 'Cypress locator copied!')}
+                      <code
+                        style={styles.codeSnippet}
+                        title="Click to copy Cypress Locator"
+                        onClick={() =>
+                          copyToClipboard(value, "Cypress locator copied!")
+                        }
                       >
                         {colorizePlaywright(value)}
                       </code>
-                      <button 
+                      <button
                         style={styles.btnVerifyInline}
-                        onClick={() => handleVerifyLocator(value.match(/cy\.get\('([^']+)'\)/)?.[1] || value.match(/cy\.contains\('([^']+)'\)/)?.[1] || value)}
+                        onClick={() =>
+                          handleVerifyLocator(
+                            value.match(/cy\.get\('([^']+)'\)/)?.[1] ||
+                              value.match(/cy\.contains\('([^']+)'\)/)?.[1] ||
+                              value,
+                          )
+                        }
                         title="Verify and highlight element"
                       >
                         Find
                       </button>
-                      <select 
-                        className="form-select select-sm" 
+                      <select
+                        className="form-select select-sm"
                         style={styles.actionSelect}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                           const act = e.target.value;
-                          if (act === 'snippet') return;
+                          if (act === "snippet") return;
                           let code = value;
-                          if (act === 'click') {
+                          if (act === "click") {
                             code = `${value}.click()`;
-                          } else if (act === 'type') {
+                          } else if (act === "type") {
                             code = `${value}.type('text')`;
-                          } else if (act === 'select') {
+                          } else if (act === "select") {
                             code = `${value}.select('value')`;
                           }
-                          copyToClipboard(code, 'Cypress action snippet copied!');
-                          e.target.value = 'snippet';
+                          copyToClipboard(
+                            code,
+                            "Cypress action snippet copied!",
+                          );
+                          e.target.value = "snippet";
                         }}
                         defaultValue="snippet"
                       >
-                        <option value="snippet" disabled>Snippet</option>
+                        <option value="snippet" disabled>
+                          Snippet
+                        </option>
                         <option value="click">click</option>
                         <option value="type">type</option>
                         <option value="select">select</option>
@@ -1479,41 +1507,60 @@ const PanelApp: React.FC = () => {
                     </div>
                   )}
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <label className="form-switch" style={{ color: "#fff", display: "inline-flex", alignItems: "center", cursor: "pointer", margin: 0 }}>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
+                >
+                  <label
+                    className="form-switch"
+                    style={{
+                      color: "#fff",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                      margin: 0,
+                    }}
+                  >
                     <input
                       type="checkbox"
                       checked={isVerifyModeActive}
                       onChange={(e) => handleToggleVerifyMode(e.target.checked)}
                     />
                     <i className="form-icon"></i>
-                    <span style={{ fontSize: "11px", marginLeft: "4px", fontWeight: 500 }}>Verify Mode</span>
+                    <span
+                      style={{
+                        fontSize: "11px",
+                        marginLeft: "4px",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Verify Mode
+                    </span>
                   </label>
                   <div style={{ display: "flex", gap: "4px" }}>
-                  {isRecordingActive ? (
+                    {isRecordingActive ? (
+                      <button
+                        style={styles.btnStopRecord}
+                        onClick={handleStopRecording}
+                      >
+                        Stop Recording
+                      </button>
+                    ) : (
+                      <button
+                        style={styles.btnStartRecord}
+                        onClick={handleStartRecording}
+                      >
+                        Start Recording
+                      </button>
+                    )}
                     <button
-                      style={styles.btnStopRecord}
-                      onClick={handleStopRecording}
+                      style={styles.btnClear}
+                      onClick={handleClearRecording}
                     >
-                      Stop Recording
+                      Clear
                     </button>
-                  ) : (
-                    <button
-                      style={styles.btnStartRecord}
-                      onClick={handleStartRecording}
-                    >
-                      Start Recording
-                    </button>
-                  )}
-                  <button
-                    style={styles.btnClear}
-                    onClick={handleClearRecording}
-                  >
-                    Clear
-                  </button>
+                  </div>
                 </div>
               </div>
-            </div>
               {recordingUrl && (
                 <div
                   style={{
@@ -1616,8 +1663,8 @@ const PanelApp: React.FC = () => {
                                 step.action === "click"
                                   ? "#0e639c"
                                   : step.action === "assert_visible"
-                                  ? "#8b5cf6"
-                                  : "#10b981",
+                                    ? "#8b5cf6"
+                                    : "#10b981",
                               color: "#fff",
                             }}
                           >
@@ -1746,23 +1793,43 @@ const PanelApp: React.FC = () => {
                     }}
                   >
                     {/* Status Badge */}
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
                       <span
                         style={{
                           width: "6px",
                           height: "6px",
                           borderRadius: "50%",
-                          backgroundColor: isAutoSyncActive ? "#4ade80" : "#ff9800",
+                          backgroundColor: isAutoSyncActive
+                            ? "#4ade80"
+                            : "#ff9800",
                           display: "inline-block",
                         }}
                       />
-                      <span style={{ fontSize: "10px", color: "#ccc", fontWeight: 600 }}>
+                      <span
+                        style={{
+                          fontSize: "10px",
+                          color: "#ccc",
+                          fontWeight: 600,
+                        }}
+                      >
                         {isAutoSyncActive ? "Live Syncing" : "Manual Edit Mode"}
                       </span>
                     </div>
 
                     {/* Editor Mode Control */}
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
                       {!isAutoSyncActive && (
                         <button
                           style={{
@@ -1777,7 +1844,14 @@ const PanelApp: React.FC = () => {
                             marginRight: "4px",
                           }}
                           onClick={() => {
-                            setEditedCode(generateRecordedScript(recordedSteps, recordingUrl, langID, templates));
+                            setEditedCode(
+                              generateRecordedScript(
+                                recordedSteps,
+                                recordingUrl,
+                                langID,
+                                templates,
+                              ),
+                            );
                             setIsAutoSyncActive(true);
                           }}
                           title="Revert manual edits and resume auto-sync with recorded steps"
@@ -1785,14 +1859,27 @@ const PanelApp: React.FC = () => {
                           Sync & Reset
                         </button>
                       )}
-                      <label className="form-switch" style={{ color: "#fff", display: "inline-flex", alignItems: "center", cursor: "pointer", margin: 0 }}>
+                      <label
+                        className="form-switch"
+                        style={{
+                          color: "#fff",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          cursor: "pointer",
+                          margin: 0,
+                        }}
+                      >
                         <input
                           type="checkbox"
                           checked={isAutoSyncActive}
-                          onChange={(e) => setIsAutoSyncActive(e.target.checked)}
+                          onChange={(e) =>
+                            setIsAutoSyncActive(e.target.checked)
+                          }
                         />
                         <i className="form-icon"></i>
-                        <span style={{ fontSize: "10px", marginLeft: "4px" }}>Auto Sync</span>
+                        <span style={{ fontSize: "10px", marginLeft: "4px" }}>
+                          Auto Sync
+                        </span>
                       </label>
                     </div>
                   </div>
@@ -1818,7 +1905,8 @@ const PanelApp: React.FC = () => {
                         backgroundColor: "#1a1a1a",
                         color: "#6e7681",
                         textAlign: "right",
-                        fontFamily: "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
+                        fontFamily:
+                          "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
                         fontSize: "10px",
                         lineHeight: "1.6",
                         userSelect: "none",
@@ -1828,9 +1916,12 @@ const PanelApp: React.FC = () => {
                         minWidth: "24px",
                       }}
                     >
-                      {editedCode.split("\n").map((_, idx) => idx + 1).join("\n")}
+                      {editedCode
+                        .split("\n")
+                        .map((_, idx) => idx + 1)
+                        .join("\n")}
                     </div>
-                    
+
                     {/* Editor Workspace Container */}
                     <div
                       style={{
@@ -1853,7 +1944,8 @@ const PanelApp: React.FC = () => {
                           padding: "6px 8px",
                           backgroundColor: "#1e1e1e",
                           color: "#d4d4d4",
-                          fontFamily: "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
+                          fontFamily:
+                            "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
                           fontSize: "10px",
                           lineHeight: "1.6",
                           whiteSpace: "pre",
@@ -1882,7 +1974,8 @@ const PanelApp: React.FC = () => {
                           caretColor: "#cccccc",
                           border: "none",
                           padding: "6px 8px",
-                          fontFamily: "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
+                          fontFamily:
+                            "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
                           fontSize: "10px",
                           lineHeight: "1.6",
                           resize: "none",
@@ -1897,10 +1990,17 @@ const PanelApp: React.FC = () => {
                   </div>
 
                   {/* Copy / Download Footer */}
-                  <div style={{ display: "flex", gap: "4px", marginTop: "6px" }}>
+                  <div
+                    style={{ display: "flex", gap: "4px", marginTop: "6px" }}
+                  >
                     <button
                       style={{ ...styles.btnFind, flex: 1 }}
-                      onClick={() => copyToClipboard(editedCode, "Script copied to clipboard!")}
+                      onClick={() =>
+                        copyToClipboard(
+                          editedCode,
+                          "Script copied to clipboard!",
+                        )
+                      }
                     >
                       Copy Script
                     </button>
@@ -2046,7 +2146,7 @@ const PanelApp: React.FC = () => {
                   Ortoni Studio
                 </span>
                 <span style={{ color: "#858585", fontSize: "9px" }}>
-                  v3.0.1 • Open Source
+                  {APPVERSION} • Open Source
                 </span>
               </div>
             </div>
@@ -2305,8 +2405,8 @@ const PanelApp: React.FC = () => {
                       maxWidth: "140px",
                     }}
                   >
-                    Ortoni Studio is free & open-source. Consider donating to help
-                    maintain it!
+                    Ortoni Studio is free & open-source. Consider donating to
+                    help maintain it!
                   </div>
                 </div>
 
