@@ -600,3 +600,7 @@ export function addAllXpathAttributesBased(attribute: NamedNodeMap, tagName: str
 (window as any).parseDOM = parseDOM;
 (window as any).parseAnchorXP = parseAnchorXP;
 (window as any).evaluateXPathExpression = evaluateXPathExpression;
+
+// Register frame context on startup
+sendMessage({ request: "register_frame" }).catch(() => {});
+

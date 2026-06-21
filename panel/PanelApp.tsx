@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const ACTION_LABELS = {
   textarea: ['snippet', 'getAttribute', 'sendKeys'],
@@ -247,6 +247,27 @@ const PanelApp: React.FC = () => {
   const [toast, setToast] = useState<string | null>(null);
   const [langID, setLangID] = useState<string>('playwrightJS');
   const [selectedFrameId, setSelectedFrameId] = useState<number | undefined>(undefined);
+  const [registeredFrameIds, setRegisteredFrameIds] = useState<Set<number>>(new Set());
+  const frameSearchResults = useRef<Map<number, { xpath: string; count: number }>>(new Map());
+  const searchValRef = useRef<string>('');
+
+  const addFrameId = (frameId: number) => {
+    setRegisteredFrameIds((prev) => {
+      if (prev.has(frameId)) return prev;
+      const next = new Set(prev);
+      next.add(frameId);
+      return next;
+    });
+  };
+
+  const removeFrameId = (frameId: number) => {
+    setRegisteredFrameIds((prev) => {
+      if (!prev.has(frameId)) return prev;
+      const next = new Set(prev);
+      next.delete(frameId);
+      return next;
+    });
+  };
 
   const tabId = typeof chrome !== 'undefined' && chrome.devtools && chrome.devtools.inspectedWindow
     ? chrome.devtools.inspectedWindow.tabId
@@ -254,8 +275,17 @@ const PanelApp: React.FC = () => {
 
   const sendMessageToCS = (msg: any) => {
     if (tabId && typeof chrome !== 'undefined' && chrome.tabs) {
-      const options = selectedFrameId !== undefined ? { frameId: selectedFrameId } : {};
-      (chrome.tabs.sendMessage(tabId, msg, options) as any)?.catch((err: any) => console.warn('Message send failed:', err));
+      if (registeredFrameIds.size > 0) {
+        registeredFrameIds.forEach((frameId) => {
+          (chrome.tabs.sendMessage(tabId, msg, { frameId }) as any)?.catch((err: any) => {
+            console.warn(`Message send failed to frame ${frameId}:`, err);
+            removeFrameId(frameId);
+          });
+        });
+      } else {
+        const options = selectedFrameId !== undefined ? { frameId: selectedFrameId } : {};
+        (chrome.tabs.sendMessage(tabId, msg, options) as any)?.catch((err: any) => console.warn('Message send failed:', err));
+      }
     } else {
       console.log('Mock Send to Content Script:', msg);
     }
@@ -269,9 +299,15 @@ const PanelApp: React.FC = () => {
 
       try {
         switch (req.request) {
+          case 'register_frame':
+            if (_sender && _sender.frameId !== undefined) {
+              addFrameId(_sender.frameId);
+            }
+            break;
           case 'send_to_dev':
             if (_sender && _sender.frameId !== undefined) {
               setSelectedFrameId(_sender.frameId);
+              addFrameId(_sender.frameId);
             }
             if (req.xpathid && req.cssPath && req.tag !== undefined && req.type !== undefined) {
               setSelectedElement({
@@ -294,6 +330,7 @@ const PanelApp: React.FC = () => {
           case 'anchor':
             if (_sender && _sender.frameId !== undefined) {
               setSelectedFrameId(_sender.frameId);
+              addFrameId(_sender.frameId);
             }
             if (req.data) {
               setAxesData(req.data);
@@ -307,9 +344,32 @@ const PanelApp: React.FC = () => {
             if (req.data) setAxesXPathResult(req.data);
             break;
           case 'customSearchResult':
-            if (req.data) {
-              setSearchResult(req.data);
-              setToast(`${req.data.xpath}: ${req.data.count} element(s) matched`);
+            if (req.data && _sender && _sender.frameId !== undefined) {
+              frameSearchResults.current.set(_sender.frameId, req.data);
+              
+              let totalCount = 0;
+              let bestXPath = '';
+              frameSearchResults.current.forEach((res) => {
+                totalCount += res.count;
+                if (res.count > 0) {
+                  bestXPath = res.xpath;
+                }
+              });
+              
+              const locatorVal = searchValRef.current || '';
+              const locatorType = locatorVal.includes('getBy') || locatorVal.includes('locator(') || locatorVal.startsWith('page.')
+                ? 'Playwright'
+                : (locatorVal.startsWith('/') || locatorVal.startsWith('(') ? 'XPath' : 'CSS');
+              
+              const status = totalCount > 0
+                ? (bestXPath || `${locatorType} found`)
+                : `Wrong ${locatorType}`;
+              
+              setSearchResult({
+                xpath: status,
+                count: totalCount
+              });
+              setToast(`${status}: ${totalCount} element(s) matched`);
               setTimeout(() => setToast(null), 3000);
             }
             break;
@@ -616,6 +676,8 @@ const PanelApp: React.FC = () => {
   // Custom Search triggers
   const handleCustomSearch = () => {
     if (searchVal.length > 0) {
+      searchValRef.current = searchVal;
+      frameSearchResults.current.clear();
       sendMessageToCS({ request: 'cleanhighlight' });
       sendMessageToCS({ request: 'userSearchXP', data: searchVal });
     }
@@ -623,12 +685,16 @@ const PanelApp: React.FC = () => {
 
   const handleVerifyLocator = (locator: string) => {
     setSearchVal(locator);
+    searchValRef.current = locator;
+    frameSearchResults.current.clear();
     sendMessageToCS({ request: 'cleanhighlight' });
     sendMessageToCS({ request: 'userSearchXP', data: locator });
   };
 
   const handleClearHighlight = () => {
     setSearchVal('');
+    searchValRef.current = '';
+    frameSearchResults.current.clear();
     setSearchResult(null);
     sendMessageToCS({ request: 'cleanhighlight' });
   };
