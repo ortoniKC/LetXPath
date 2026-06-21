@@ -30,13 +30,23 @@ export function getLongCssPath(ele: HTMLElement): string {
 }
 
 export function getClassCSS(ele: HTMLElement): void {
-    let clscss = (ele.className).replace(/ /g, '.').replace(/\.\.+/g, '.');
+    let clickedItemClass = ele.className;
+    if (typeof clickedItemClass !== 'string') {
+        if (clickedItemClass && typeof (clickedItemClass as any).animVal === 'string') {
+            clickedItemClass = (clickedItemClass as any).animVal;
+        } else {
+            return;
+        }
+    }
+    let clscss = clickedItemClass.replace(/ /g, '.').replace(/\.\.+/g, '.');
     const spl = clscss.split('.');
     if (!(spl.length > 3)) {
         clscss = `${ele.tagName.toLowerCase()}.${clscss}`;
-        if (ele.ownerDocument.querySelectorAll(clscss).length == 1) {
-            state.CSSPATHDATA.push([3, 'Unique class', clscss]);
-        }
+        try {
+            if (ele.ownerDocument.querySelectorAll(clscss).length == 1) {
+                state.CSSPATHDATA.push([3, 'Unique class', clscss]);
+            }
+        } catch (e) {}
     }
 }
 

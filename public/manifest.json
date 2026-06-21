@@ -15,7 +15,7 @@
   "content_scripts": [
     {
       "run_at": "document_start",
-      "all_frames": false,
+      "all_frames": true,
       "matches": ["<all_urls>"],
       "js": ["app/src/content.js"],
       "css": ["app/styles/highlight.css"]

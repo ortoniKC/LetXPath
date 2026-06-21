@@ -45,8 +45,10 @@ export const getAccessibleName = (el: HTMLElement): string => {
   if (el.getAttribute('aria-label')) {
     name = el.getAttribute('aria-label') || "";
   } else if (el.id) {
-    const label = el.ownerDocument.querySelector(`label[for="${el.id}"]`);
-    if (label) name = label.textContent || "";
+    try {
+      const label = el.ownerDocument.querySelector(`label[for="${CSS.escape(el.id)}"]`);
+      if (label) name = label.textContent || "";
+    } catch (e) {}
   }
   if (!name) {
     const preceding = el.previousElementSibling;
@@ -78,8 +80,10 @@ export const getAccessibleName = (el: HTMLElement): string => {
 export const getElementLabelText = (el: HTMLElement): string => {
   let labelText = "";
   if (el.id) {
-    const label = el.ownerDocument.querySelector(`label[for="${el.id}"]`);
-    if (label) labelText = label.textContent || "";
+    try {
+      const label = el.ownerDocument.querySelector(`label[for="${CSS.escape(el.id)}"]`);
+      if (label) labelText = label.textContent || "";
+    } catch (e) {}
   }
   if (!labelText) {
     const preceding = el.previousElementSibling;
@@ -222,7 +226,7 @@ export function buildPlaywrightLocators(
 
   // 5. page.getByText
   const text = element.textContent?.replace(/\s+/g, ' ').trim() || "";
-  if (text && text.length > 1 && text.length < 80) {
+  if (text && text.length >= 1 && text.length < 80) {
     const substringMatches = getByTextMatches(doc, text, false);
     const exactMatches = getByTextMatches(doc, text, true);
     

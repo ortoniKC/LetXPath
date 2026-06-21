@@ -246,6 +246,7 @@ const PanelApp: React.FC = () => {
   // Settings & toast
   const [toast, setToast] = useState<string | null>(null);
   const [langID, setLangID] = useState<string>('playwrightJS');
+  const [selectedFrameId, setSelectedFrameId] = useState<number | undefined>(undefined);
 
   const tabId = typeof chrome !== 'undefined' && chrome.devtools && chrome.devtools.inspectedWindow
     ? chrome.devtools.inspectedWindow.tabId
@@ -253,7 +254,8 @@ const PanelApp: React.FC = () => {
 
   const sendMessageToCS = (msg: any) => {
     if (tabId && typeof chrome !== 'undefined' && chrome.tabs) {
-      chrome.tabs.sendMessage(tabId, msg).catch(err => console.warn('Message send failed:', err));
+      const options = selectedFrameId !== undefined ? { frameId: selectedFrameId } : {};
+      (chrome.tabs.sendMessage(tabId, msg, options) as any)?.catch((err: any) => console.warn('Message send failed:', err));
     } else {
       console.log('Mock Send to Content Script:', msg);
     }
@@ -268,6 +270,9 @@ const PanelApp: React.FC = () => {
       try {
         switch (req.request) {
           case 'send_to_dev':
+            if (_sender && _sender.frameId !== undefined) {
+              setSelectedFrameId(_sender.frameId);
+            }
             if (req.xpathid && req.cssPath && req.tag !== undefined && req.type !== undefined) {
               setSelectedElement({
                 xpathid: req.xpathid,
@@ -287,6 +292,9 @@ const PanelApp: React.FC = () => {
             }
             break;
           case 'anchor':
+            if (_sender && _sender.frameId !== undefined) {
+              setSelectedFrameId(_sender.frameId);
+            }
             if (req.data) {
               setAxesData(req.data);
               if (req.data.src && req.data.src.length > 0) setSelectedSrc(req.data.src[0][1]);
