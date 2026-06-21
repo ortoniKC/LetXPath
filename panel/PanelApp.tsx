@@ -1004,7 +1004,7 @@ const PanelApp: React.FC = () => {
                   Select an element in Elements tab
                 </div>
                 <div style={styles.emptySubtitle}>
-                  LetXPath will display optimized XPaths & action snippets here.
+                  Ortoni Studio will display optimized XPaths & action snippets here.
                 </div>
               </div>
             ) : (
@@ -1128,7 +1128,7 @@ const PanelApp: React.FC = () => {
                   Select an element in Elements tab
                 </div>
                 <div style={styles.emptySubtitle}>
-                  LetXPath will display optimized CSS selectors here.
+                  Ortoni Studio will display optimized CSS selectors here.
                 </div>
               </div>
             ) : (
@@ -1299,7 +1299,7 @@ const PanelApp: React.FC = () => {
                   Select an element in Elements tab
                 </div>
                 <div style={styles.emptySubtitle}>
-                  LetXPath will display Playwright-recommended locators here.
+                  Ortoni Studio will display Playwright-recommended locators here.
                 </div>
               </div>
             ) : (
@@ -1369,7 +1369,7 @@ const PanelApp: React.FC = () => {
               <div style={styles.emptyState}>
                 <div style={{ fontSize: '1.8rem', marginBottom: '4px' }}>🌲</div>
                 <div style={styles.emptyTitle}>Select an element in Elements tab</div>
-                <div style={styles.emptySubtitle}>LetXPath will display Cypress-recommended locators here.</div>
+                <div style={styles.emptySubtitle}>Ortoni Studio will display Cypress-recommended locators here.</div>
               </div>
             ) : (
               <div style={styles.locatorList}>
@@ -2031,7 +2031,7 @@ const PanelApp: React.FC = () => {
                 src="../assets/32.png"
                 width="20px"
                 height="20px"
-                alt="LetXPath logo"
+                alt="Ortoni Studio logo"
                 style={{ borderRadius: "4px" }}
               />
               <div style={{ display: "flex", flexDirection: "column" }}>
@@ -2043,7 +2043,7 @@ const PanelApp: React.FC = () => {
                     lineHeight: 1.2,
                   }}
                 >
-                  LetXPath
+                  Ortoni Studio
                 </span>
                 <span style={{ color: "#858585", fontSize: "9px" }}>
                   v3.0.1 • Open Source
@@ -2305,7 +2305,7 @@ const PanelApp: React.FC = () => {
                       maxWidth: "140px",
                     }}
                   >
-                    LetXPath is free & open-source. Consider donating to help
+                    Ortoni Studio is free & open-source. Consider donating to help
                     maintain it!
                   </div>
                 </div>

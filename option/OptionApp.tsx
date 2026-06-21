@@ -449,7 +449,7 @@ const OptionApp: React.FC = () => {
           <div style={styles.sidebarBrand}>
             <div style={styles.logoBadge}>L</div>
             <div>
-              <div style={styles.brandTitle}>LetXPath</div>
+              <div style={styles.brandTitle}>Ortoni Studio</div>
               <div style={styles.brandSubtitle}>Developer settings</div>
             </div>
           </div>
@@ -506,7 +506,7 @@ const OptionApp: React.FC = () => {
           </div>
 
           <div style={styles.sidebarFooter}>
-            <div style={{ fontSize: '11px', color: '#484f58' }}>LetXPath Project</div>
+            <div style={{ fontSize: '11px', color: '#484f58' }}>Ortoni Studio Project</div>
             <div style={{ fontSize: '12px', fontWeight: '600', color: '#8b949e', marginTop: '2px' }}>v3.0.2</div>
           </div>
         </div>
@@ -619,7 +619,7 @@ const OptionApp: React.FC = () => {
                 {!rawTextMode ? (
                   <>
                     <div style={{ color: '#8b949e', fontSize: '13px', marginBottom: '16px', lineHeight: '1.4' }}>
-                      Drag-style order list. Use the <strong style={{ color: '#58a6ff' }}>left (◂)</strong> and <strong style={{ color: '#58a6ff' }}>right (▸)</strong> buttons on each badge to change priorities. LetXPath evaluates from left to right.
+                      Drag-style order list. Use the <strong style={{ color: '#58a6ff' }}>left (◂)</strong> and <strong style={{ color: '#58a6ff' }}>right (▸)</strong> buttons on each badge to change priorities. Ortoni Studio evaluates from left to right.
                     </div>
                     
                     <div style={styles.priorityPillContainer}>
@@ -723,7 +723,7 @@ const OptionApp: React.FC = () => {
                   <span>💡</span> How Prioritization Works
                 </div>
                 <div style={{ color: '#c9d1d9', fontSize: '13px', lineHeight: '1.6' }}>
-                  When LetXPath scans a web element on a page, it loops through your prioritized list of attributes. If it finds a unique element using the highest priority attribute (e.g. <code style={styles.codeText}>data-testid</code>), it creates a selector instantly. If that fails or is non-unique, it proceeds to the next attribute in the list. Setting test-ids at the top ensures robust locator generation.
+                  When Ortoni Studio scans a web element on a page, it loops through your prioritized list of attributes. If it finds a unique element using the highest priority attribute (e.g. <code style={styles.codeText}>data-testid</code>), it creates a selector instantly. If that fails or is non-unique, it proceeds to the next attribute in the list. Setting test-ids at the top ensures robust locator generation.
                 </div>
               </div>
             </div>
@@ -931,7 +931,7 @@ const OptionApp: React.FC = () => {
           {activeTab === 'about' && (
             <div style={styles.tabContent}>
               <div style={styles.sectionHeader}>
-                <h1 style={styles.mainTitle}>About LetXPath</h1>
+                <h1 style={styles.mainTitle}>About Ortoni Studio</h1>
                 <p style={styles.mainSubtitle}>Learn more about the extension and get resources for automation testing.</p>
               </div>
 
@@ -953,7 +953,7 @@ const OptionApp: React.FC = () => {
                     L
                   </div>
                   <div>
-                    <h2 style={{ margin: '0 0 4px 0', color: '#ffffff', fontSize: '20px' }}>LetXPath Pro</h2>
+                    <h2 style={{ margin: '0 0 4px 0', color: '#ffffff', fontSize: '20px' }}>Ortoni Studio Pro</h2>
                     <div style={{ color: '#8b949e', fontSize: '13px' }}>Open Source XPath & Selector Tool • Version 3.0.2</div>
                   </div>
                 </div>
@@ -999,7 +999,7 @@ const OptionApp: React.FC = () => {
               <div style={{ ...styles.card, marginTop: '20px', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.02) 100%)', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
                 <div style={{ fontSize: '14px', fontWeight: '600', color: '#10b981', marginBottom: '6px' }}>⭐ Support the Project</div>
                 <div style={{ color: '#c9d1d9', fontSize: '13px', lineHeight: '1.5' }}>
-                  If you find LetXPath helpful, please consider leaving a review on the Chrome Web Store or giving our GitHub repository a star. It helps other developers find the tool!
+                  If you find Ortoni Studio helpful, please consider leaving a review on the Chrome Web Store or giving our GitHub repository a star. It helps other developers find the tool!
                 </div>
               </div>
             </div>

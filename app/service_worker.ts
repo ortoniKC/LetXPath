@@ -3,10 +3,10 @@ let isSource = false;
 function toggle() {
   isSource = !isSource;
   if (isSource) {
-    chrome.contextMenus.update("LetXPath", { title: "Select Child" }, () => {});
+    chrome.contextMenus.update("OrtoniStudio", { title: "Select Child" }, () => {});
   } else {
     chrome.contextMenus.update(
-      "LetXPath",
+      "OrtoniStudio",
       { title: "Select Parent" },
       () => {},
     );
@@ -32,7 +32,7 @@ function getXPath(
 }
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "LetXPath" && tab) {
+  if (info.menuItemId === "OrtoniStudio" && tab) {
     toggle();
     getXPath(info, tab);
   }
@@ -61,17 +61,16 @@ function handleInstall(details: chrome.runtime.InstalledDetails) {
   if (details.reason === "install") {
     chrome.tabs.create({ url: installURL });
     chrome.notifications.create({
-      title: "LetXPath By LetCode with Koushik",
-      message: "Please restart your browser to use LetXPath",
+      title: "Ortoni Studio By LetCode with Koushik",
+      message: "Please restart your browser to use Ortoni Studio",
       iconUrl: "assets/32.png",
       type: "basic",
     });
   }
 
-  // Clean up and recreate context menu
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
-      id: "LetXPath",
+      id: "OrtoniStudio",
       title: "Select Parent",
       contexts: ["all"],
     });

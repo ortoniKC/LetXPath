@@ -1,8 +1,8 @@
-# Contributing to LetXPath
+# Contributing to Ortoni Studio
 
 👍🎉 First off, thanks for taking the time to contribute! 🎉👍
 
-The following is a set of guidelines for contributing to LetXPath. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
+The following is a set of guidelines for contributing to Ortoni Studio. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
 ## Table Of Contents
 
@@ -56,7 +56,7 @@ Anyone can contribute to our project in four ways
 I don't know how does it work, but I like to contribute. What should I do next?
 
 **No worries**
-LetCode has created all the basic video on how to build LetXPath
+LetCode has created all the basic video on how to build Ortoni Studio
 Feel free to check out our get started videos and we appreciate your contribution
 
 [YouTube](https://youtube.com/letcode)

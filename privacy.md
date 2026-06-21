@@ -2,7 +2,7 @@
 
 This document is used to inform our users regarding the policies with the use, collection, and disclosure of the Personal Information if any user decides to use our service.
 You’re requested to review and agree to the use and collection of information when you choose to use our service.
-LetXPath collects only the node (HTML elements), but we assure you that we flush all the data as soon as the session gets over.
+Ortoni Studio collects only the node (HTML elements), but we assure you that we flush all the data as soon as the session gets over.
 We assure you that we won’t share your information with anyone. All the terms used in this Privacy Policy have the same meanings that are in our Terms and Conditions.
 
 # Information Collected and its Uses

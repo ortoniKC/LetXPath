@@ -22,7 +22,7 @@ function onHidden() {
   );
 }
 
-chrome.devtools.panels.elements.createSidebarPane("LetXPath", (sideBar) => {
+chrome.devtools.panels.elements.createSidebarPane("Ortoni Studio", (sideBar) => {
   sideBar.setPage(html);
 
   chrome.devtools.panels.elements.onSelectionChanged.addListener(updatePanel);
