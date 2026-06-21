@@ -269,6 +269,15 @@ const PanelApp: React.FC = () => {
     });
   };
 
+  const handleTabChange = (tabIndex: number) => {
+    setActiveTab(tabIndex);
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({ activeTab: tabIndex });
+    } else {
+      localStorage.setItem('activeTab', String(tabIndex));
+    }
+  };
+
   const tabId = typeof chrome !== 'undefined' && chrome.devtools && chrome.devtools.inspectedWindow
     ? chrome.devtools.inspectedWindow.tabId
     : null;
@@ -323,8 +332,6 @@ const PanelApp: React.FC = () => {
                 labelText: req.labelText,
                 playwrightLocators: req.playwrightLocators
               });
-              // Default activeTab to 1 if we get element updates
-              setActiveTab(1);
             }
             break;
           case 'anchor':
@@ -337,7 +344,7 @@ const PanelApp: React.FC = () => {
               if (req.data.src && req.data.src.length > 0) setSelectedSrc(req.data.src[0][1]);
               if (req.data.dst && req.data.dst.length > 0) setSelectedDst(req.data.dst[0][1]);
               setAxesXPathResult(req.data.defaultXPath);
-              setActiveTab(3); // Switch to Axes panel
+              handleTabChange(3); // Switch to Axes panel
             }
             break;
           case 'axes':
@@ -397,20 +404,26 @@ const PanelApp: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const loadLang = () => {
+    const loadSettings = () => {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-        chrome.storage.local.get(['langID'], (result) => {
+        chrome.storage.local.get(['langID', 'activeTab'], (result) => {
           if (result.langID) setLangID(result.langID);
+          if (result.activeTab) setActiveTab(result.activeTab);
         });
       } else {
         const localLang = localStorage.getItem('langID');
         if (localLang) setLangID(localLang);
+        const localTab = localStorage.getItem('activeTab');
+        if (localTab) setActiveTab(Number(localTab));
       }
     };
-    loadLang();
+    loadSettings();
     const storageListener = (changes: any) => {
       if (changes.langID) {
         setLangID(changes.langID.newValue);
+      }
+      if (changes.activeTab) {
+        setActiveTab(changes.activeTab.newValue);
       }
     };
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
@@ -843,22 +856,22 @@ const PanelApp: React.FC = () => {
       {/* Tab Navigation header */}
       <div style={styles.navBar}>
         <ul style={styles.tabsList}>
-          <li style={styles.tabItem} onClick={() => setActiveTab(1)}>
+          <li style={styles.tabItem} onClick={() => handleTabChange(1)}>
             <span style={activeTab === 1 ? styles.activeLink : styles.link}>XPath</span>
           </li>
-          <li style={styles.tabItem} onClick={() => setActiveTab(2)}>
+          <li style={styles.tabItem} onClick={() => handleTabChange(2)}>
             <span style={activeTab === 2 ? styles.activeLink : styles.link}>CSS</span>
           </li>
-          <li style={styles.tabItem} onClick={() => setActiveTab(3)}>
+          <li style={styles.tabItem} onClick={() => handleTabChange(3)}>
             <span style={activeTab === 3 ? styles.activeLink : styles.link}>Axes</span>
           </li>
-          <li style={styles.tabItem} onClick={() => setActiveTab(4)}>
+          <li style={styles.tabItem} onClick={() => handleTabChange(4)}>
             <span style={activeTab === 4 ? styles.activeLink : styles.link}>Playwright</span>
           </li>
-          <li style={styles.tabItem} onClick={() => setActiveTab(5)}>
+          <li style={styles.tabItem} onClick={() => handleTabChange(5)}>
             <span style={activeTab === 5 ? styles.activeLink : styles.link}>Tools</span>
           </li>
-          <li style={styles.tabItem} onClick={() => setActiveTab(6)}>
+          <li style={styles.tabItem} onClick={() => handleTabChange(6)}>
             <span style={activeTab === 6 ? styles.activeLink : styles.link}>About</span>
           </li>
         </ul>
