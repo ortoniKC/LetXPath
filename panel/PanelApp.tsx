@@ -297,7 +297,16 @@ const PanelApp: React.FC = () => {
 
   // Recorder states
   const [recordedSteps, setRecordedSteps] = useState<any[]>([]);
+  const stepsContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (stepsContainerRef.current) {
+      stepsContainerRef.current.scrollTop = stepsContainerRef.current.scrollHeight;
+    }
+  }, [recordedSteps.length]);
+
   const [isRecordingActive, setIsRecordingActive] = useState<boolean>(false);
+  const [isVerifyModeActive, setIsVerifyModeActive] = useState<boolean>(false);
   const [recordingUrl, setRecordingUrl] = useState<string>("");
   const [templates, setTemplates] = useState<ChromeStorageResult>({});
 
@@ -398,6 +407,19 @@ const PanelApp: React.FC = () => {
     }
   };
 
+  const handleToggleVerifyMode = (active: boolean) => {
+    setIsVerifyModeActive(active);
+    if (
+      typeof chrome !== "undefined" &&
+      chrome.storage &&
+      chrome.storage.local
+    ) {
+      chrome.storage.local.set({ isVerifyModeActive: active });
+    } else {
+      localStorage.setItem("isVerifyModeActive", active ? "true" : "false");
+    }
+  };
+
   const handleClearRecording = () => {
     setRecordedSteps([]);
     if (
@@ -425,6 +447,9 @@ const PanelApp: React.FC = () => {
     } else if (currentLang === "csharp") {
       filename = "RecordedTest.cs";
       mimeType = "text/plain";
+    } else if (currentLang === "cypress") {
+      filename = "recorded_test.cy.js";
+      mimeType = "text/javascript";
     }
 
     const blob = new Blob([code], { type: mimeType });
@@ -458,6 +483,8 @@ const PanelApp: React.FC = () => {
             return `  await ${call}.fill('${step.value || ""}');`;
           } else if (step.action === "select") {
             return `  await ${call}.selectOption('${step.value || ""}');`;
+          } else if (step.action === "assert_visible") {
+            return `  await expect(${call}).toBeVisible();`;
           }
         } else if (currentLang === "playwrightJava") {
           const locator = step.playwrightLocator;
@@ -470,6 +497,8 @@ const PanelApp: React.FC = () => {
             return `    ${call}.fill("${step.value || ""}");`;
           } else if (step.action === "select") {
             return `    ${call}.selectOption("${step.value || ""}");`;
+          } else if (step.action === "assert_visible") {
+            return `    assertThat(${call}).isVisible();`;
           }
         } else if (currentLang === "javas") {
           const xpath = step.xpathLocator;
@@ -479,6 +508,8 @@ const PanelApp: React.FC = () => {
             return `    driver.findElement(By.xpath("${xpath}")).sendKeys("${step.value || ""}");`;
           } else if (step.action === "select") {
             return `    new Select(driver.findElement(By.xpath("${xpath}"))).selectByValue("${step.value || ""}");`;
+          } else if (step.action === "assert_visible") {
+            return `    assertTrue(driver.findElement(By.xpath("${xpath}")).isDisplayed());`;
           }
         } else if (currentLang === "py") {
           const xpath = step.xpathLocator;
@@ -488,6 +519,8 @@ const PanelApp: React.FC = () => {
             return `    driver.find_element(By.XPATH, "${xpath}").send_keys("${step.value || ""}")`;
           } else if (step.action === "select") {
             return `    Select(driver.find_element(By.XPATH, "${xpath}")).select_by_value("${step.value || ""}")`;
+          } else if (step.action === "assert_visible") {
+            return `    assert driver.find_element(By.XPATH, "${xpath}").is_displayed()`;
           }
         } else if (currentLang === "csharp") {
           const xpath = step.xpathLocator;
@@ -497,6 +530,8 @@ const PanelApp: React.FC = () => {
             return `    driver.FindElement(By.XPath("${xpath}")).SendKeys("${step.value || ""}");`;
           } else if (step.action === "select") {
             return `    new SelectElement(driver.FindElement(By.XPath("${xpath}"))).SelectByValue("${step.value || ""}");`;
+          } else if (step.action === "assert_visible") {
+            return `    Assert.IsTrue(driver.FindElement(By.XPath("${xpath}")).Displayed);`;
           }
         } else if (currentLang === "protractorjs") {
           const xpath = step.xpathLocator;
@@ -504,6 +539,19 @@ const PanelApp: React.FC = () => {
             return `    await element(by.xpath('${xpath}')).click();`;
           } else if (step.action === "fill") {
             return `    await element(by.xpath('${xpath}')).sendKeys('${step.value || ""}');`;
+          } else if (step.action === "assert_visible") {
+            return `    expect(await element(by.xpath('${xpath}')).isDisplayed()).toBe(true);`;
+          }
+        } else if (currentLang === "cypress") {
+          const locator = step.cypressLocator || `cy.xpath('${step.xpathLocator}')`;
+          if (step.action === "click") {
+            return `  ${locator}.click();`;
+          } else if (step.action === "fill") {
+            return `  ${locator}.type('${step.value || ""}');`;
+          } else if (step.action === "select") {
+            return `  ${locator}.select('${step.value || ""}');`;
+          } else if (step.action === "assert_visible") {
+            return `  ${locator}.should('be.visible');`;
           }
         } else if (currentLang === "custom") {
           const variable = step.variableName || "ele";
@@ -521,6 +569,8 @@ const PanelApp: React.FC = () => {
                 templates,
               )
             );
+          } else if (step.action === "assert_visible") {
+            return `    // Assert visibility of element: ${xpath}`;
           } else {
             return (
               "    " +
@@ -552,6 +602,8 @@ const PanelApp: React.FC = () => {
       return `using OpenQA.Selenium;\nusing OpenQA.Selenium.Chrome;\nusing OpenQA.Selenium.Support.UI;\n\nclass RecordedTest {\n  static void Main() {\n    IWebDriver driver = new ChromeDriver();\n    driver.Navigate().GoToUrl("${initialUrl}");\n${formattedSteps}\n    driver.Quit();\n  }\n}`;
     } else if (currentLang === "protractorjs") {
       return `import { browser, element, by } from 'protractor';\n\ndescribe('Recorded Test', () => {\n  it('should execute recorded actions', async () => {\n    await browser.get('${initialUrl}');\n${formattedSteps}\n  });\n});`;
+    } else if (currentLang === "cypress") {
+      return `describe('Recorded Test', () => {\n  it('should execute recorded actions', () => {\n    cy.visit('${initialUrl}');\n${formattedSteps}\n  });\n});`;
     } else if (currentLang === "custom") {
       return `// Custom Framework Recorded Script\n// Start URL: ${initialUrl}\n\n${formattedSteps}`;
     }
@@ -773,6 +825,7 @@ const PanelApp: React.FC = () => {
             "langID",
             "activeTab",
             "isRecordingActive",
+            "isVerifyModeActive",
             "recordedSteps",
             "recordingUrl",
             "customLang",
@@ -786,6 +839,8 @@ const PanelApp: React.FC = () => {
             if (result.activeTab) setActiveTab(result.activeTab);
             if (result.isRecordingActive !== undefined)
               setIsRecordingActive(result.isRecordingActive);
+            if (result.isVerifyModeActive !== undefined)
+              setIsVerifyModeActive(result.isVerifyModeActive);
             if (result.recordedSteps) setRecordedSteps(result.recordedSteps);
             if (result.recordingUrl) setRecordingUrl(result.recordingUrl);
             setTemplates(result);
@@ -799,6 +854,9 @@ const PanelApp: React.FC = () => {
         const localRecordingActive =
           localStorage.getItem("isRecordingActive") === "true";
         setIsRecordingActive(localRecordingActive);
+        const localVerifyActive =
+          localStorage.getItem("isVerifyModeActive") === "true";
+        setIsVerifyModeActive(localVerifyActive);
         const localRecordedSteps = JSON.parse(
           localStorage.getItem("recordedSteps") || "[]",
         );
@@ -827,6 +885,9 @@ const PanelApp: React.FC = () => {
       }
       if (changes.isRecordingActive) {
         setIsRecordingActive(changes.isRecordingActive.newValue);
+      }
+      if (changes.isVerifyModeActive) {
+        setIsVerifyModeActive(changes.isVerifyModeActive.newValue);
       }
       if (changes.recordedSteps) {
         setRecordedSteps(changes.recordedSteps.newValue || []);
@@ -1984,7 +2045,17 @@ const PanelApp: React.FC = () => {
                     </div>
                   )}
                 </div>
-                <div style={{ display: "flex", gap: "4px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <label className="form-switch" style={{ color: "#fff", display: "inline-flex", alignItems: "center", cursor: "pointer", margin: 0 }}>
+                    <input
+                      type="checkbox"
+                      checked={isVerifyModeActive}
+                      onChange={(e) => handleToggleVerifyMode(e.target.checked)}
+                    />
+                    <i className="form-icon"></i>
+                    <span style={{ fontSize: "11px", marginLeft: "4px", fontWeight: 500 }}>Verify Mode</span>
+                  </label>
+                  <div style={{ display: "flex", gap: "4px" }}>
                   {isRecordingActive ? (
                     <button
                       style={styles.btnStopRecord}
@@ -2008,6 +2079,7 @@ const PanelApp: React.FC = () => {
                   </button>
                 </div>
               </div>
+            </div>
               {recordingUrl && (
                 <div
                   style={{
@@ -2053,6 +2125,7 @@ const PanelApp: React.FC = () => {
                   Recorded Steps ({recordedSteps.length})
                 </div>
                 <div
+                  ref={stepsContainerRef}
                   style={{
                     flex: 1,
                     overflowY: "auto",
@@ -2106,7 +2179,11 @@ const PanelApp: React.FC = () => {
                               padding: "1px 4px",
                               borderRadius: "3px",
                               backgroundColor:
-                                step.action === "click" ? "#0e639c" : "#10b981",
+                                step.action === "click"
+                                  ? "#0e639c"
+                                  : step.action === "assert_visible"
+                                  ? "#8b5cf6"
+                                  : "#10b981",
                               color: "#fff",
                             }}
                           >
@@ -2208,6 +2285,7 @@ const PanelApp: React.FC = () => {
                     <option value="py">Selenium Python</option>
                     <option value="csharp">Selenium C#</option>
                     <option value="protractorjs">Protractor (Angular)</option>
+                    <option value="cypress">Cypress</option>
                     <option value="custom">Custom Framework</option>
                   </select>
                 </div>

@@ -21,11 +21,12 @@ import { evaluatePlaywrightLocator } from './playwrightEvaluator';
 import { startRecording, stopRecord } from './record';
 import { buildCypressLocators } from './cypressLocators';
 
-export let selectorPriorityList = ['data-testid', 'id', 'name', 'class'];
+export let selectorPriorityList = state.selectorPriorityList;
 
 function updatePriorityList(val: string) {
   if (val) {
-    selectorPriorityList = val.split(',').map(s => s.trim()).filter(Boolean);
+    state.selectorPriorityList = val.split(',').map(s => s.trim()).filter(Boolean);
+    selectorPriorityList = state.selectorPriorityList;
   }
 }
 
@@ -631,9 +632,12 @@ sendMessage({ request: "register_frame" }).catch(() => {});
 
 // Initialize recording state and register listener
 if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-  chrome.storage.local.get(['isRecordingActive', 'selectorPriority'], (result) => {
+  chrome.storage.local.get(['isRecordingActive', 'selectorPriority', 'isVerifyModeActive'], (result) => {
     if (result.isRecordingActive) {
       startRecording();
+    }
+    if (result.isVerifyModeActive) {
+      state.isVerifyModeActive = true;
     }
     if (result.selectorPriority) {
       updatePriorityList(result.selectorPriority);
@@ -647,6 +651,9 @@ if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
       } else {
         stopRecord();
       }
+    }
+    if (changes.isVerifyModeActive) {
+      state.isVerifyModeActive = !!changes.isVerifyModeActive.newValue;
     }
     if (changes.selectorPriority) {
       updatePriorityList(changes.selectorPriority.newValue);

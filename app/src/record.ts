@@ -1,5 +1,6 @@
 import { state } from './state';
 import { buildPlaywrightLocators } from './playwrightLocators';
+import { buildCypressLocators } from './cypressLocators';
 
 function sendMessage(msg: any): Promise<any> {
     return new Promise((resolve) => {
@@ -22,8 +23,11 @@ function getBestLocators(element: HTMLElement) {
     const bestXPath = state.XPATHDATA && state.XPATHDATA.length > 0 ? state.XPATHDATA[0][2] : '';
     const bestCSS = state.CSSPATHDATA && state.CSSPATHDATA.length > 0 ? state.CSSPATHDATA[0][2] : '';
     
-    const pwLocators = buildPlaywrightLocators(element, state.XPATHDATA, state.CSSPATHDATA);
+    const pwLocators = buildPlaywrightLocators(element, state.XPATHDATA, state.CSSPATHDATA, state.selectorPriorityList);
     const bestPlaywright = pwLocators && pwLocators.length > 0 ? pwLocators[0] : null;
+
+    const cyLocators = buildCypressLocators(element, state.XPATHDATA, state.CSSPATHDATA, state.selectorPriorityList);
+    const bestCypress = cyLocators && cyLocators.length > 0 ? cyLocators[0] : null;
 
     return {
         xpath: bestXPath,
@@ -32,6 +36,7 @@ function getBestLocators(element: HTMLElement) {
         playwrightPy: bestPlaywright ? bestPlaywright[3] : '',
         playwrightJava: bestPlaywright ? bestPlaywright[4] : '',
         playwrightCS: bestPlaywright ? bestPlaywright[5] : '',
+        cypress: bestCypress ? bestCypress[2] : '',
         variableName: state.variablename || 'ele',
         methodName: state.methodName || 'ele'
     };
@@ -46,11 +51,16 @@ export function recordClick(event: MouseEvent): void {
     // Skip our own highlighted elements or overlay widgets
     if (element.getAttribute('letxxpath') === 'letX') return;
 
+    if (state.isVerifyModeActive) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
     const locators = getBestLocators(element);
 
     const step = {
         id: Math.random().toString(36).substring(2, 9),
-        action: 'click',
+        action: state.isVerifyModeActive ? 'assert_visible' : 'click',
         tag: element.tagName.toLowerCase(),
         type: element.getAttribute('type') || undefined,
         xpathLocator: locators.xpath,
@@ -59,6 +69,7 @@ export function recordClick(event: MouseEvent): void {
         playwrightPy: locators.playwrightPy,
         playwrightJava: locators.playwrightJava,
         playwrightCS: locators.playwrightCS,
+        cypressLocator: locators.cypress,
         variableName: locators.variableName,
         methodName: locators.methodName,
         url: element.ownerDocument.URL,
@@ -115,6 +126,7 @@ export function recordChange(event: Event): void {
         playwrightPy: locators.playwrightPy,
         playwrightJava: locators.playwrightJava,
         playwrightCS: locators.playwrightCS,
+        cypressLocator: locators.cypress,
         variableName: locators.variableName,
         methodName: locators.methodName,
         url: element.ownerDocument.URL,
