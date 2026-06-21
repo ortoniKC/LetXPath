@@ -2,6 +2,39 @@ import React from "react";
 import { ChromeStorageResult } from "./types";
 import { ACTION_LABELS, DEFAULT_TEMPLATES } from "./constants";
 
+export const colorizeCode = (code: string, _lang: string): React.ReactNode => {
+  if (!code) return "";
+  
+  // Regex to match comments, strings, keywords, numbers, builtins/objects, and method/variable identifiers
+  const tokenRegex = /(\/\/.*|#.*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:await|async|import|from|const|let|class|public|static|void|try|using|new|describe|it|def|return)\b|\b\d+\b|\b(?:cy|page|expect|assert|driver|browser|element|by|By)\b|[a-zA-Z0-9_$]+|[^a-zA-Z0-9_$\s]+|\s+)/g;
+  
+  const tokens = code.split(tokenRegex);
+  return tokens.map((token, idx) => {
+    if (!token) return null;
+    let color = "#d4d4d4";
+    
+    if (token.startsWith("//") || token.startsWith("#")) {
+      color = "#6a9955"; // green comments
+    } else if (token.startsWith('"') || token.startsWith("'")) {
+      color = "#ce9178"; // orange/brown strings
+    } else if (/^(?:await|async|import|from|const|let|class|public|static|void|try|using|new|describe|it|def|return)$/.test(token)) {
+      color = "#569cd6"; // blue keywords
+    } else if (/^(?:cy|page|expect|assert|driver|browser|element|by|By)$/.test(token)) {
+      color = "#9cdcfe"; // light blue builtins/objects
+    } else if (/^\d+$/.test(token)) {
+      color = "#b5cea8"; // light green numbers
+    } else if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(token)) {
+      color = "#dcdcaa"; // yellow function/method/variable identifiers
+    }
+    
+    return (
+      <span key={idx} style={{ color }}>
+        {token}
+      </span>
+    );
+  });
+};
+
 export const colorizeXPath = (xpath: string): React.ReactNode => {
   const tokenRegex =
     /('(?:\\'|[^'])*'|"(?:\\"|[^"])*"|[a-zA-Z-]+::|@[a-zA-Z0-9_-]+|[a-zA-Z-]+\s*\(|text\s*\(\)|\/\/|\/|\[|\]|\(|\)|=|\b(?:and|or)\b|\d+|[a-zA-Z0-9_-]+)/g;

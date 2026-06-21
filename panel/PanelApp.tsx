@@ -10,6 +10,7 @@ import {
   colorizeXPath,
   colorizeCSS,
   colorizePlaywright,
+  colorizeCode,
   getPlaywrightActions,
   getPlaywrightSnippet,
   getSeleniumJava,
@@ -77,11 +78,17 @@ const PanelApp: React.FC = () => {
   const [isAutoSyncActive, setIsAutoSyncActive] = useState<boolean>(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
-
+  const highlightRef = useRef<HTMLPreElement>(null);
 
   const handleEditorScroll = () => {
-    if (textareaRef.current && lineNumbersRef.current) {
-      lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
+    if (textareaRef.current) {
+      if (lineNumbersRef.current) {
+        lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
+      }
+      if (highlightRef.current) {
+        highlightRef.current.scrollTop = textareaRef.current.scrollTop;
+        highlightRef.current.scrollLeft = textareaRef.current.scrollLeft;
+      }
     }
   };
 
@@ -1824,28 +1831,69 @@ const PanelApp: React.FC = () => {
                       {editedCode.split("\n").map((_, idx) => idx + 1).join("\n")}
                     </div>
                     
-                    {/* Textarea Editor */}
-                    <textarea
-                      ref={textareaRef}
-                      value={editedCode}
-                      onChange={handleEditorChange}
-                      onScroll={handleEditorScroll}
+                    {/* Editor Workspace Container */}
+                    <div
                       style={{
+                        position: "relative",
                         flex: 1,
-                        backgroundColor: "#1e1e1e",
-                        color: "#9cdcfe",
-                        border: "none",
-                        padding: "6px 8px",
-                        fontFamily: "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
-                        fontSize: "10px",
-                        lineHeight: "1.6",
-                        resize: "none",
-                        outline: "none",
-                        overflowY: "auto",
-                        whiteSpace: "pre",
+                        display: "flex",
+                        overflow: "hidden",
                       }}
-                      placeholder="/* Type or record steps to see script code */"
-                    />
+                    >
+                      {/* Highlighted Code (Behind) */}
+                      <pre
+                        ref={highlightRef}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          margin: 0,
+                          padding: "6px 8px",
+                          backgroundColor: "#1e1e1e",
+                          color: "#d4d4d4",
+                          fontFamily: "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
+                          fontSize: "10px",
+                          lineHeight: "1.6",
+                          whiteSpace: "pre",
+                          overflow: "hidden",
+                          pointerEvents: "none",
+                          boxSizing: "border-box",
+                        }}
+                      >
+                        {colorizeCode(editedCode, langID)}
+                      </pre>
+
+                      {/* Textarea Editor (On Top) */}
+                      <textarea
+                        ref={textareaRef}
+                        value={editedCode}
+                        onChange={handleEditorChange}
+                        onScroll={handleEditorScroll}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          backgroundColor: "transparent",
+                          color: "transparent",
+                          caretColor: "#cccccc",
+                          border: "none",
+                          padding: "6px 8px",
+                          fontFamily: "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
+                          fontSize: "10px",
+                          lineHeight: "1.6",
+                          resize: "none",
+                          outline: "none",
+                          overflowY: "auto",
+                          whiteSpace: "pre",
+                          boxSizing: "border-box",
+                        }}
+                        placeholder="/* Type or record steps to see script code */"
+                      />
+                    </div>
                   </div>
 
                   {/* Copy / Download Footer */}
