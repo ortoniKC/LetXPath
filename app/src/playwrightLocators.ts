@@ -18,7 +18,15 @@ function getByTextMatches(doc: Document, val: string, exact: boolean): HTMLEleme
 }
 
 // Helper to determine the Playwright ARIA role
-export const getPlaywrightRole = (tag: string, type?: string): string | null => {
+export const getPlaywrightRole = (
+  tag: string,
+  type?: string,
+  explicitRole?: string | null,
+): string | null => {
+  if (explicitRole) {
+    const r = explicitRole.toLowerCase().trim();
+    if (r) return r;
+  }
   const t = tag.toLowerCase();
   if (t === "button") return "button";
   if (t === "a") return "link";
@@ -29,10 +37,34 @@ export const getPlaywrightRole = (tag: string, type?: string): string | null => 
     if (typeLower === "checkbox") return "checkbox";
     if (typeLower === "radio") return "radio";
     if (typeLower === "button" || typeLower === "submit" || typeLower === "reset") return "button";
+    if (typeLower === "search") return "searchbox";
+    if (typeLower === "number") return "spinbutton";
+    if (typeLower === "range") return "slider";
     return "textbox";
   }
   if (t === "textarea") return "textbox";
   if (t === "select") return "combobox";
+
+  // Implicit HTML5 ARIA Roles
+  if (t === "nav") return "navigation";
+  if (t === "aside") return "complementary";
+  if (t === "main") return "main";
+  if (t === "header") return "banner";
+  if (t === "footer") return "contentinfo";
+  if (t === "dialog") return "dialog";
+  if (t === "form") return "form";
+  if (t === "article") return "article";
+  if (t === "section") return "region";
+  if (t === "ul" || t === "ol") return "list";
+  if (t === "li") return "listitem";
+  if (t === "table") return "table";
+  if (t === "thead" || t === "tbody" || t === "tfoot") return "rowgroup";
+  if (t === "tr") return "row";
+  if (t === "th") return "columnheader";
+  if (t === "td") return "cell";
+  if (t === "option") return "option";
+  if (t === "fieldset") return "group";
+
   return null;
 };
 
@@ -41,7 +73,26 @@ export const getAccessibleName = (el: HTMLElement): string => {
   let name = "";
   if (el.getAttribute("aria-label")) {
     name = el.getAttribute("aria-label") || "";
-  } else if (el.id) {
+  } else if (el.getAttribute("aria-labelledby")) {
+    const labelledby = el.getAttribute("aria-labelledby") || "";
+    const ids = labelledby.trim().split(/\s+/);
+    const parts = [];
+    for (const id of ids) {
+      if (id) {
+        try {
+          const labelEl = el.ownerDocument.getElementById(id);
+          if (labelEl && labelEl.textContent) {
+            parts.push(labelEl.textContent.trim());
+          }
+        } catch (e) {}
+      }
+    }
+    if (parts.length > 0) {
+      name = parts.join(" ");
+    }
+  }
+
+  if (!name && el.id) {
     try {
       const label = el.ownerDocument.querySelector(`label[for="${CSS.escape(el.id)}"]`);
       if (label) name = label.textContent || "";
@@ -67,6 +118,12 @@ export const getAccessibleName = (el: HTMLElement): string => {
   if (!name && el.getAttribute("alt")) {
     name = el.getAttribute("alt") || "";
   }
+  if (!name && el.tagName.toLowerCase() === "input") {
+    const type = el.getAttribute("type")?.toLowerCase();
+    if (type === "button" || type === "submit" || type === "reset") {
+      name = el.getAttribute("value") || "";
+    }
+  }
   if (!name) {
     name = el.textContent || "";
   }
@@ -76,7 +133,28 @@ export const getAccessibleName = (el: HTMLElement): string => {
 // Get the associated label text
 export const getElementLabelText = (el: HTMLElement): string => {
   let labelText = "";
-  if (el.id) {
+  if (el.getAttribute("aria-label")) {
+    labelText = el.getAttribute("aria-label") || "";
+  } else if (el.getAttribute("aria-labelledby")) {
+    const labelledby = el.getAttribute("aria-labelledby") || "";
+    const ids = labelledby.trim().split(/\s+/);
+    const parts = [];
+    for (const id of ids) {
+      if (id) {
+        try {
+          const labelEl = el.ownerDocument.getElementById(id);
+          if (labelEl && labelEl.textContent) {
+            parts.push(labelEl.textContent.trim());
+          }
+        } catch (e) {}
+      }
+    }
+    if (parts.length > 0) {
+      labelText = parts.join(" ");
+    }
+  }
+
+  if (!labelText && el.id) {
     try {
       const label = el.ownerDocument.querySelector(`label[for="${CSS.escape(el.id)}"]`);
       if (label) labelText = label.textContent || "";
@@ -176,32 +254,66 @@ export function buildPlaywrightLocators(
   }
 
   // 2. page.getByRole
-  const role = getPlaywrightRole(tag, type);
+  const role = getPlaywrightRole(tag, type, element.getAttribute("role"));
   if (role) {
     const name = getAccessibleName(element);
 
-    // Find matching elements for substring and exact name matches
-    const substringRoleElements: HTMLElement[] = [];
-    const exactRoleElements: HTMLElement[] = [];
-
-    const all = doc.getElementsByTagName("*");
-    for (let i = 0; i < all.length; i++) {
-      const el = all[i] as HTMLElement;
-      const elRole = getPlaywrightRole(el.tagName, el.getAttribute("type") || undefined);
-      if (elRole === role) {
-        const elName = getAccessibleName(el);
-        if (elName.toLowerCase().includes(name.toLowerCase())) {
-          substringRoleElements.push(el);
-        }
-        if (elName === name) {
-          exactRoleElements.push(el);
+    if (name === "") {
+      const roleElements: HTMLElement[] = [];
+      const all = doc.getElementsByTagName("*");
+      for (let i = 0; i < all.length; i++) {
+        const el = all[i] as HTMLElement;
+        const elRole = getPlaywrightRole(
+          el.tagName,
+          el.getAttribute("type") || undefined,
+          el.getAttribute("role"),
+        );
+        if (elRole === role) {
+          roleElements.push(el);
         }
       }
-    }
 
-    const basePriority = getPriority("role", 2);
-    if (substringRoleElements.length === 1 && substringRoleElements[0] === element) {
-      if (name) {
+      const basePriority = getPriority("role", 2);
+      if (roleElements.length === 1 && roleElements[0] === element) {
+        list.push(getLocators(basePriority, `getByRole ('${role}')`, `internal:role=${role}`));
+      } else if (roleElements.length > 1) {
+        const idx = roleElements.indexOf(element);
+        if (idx !== -1) {
+          list.push(
+            getLocators(
+              basePriority + 0.5,
+              `getByRole ('${role}') [index]`,
+              `internal:role=${role} >> nth=${idx}`,
+            ),
+          );
+        }
+      }
+    } else {
+      // Find matching elements for substring and exact name matches
+      const substringRoleElements: HTMLElement[] = [];
+      const exactRoleElements: HTMLElement[] = [];
+
+      const all = doc.getElementsByTagName("*");
+      for (let i = 0; i < all.length; i++) {
+        const el = all[i] as HTMLElement;
+        const elRole = getPlaywrightRole(
+          el.tagName,
+          el.getAttribute("type") || undefined,
+          el.getAttribute("role"),
+        );
+        if (elRole === role) {
+          const elName = getAccessibleName(el);
+          if (elName.toLowerCase().includes(name.toLowerCase())) {
+            substringRoleElements.push(el);
+          }
+          if (elName === name) {
+            exactRoleElements.push(el);
+          }
+        }
+      }
+
+      const basePriority = getPriority("role", 2);
+      if (substringRoleElements.length === 1 && substringRoleElements[0] === element) {
         const escapedName = escapeForAttributeSelector(name, false);
         list.push(
           getLocators(
@@ -210,29 +322,27 @@ export function buildPlaywrightLocators(
             `internal:role=${role}[name=${escapedName}]`,
           ),
         );
-      } else {
-        list.push(getLocators(basePriority, `getByRole ('${role}')`, `internal:role=${role}`));
-      }
-    } else if (exactRoleElements.length === 1 && exactRoleElements[0] === element) {
-      const escapedName = escapeForAttributeSelector(name, true);
-      list.push(
-        getLocators(
-          basePriority,
-          `getByRole ('${role}') [exact]`,
-          `internal:role=${role}[name=${escapedName}]`,
-        ),
-      );
-    } else if (exactRoleElements.length > 1) {
-      const idx = exactRoleElements.indexOf(element);
-      if (idx !== -1) {
+      } else if (exactRoleElements.length === 1 && exactRoleElements[0] === element) {
         const escapedName = escapeForAttributeSelector(name, true);
         list.push(
           getLocators(
-            basePriority + 0.5,
-            `getByRole ('${role}') [exact index]`,
-            `internal:role=${role}[name=${escapedName}] >> nth=${idx}`,
+            basePriority,
+            `getByRole ('${role}') [exact]`,
+            `internal:role=${role}[name=${escapedName}]`,
           ),
         );
+      } else if (exactRoleElements.length > 1) {
+        const idx = exactRoleElements.indexOf(element);
+        if (idx !== -1) {
+          const escapedName = escapeForAttributeSelector(name, true);
+          list.push(
+            getLocators(
+              basePriority + 0.5,
+              `getByRole ('${role}') [exact index]`,
+              `internal:role=${role}[name=${escapedName}] >> nth=${idx}`,
+            ),
+          );
+        }
       }
     }
   }

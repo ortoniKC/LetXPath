@@ -378,7 +378,11 @@ function evaluateSelectorPart(part: any, doc: Document): HTMLElement[] {
     }
     const all = getAllElementsIncludingShadow(doc);
     return all.filter((el) => {
-      const role = getPlaywrightRole(el.tagName, el.getAttribute("type") || undefined);
+      const role = getPlaywrightRole(
+        el.tagName,
+        el.getAttribute("type") || undefined,
+        el.getAttribute("role"),
+      );
       if (role !== roleVal) return false;
       if (nameVal !== null) {
         const accName = getAccessibleName(el);

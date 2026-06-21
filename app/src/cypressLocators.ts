@@ -57,20 +57,31 @@ export function buildCypressLocators(
   const textContent = element.textContent?.trim() || "";
   if (textContent && textContent.length > 0 && textContent.length < 50) {
     const escapedText = textContent.replace(/'/g, "\\'");
-    const textMatches = Array.from(doc.querySelectorAll(tag)).filter(
+
+    // Check global text uniqueness
+    const globalTextMatches = Array.from(doc.getElementsByTagName("*")).filter(
       (el) => el.textContent?.trim() === textContent,
     );
+
+    // Check tag-specific text uniqueness
+    const tagTextMatches = Array.from(doc.querySelectorAll(tag)).filter(
+      (el) => el.textContent?.trim() === textContent,
+    );
+
     const containsIdx = priorityList.indexOf("contains");
     const containsPriority = containsIdx !== -1 ? containsIdx + 1 : pIdx;
-    if (textMatches.length === 1) {
+
+    if (globalTextMatches.length === 1 && globalTextMatches[0] === element) {
       list.push([containsPriority, `cy.contains`, `cy.contains('${escapedText}')`]);
-    } else if (textMatches.length > 1) {
-      const idx = textMatches.indexOf(element);
+    } else if (tagTextMatches.length === 1 && tagTextMatches[0] === element) {
+      list.push([containsPriority, `cy.contains (tag)`, `cy.contains('${tag}', '${escapedText}')`]);
+    } else if (tagTextMatches.length > 1) {
+      const idx = tagTextMatches.indexOf(element);
       if (idx !== -1) {
         list.push([
           containsPriority + 0.5,
-          `cy.contains [eq]`,
-          `cy.contains('${escapedText}').eq(${idx})`,
+          `cy.contains (tag) [eq]`,
+          `cy.contains('${tag}', '${escapedText}').eq(${idx})`,
         ]);
       }
     }
