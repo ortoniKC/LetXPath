@@ -454,9 +454,14 @@ export function generateRecordedScript(
     .map((step) => {
       if (currentLang === "playwrightJS") {
         const locator = step.playwrightLocator;
-        const call = locator.startsWith("page.")
-          ? locator
-          : "page.locator('" + locator + "')";
+        let call = locator;
+        if (!locator.startsWith("page.")) {
+          if (locator.startsWith("getBy") || locator.startsWith("locator(") || locator.startsWith("frameLocator(")) {
+            call = "page." + locator;
+          } else {
+            call = "page.locator('" + locator + "')";
+          }
+        }
         if (step.action === "click") {
           return "  await " + call + ".click();";
         } else if (step.action === "fill") {
@@ -464,13 +469,18 @@ export function generateRecordedScript(
         } else if (step.action === "select") {
           return "  await " + call + ".selectOption('" + (step.value || "") + "');";
         } else if (step.action === "assert_visible") {
-          return "  await expect(" + call + ").toBeVisible();";
+          return "  await expect(page." + (locator.startsWith("page.") ? locator.substring(5) : locator) + ").toBeVisible();";
         }
       } else if (currentLang === "playwrightJava") {
-        const locator = step.playwrightLocator;
-        const call = locator.startsWith("page.")
-          ? locator
-          : "page.locator(\"" + locator + "\")";
+        const locator = step.playwrightJava || step.playwrightLocator;
+        let call = locator;
+        if (!locator.startsWith("page.")) {
+          if (locator.startsWith("getBy") || locator.startsWith("locator(") || locator.startsWith("frameLocator(")) {
+            call = "page." + locator;
+          } else {
+            call = "page.locator(\"" + locator.replace(/"/g, '\\"') + "\")";
+          }
+        }
         if (step.action === "click") {
           return "    " + call + ".click();";
         } else if (step.action === "fill") {
@@ -478,7 +488,7 @@ export function generateRecordedScript(
         } else if (step.action === "select") {
           return "    " + call + ".selectOption(\"" + (step.value || "") + "\");";
         } else if (step.action === "assert_visible") {
-          return "    assertThat(" + call + ").isVisible();";
+          return "    assertThat(page." + (locator.startsWith("page.") ? locator.substring(5) : locator) + ").isVisible();";
         }
       } else if (currentLang === "javas") {
         const xpath = step.xpathLocator;
