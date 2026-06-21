@@ -634,19 +634,23 @@ const PanelApp: React.FC = () => {
     if (tabId && typeof chrome !== "undefined" && chrome.tabs) {
       if (registeredFrameIds.size > 0) {
         registeredFrameIds.forEach((frameId) => {
-          (chrome.tabs.sendMessage(tabId, msg, { frameId }) as any)?.catch(
-            (err: any) => {
-              console.warn(`Message send failed to frame ${frameId}:`, err);
+          chrome.tabs.sendMessage(tabId, msg, { frameId }, () => {
+            const err = chrome.runtime.lastError;
+            if (err) {
+              console.warn(`Message send failed to frame ${frameId}:`, err.message);
               removeFrameId(frameId);
-            },
-          );
+            }
+          });
         });
       } else {
         const options =
           selectedFrameId !== undefined ? { frameId: selectedFrameId } : {};
-        (chrome.tabs.sendMessage(tabId, msg, options) as any)?.catch(
-          (err: any) => console.warn("Message send failed:", err),
-        );
+        chrome.tabs.sendMessage(tabId, msg, options, () => {
+          const err = chrome.runtime.lastError;
+          if (err) {
+            console.warn("Message send failed:", err.message);
+          }
+        });
       }
     } else {
       console.log("Mock Send to Content Script:", msg);

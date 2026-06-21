@@ -360,7 +360,9 @@ export function buildXpath(element: HTMLElement, boolAnchor: number, _utils: boo
   }
 
   if (state.elementOwnerDocument.getElementsByTagName(tagName).length == 1) {
-    state.XPATHDATA.push([10, "Unique TagName", tagName]);
+    const idx = selectorPriorityList.indexOf('tag');
+    const priority = idx !== -1 ? idx + 1 : 10;
+    state.XPATHDATA.push([priority, "Unique TagName", tagName]);
   }
 
   // Find no.of frames available, then generate XPath or index for that
@@ -416,7 +418,9 @@ export function buildXpath(element: HTMLElement, boolAnchor: number, _utils: boo
   // Based on parent XPath
   try {
     if (state.XPATHDATA.length < 3) {
-      state.XPATHDATA.push([90, "Closest ID XPath", getXPathWithPosition(currentElement)]);
+      const idx = selectorPriorityList.indexOf('xpath');
+      const priority = idx !== -1 ? idx + 1 : 90;
+      state.XPATHDATA.push([priority, "Closest ID XPath", getXPathWithPosition(currentElement)]);
     }
   } catch (error) {}
 
@@ -424,7 +428,9 @@ export function buildXpath(element: HTMLElement, boolAnchor: number, _utils: boo
     const css = getLongCssPath(currentElement);
     const csslen = css.split(">");
     if (csslen.length < 5) {
-      state.CSSPATHDATA.push([11, "Closest ID CSS", css]);
+      const idx = selectorPriorityList.indexOf('xpath');
+      const priority = idx !== -1 ? idx + 1 : 11;
+      state.CSSPATHDATA.push([priority, "Closest ID CSS", css]);
     }
   } catch (error) {}
 
@@ -453,7 +459,9 @@ export function xpathFollowingSibling(preiousSiblingElement: HTMLElement, tagNam
 export function xpathText(element: HTMLElement, tagName: string) {
   const getTextXPathEle = getTextBasedXPath(element, tagName);
   if (!(getTextXPathEle === null || getTextXPathEle === undefined)) {
-    state.XPATHDATA.push([6, "Text based XPath", getTextXPathEle]);
+    const idx = selectorPriorityList.indexOf('contains');
+    const priority = idx !== -1 ? idx + 1 : 6;
+    state.XPATHDATA.push([priority, "Text based XPath", getTextXPathEle]);
   }
 }
 
