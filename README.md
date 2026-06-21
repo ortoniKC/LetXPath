@@ -1,45 +1,70 @@
-**LetXPath: Your Ultimate XPath & CSS Selector Finder**
+# Ortoni Studio: Your Ultimate XPath & CSS Selector Finder 🚀
 
-LetXPath is an open-source project designed to help you find XPath and CSS selectors with a single click, complete with code snippets tailored to the element type.
+Ortoni Studio (formerly LetXPath) is an advanced, developer-focused browser extension designed to help automation engineers, QA specialists, and developers find, evaluate, and organize XPath and CSS selectors with a single click. Complete with tailored code snippets, a live code editor, smart action recorder, and priority tag management, Ortoni Studio brings a premium workspace directly into your DevTools.
 
-### How to Use LetXPath? 🤔
-1. **Install the Extension**: After installation, restart your browser.
-2. **Navigate to the Desired Page**: Open the page from which you want to extract XPath.
-3. **Open DevTools**: Click on the inspect window or press `F12` (Function `F12`).
-4. **Access LetXPath**: Open the LetXPath menu from the sidebar panel.
-5. **Get Your XPath**: Click on the desired element to obtain its XPath.
+---
 
-### Features 💭
-1. **Single-Click XPath**: Obtain the best XPath with just one click.
-2. **Smart XPath Generation**: Generates XPaths based on direct elements or parent-child relationships.
-3. **Dynamic XPaths**: Supports dynamic XPaths, including relationships like `following`, `following-sibling`, `preceding`, and `preceding-sibling`.
-4. **Axis-Based XPaths**: Creates XPaths based on axes.
-5. **User-Enhanced Axes**: Allows enhanced axes XPaths through user selection.
-6. **Playwright Isomorphic Engine**: Uses Microsoft Playwright's official isomorphic generator and parser logic (`asLocator`) to output native locators.
-7. **Universal Locator Evaluator**: Test, verify, and outline XPath, CSS, and Playwright locators inside the web page in real-time.
+## 🎨 What's New in Ortoni Studio?
 
-### Code Snippets & Locators 🎓
-1. **XPath with Driver Code**: Provides driver code snippets.
-2. **Playwright Specific Locators**: Generates exact, native Playwright locators (e.g. `getByRole`, `getByText`) dynamically mapped across **JavaScript/TypeScript, Python, Java, and C#** targets.
-3. **Supported Frameworks**: Currently supports Selenium (Java, Python, C#), Protractor JS, and Playwright (Node, Java, Python, C#).
+We have completely modernized the tool and introduced several key features to elevate your automation workflow:
 
-### Why Choose LetXPath? 🤔
-While there are many XPath tools available, LetXPath stands out by not only offering XPaths and snippets but also providing video tutorials on building the entire tool. It’s the only product that shows you how to create the tool itself.
+### 1. Zero-Dependency Live Code Editor with Syntax Highlighting ✍️
+- We refactored and modularized the main panel interface into clean, single-responsibility files.
+- The built-in interactive live code editor now features a high-performance syntax-highlighted editor overlay. It synchronizes text scrolls with a tokenized preview in real-time, preserving native keyboard controls, typing speeds, and selection states.
 
-### Get Started
-- **Source Code**: [GitHub](https://github.com/ortoniKC/LetXPath)
-- **Tutorial**: [Video Tutorial](https://bit.ly/2S3eksW)
+### 2. Interactive Attribute Prioritization 🎯
+- You can now manage your query attributes (e.g., `data-testid`, `data-cy`, `id`, `name`, `class`) interactively in our redesigned settings dashboard.
+- Instead of typing comma-separated strings, you can move chips left/right to adjust priorities, delete unused tags, or type to add custom ones. A text mode is still available for raw copy-pasting.
 
-### Troubleshooting 😢
-If it doesn’t work, restarting your browser should resolve most issues. Feel free to raise any bugs on GitHub.
+### 3. Custom POM Templates Builder & Real-time Compiler 🛠️
+- Design custom page-object-model template methods for Click, SendKeys, GetText, and GetAttribute using placeholder interpolation variables like `${lc}` (locator), `${vn}` (variable name), and `${mn}` (method name).
+- Features a **Live Compiler Playground** in the sidebar that instantly shows you how your templates compile against a mock element.
 
-### Is It Free? 😱
-Yes, LetXPath is completely free and always will be.
+### 4. Smart Recorder Engine 📼
+- Record clicks, text inputs, selection options, and assertions directly on the page.
+- Generates clean, native Playwright (JavaScript/TypeScript/Java) or Cypress tests.
+- **Redundancy Fix**: The engine detects when native selectors (like `getByText()`, `getByRole()`) are available and prefixes them with `page.` directly (e.g. `await expect(page.getByText('Item')).toBeVisible()`) rather than wrapping them in redundant locator methods.
 
-### What’s in It for You? 🙋
-Installing LetXPath brings you the joy of seamless XPath generation and the satisfaction of leaving a 5-star rating.
+### 5. Premium Dashboard UI & Aesthetics ✨
+- Designed with deep-dark themes, ambient gradient glows, glassmorphism borders, responsive grid layouts, custom scrollbars, and slide-in animated success toasts.
 
-### Roadmap 😁
-Our roadmap is extensive and full of features designed to save you time. Stay tuned for more updates!
+---
 
-Thanks for reading this far! Install LetXPath now and start exploring—you might just fall in love with it. 😉
+## 🛠️ Key Features
+
+- **Single-Click Selectors**: Obtain the absolute best XPath or CSS selector with just one click on any webpage element.
+- **Axis-Based XPath Generation**: Automatically generates relational XPaths (like `following`, `following-sibling`, `preceding`, `preceding-sibling`) and parent-child hierarchies.
+- **Playwright Isomorphic Engine**: Evaluates selectors using Microsoft Playwright's official isomorphic generator logic (`asLocator`) to output native, production-grade locators.
+- **Universal Locator Evaluator**: Directly test, highlight, and verify CSS selectors, XPath expressions, or Playwright locators inside the web page in real-time.
+- **Supported Frameworks**: Generates copy-paste code snippets for Selenium (Java, Python, C#), Protractor JS, Cypress, Playwright (Node, Java, Python, C#), and Custom POM frameworks.
+
+---
+
+## 🚀 How to Use Ortoni Studio
+
+1. **Install the Extension**: Install Ortoni Studio into your Chromium-based browser.
+2. **Open DevTools**: Press `F12` or right-click any element and select **Inspect**.
+3. **Navigate to the Ortoni Studio Panel**: Look for the **Ortoni Studio** tab in your DevTools pane.
+4. **Inspect & Extract**: Turn on inspector mode or click on the desired element on the web page to obtain its unique XPath and CSS locators immediately.
+5. **Adjust Settings**: Open the **Settings** gear to customize your target frameworks, reorder selector priorities, or build custom page object templates.
+
+---
+
+## 🔗 Get Involved
+
+- **Source Code**: [GitHub Repository](https://github.com/ortoniKC/LetXPath)
+- **Tutorials & Videos**: Check out [LetCode with Koushik](https://letcode.in) for video tutorials on building and configuring the automation workspace.
+
+---
+
+## 💬 FAQ & Troubleshooting
+
+* **Is it free?**
+  Yes! Ortoni Studio is 100% free and open-source.
+* **The extension isn't highlighting elements?**
+  Try restarting your browser or refreshing the web tab. DevTools extensions require active tab permissions which can occasionally be suspended when reloading pages.
+* **Where is my settings data stored?**
+  All templates and selector priorities are stored locally using browser local storage or Chrome Sync storage. No external servers are called.
+
+---
+*Thank you for using Ortoni Studio! If this tool saves you time, please give us a 5-star rating on the Web Store or star our repository on GitHub!* ⭐
