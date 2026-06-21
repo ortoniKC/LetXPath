@@ -103,7 +103,8 @@ export const getElementLabelText = (el: HTMLElement): string => {
 export function buildPlaywrightLocators(
   element: HTMLElement,
   xpathData: [number, string, string][],
-  cssData: [number, string, string][]
+  cssData: [number, string, string][],
+  priorityList?: string[]
 ): [number, string, string, string, string, string][] {
   const list: [number, string, string, string, string, string][] = [];
   const doc = element.ownerDocument;
@@ -119,7 +120,9 @@ export function buildPlaywrightLocators(
   };
 
   // 1. page.getByTestId
-  const testIdAttrs = ['data-testid', 'data-test-id', 'data-test', 'testid'];
+  const testIdAttrs = priorityList && priorityList.length > 0
+    ? priorityList.filter(attr => attr !== 'id' && attr !== 'class' && attr !== 'name')
+    : ['data-testid', 'data-test-id', 'data-test', 'testid'];
   for (const attr of testIdAttrs) {
     const testId = element.getAttribute(attr);
     if (testId) {

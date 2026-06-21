@@ -29,6 +29,7 @@ interface ChromeStorageResult {
   sendvalue?: string;
   textvalue?: string;
   attrvalue?: string;
+  selectorPriority?: string;
 }
 
 const OptionApp: React.FC = () => {
@@ -38,16 +39,18 @@ const OptionApp: React.FC = () => {
   const [sendvalue, setSendvalue] = useState<string>('');
   const [textvalue, setTextvalue] = useState<string>('');
   const [attrvalue, setAttrvalue] = useState<string>('');
+  const [selectorPriority, setSelectorPriority] = useState<string>('data-testid, id, name, class');
   const [toast, setToast] = useState<string | null>(null);
 
   // Sync state with chrome.storage.local
   useEffect(() => {
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
       chrome.storage.local.get(
-        ['langID', 'customLang', 'clickvalue', 'sendvalue', 'textvalue', 'attrvalue'],
+        ['langID', 'customLang', 'clickvalue', 'sendvalue', 'textvalue', 'attrvalue', 'selectorPriority'],
         (result: ChromeStorageResult) => {
           if (result.langID) setLangID(result.langID);
           if (result.customLang) setCustomLang(result.customLang);
+          if (result.selectorPriority) setSelectorPriority(result.selectorPriority);
           
           const currentCustomLang = result.customLang || 'javacs';
           setClickvalue(result.clickvalue !== undefined ? result.clickvalue : DEFAULT_TEMPLATES[currentCustomLang].click);
@@ -61,6 +64,7 @@ const OptionApp: React.FC = () => {
       const localCustomLang = (localStorage.getItem('customLang') as 'jscs' | 'javacs') || 'javacs';
       setLangID(localStorage.getItem('langID') || 'javas');
       setCustomLang(localCustomLang);
+      setSelectorPriority(localStorage.getItem('selectorPriority') || 'data-testid, id, name, class');
       setClickvalue(localStorage.getItem('clickvalue') || DEFAULT_TEMPLATES[localCustomLang].click);
       setSendvalue(localStorage.getItem('sendvalue') || DEFAULT_TEMPLATES[localCustomLang].send);
       setTextvalue(localStorage.getItem('textvalue') || DEFAULT_TEMPLATES[localCustomLang].text);
@@ -77,6 +81,15 @@ const OptionApp: React.FC = () => {
     setAttrvalue(DEFAULT_TEMPLATES[newLang].attr);
   };
 
+  const handlePriorityChange = (val: string) => {
+    setSelectorPriority(val);
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({ selectorPriority: val });
+    } else {
+      localStorage.setItem('selectorPriority', val);
+    }
+  };
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     const data = {
@@ -85,7 +98,8 @@ const OptionApp: React.FC = () => {
       clickvalue,
       sendvalue,
       textvalue,
-      attrvalue
+      attrvalue,
+      selectorPriority
     };
 
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
@@ -176,6 +190,35 @@ const OptionApp: React.FC = () => {
                 <div style={styles.previewBox}>
                   <div style={{ fontSize: '0.8rem', color: '#999', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '1px' }}>Preview Template:</div>
                   <pre style={styles.code}><code>{getCodeSample()}</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="columns" style={{ marginTop: '24px' }}>
+          <div className="column col-12">
+            <div className="card" style={styles.card}>
+              <div className="card-header">
+                <div className="card-title h5" style={{ color: '#fff' }}>Smart Selector Prioritization</div>
+                <div className="card-subtitle" style={{ color: '#aaa' }}>
+                  Define the priority order of HTML attributes for generating selectors. Separate names with commas.
+                </div>
+              </div>
+              <div className="card-body">
+                <div className="form-group">
+                  <input
+                    type="text"
+                    className="form-input"
+                    style={{ ...styles.select, width: '100%' }}
+                    value={selectorPriority}
+                    onChange={(e) => handlePriorityChange(e.target.value)}
+                    placeholder="e.g. data-testid, id, name, class"
+                  />
+                  <div style={{ fontSize: '0.8rem', color: '#858585', marginTop: '6px' }}>
+                    Standard priority order determines sorting for XPath, CSS, Playwright, and Cypress locators. 
+                    Recommended: <code>data-testid, data-cy, id, name, class</code>.
+                  </div>
                 </div>
               </div>
             </div>

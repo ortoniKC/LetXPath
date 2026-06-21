@@ -52,6 +52,7 @@ interface SelectedElement {
   text?: string;
   labelText?: string;
   playwrightLocators?: [number, string, string, string, string, string][];
+  cypressLocators?: [number, string, string][];
 }
 
 interface AxesData {
@@ -85,6 +86,7 @@ interface DevToolsMessageRequest {
   text?: string;
   labelText?: string;
   playwrightLocators?: [number, string, string, string, string, string][];
+  cypressLocators?: [number, string, string][];
   step?: any;
 }
 
@@ -357,13 +359,16 @@ const PanelApp: React.FC = () => {
         setRecordingUrl(url);
         setRecordedSteps([]);
         setIsRecordingActive(true);
-        chrome.storage.local.set({
-          isRecordingActive: true,
-          recordedSteps: [],
-          recordingUrl: url,
-        }, () => {
-          sendMessageToCS({ request: "start_recording" });
-        });
+        chrome.storage.local.set(
+          {
+            isRecordingActive: true,
+            recordedSteps: [],
+            recordingUrl: url,
+          },
+          () => {
+            sendMessageToCS({ request: "start_recording" });
+          },
+        );
       });
     } else {
       const url = window.location.href;
@@ -379,7 +384,11 @@ const PanelApp: React.FC = () => {
 
   const handleStopRecording = () => {
     setIsRecordingActive(false);
-    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+    if (
+      typeof chrome !== "undefined" &&
+      chrome.storage &&
+      chrome.storage.local
+    ) {
       chrome.storage.local.set({ isRecordingActive: false }, () => {
         sendMessageToCS({ request: "stop_recording" });
       });
@@ -391,7 +400,11 @@ const PanelApp: React.FC = () => {
 
   const handleClearRecording = () => {
     setRecordedSteps([]);
-    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+    if (
+      typeof chrome !== "undefined" &&
+      chrome.storage &&
+      chrome.storage.local
+    ) {
       chrome.storage.local.set({ recordedSteps: [] });
     } else {
       localStorage.setItem("recordedSteps", JSON.stringify([]));
@@ -427,74 +440,105 @@ const PanelApp: React.FC = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const generateRecordedScript = (steps: any[], initialUrl: string, currentLang: string): string => {
-    const formattedSteps = steps.map(step => {
-      if (currentLang === "playwrightJS") {
-        const locator = step.playwrightLocator;
-        const call = locator.startsWith("page.") ? locator : `page.locator('${locator}')`;
-        if (step.action === "click") {
-          return `  await ${call}.click();`;
-        } else if (step.action === "fill") {
-          return `  await ${call}.fill('${step.value || ""}');`;
-        } else if (step.action === "select") {
-          return `  await ${call}.selectOption('${step.value || ""}');`;
+  const generateRecordedScript = (
+    steps: any[],
+    initialUrl: string,
+    currentLang: string,
+  ): string => {
+    const formattedSteps = steps
+      .map((step) => {
+        if (currentLang === "playwrightJS") {
+          const locator = step.playwrightLocator;
+          const call = locator.startsWith("page.")
+            ? locator
+            : `page.locator('${locator}')`;
+          if (step.action === "click") {
+            return `  await ${call}.click();`;
+          } else if (step.action === "fill") {
+            return `  await ${call}.fill('${step.value || ""}');`;
+          } else if (step.action === "select") {
+            return `  await ${call}.selectOption('${step.value || ""}');`;
+          }
+        } else if (currentLang === "playwrightJava") {
+          const locator = step.playwrightLocator;
+          const call = locator.startsWith("page.")
+            ? locator
+            : `page.locator("${locator}")`;
+          if (step.action === "click") {
+            return `    ${call}.click();`;
+          } else if (step.action === "fill") {
+            return `    ${call}.fill("${step.value || ""}");`;
+          } else if (step.action === "select") {
+            return `    ${call}.selectOption("${step.value || ""}");`;
+          }
+        } else if (currentLang === "javas") {
+          const xpath = step.xpathLocator;
+          if (step.action === "click") {
+            return `    driver.findElement(By.xpath("${xpath}")).click();`;
+          } else if (step.action === "fill") {
+            return `    driver.findElement(By.xpath("${xpath}")).sendKeys("${step.value || ""}");`;
+          } else if (step.action === "select") {
+            return `    new Select(driver.findElement(By.xpath("${xpath}"))).selectByValue("${step.value || ""}");`;
+          }
+        } else if (currentLang === "py") {
+          const xpath = step.xpathLocator;
+          if (step.action === "click") {
+            return `    driver.find_element(By.XPATH, "${xpath}").click()`;
+          } else if (step.action === "fill") {
+            return `    driver.find_element(By.XPATH, "${xpath}").send_keys("${step.value || ""}")`;
+          } else if (step.action === "select") {
+            return `    Select(driver.find_element(By.XPATH, "${xpath}")).select_by_value("${step.value || ""}")`;
+          }
+        } else if (currentLang === "csharp") {
+          const xpath = step.xpathLocator;
+          if (step.action === "click") {
+            return `    driver.FindElement(By.XPath("${xpath}")).Click();`;
+          } else if (step.action === "fill") {
+            return `    driver.FindElement(By.XPath("${xpath}")).SendKeys("${step.value || ""}");`;
+          } else if (step.action === "select") {
+            return `    new SelectElement(driver.FindElement(By.XPath("${xpath}"))).SelectByValue("${step.value || ""}");`;
+          }
+        } else if (currentLang === "protractorjs") {
+          const xpath = step.xpathLocator;
+          if (step.action === "click") {
+            return `    await element(by.xpath('${xpath}')).click();`;
+          } else if (step.action === "fill") {
+            return `    await element(by.xpath('${xpath}')).sendKeys('${step.value || ""}');`;
+          }
+        } else if (currentLang === "custom") {
+          const variable = step.variableName || "ele";
+          const method = step.methodName || "ele";
+          const xpath = step.xpathLocator;
+          if (step.action === "click") {
+            return (
+              "    " +
+              getCustomSnippet(
+                "click",
+                "XPath",
+                xpath,
+                variable,
+                method,
+                templates,
+              )
+            );
+          } else {
+            return (
+              "    " +
+              getCustomSnippet(
+                "sendKeys",
+                "XPath",
+                xpath,
+                variable,
+                method,
+                templates,
+              ).replaceAll("${value}", step.value || "")
+            );
+          }
         }
-      } else if (currentLang === "playwrightJava") {
-        const locator = step.playwrightLocator;
-        const call = locator.startsWith("page.") ? locator : `page.locator("${locator}")`;
-        if (step.action === "click") {
-          return `    ${call}.click();`;
-        } else if (step.action === "fill") {
-          return `    ${call}.fill("${step.value || ""}");`;
-        } else if (step.action === "select") {
-          return `    ${call}.selectOption("${step.value || ""}");`;
-        }
-      } else if (currentLang === "javas") {
-        const xpath = step.xpathLocator;
-        if (step.action === "click") {
-          return `    driver.findElement(By.xpath("${xpath}")).click();`;
-        } else if (step.action === "fill") {
-          return `    driver.findElement(By.xpath("${xpath}")).sendKeys("${step.value || ""}");`;
-        } else if (step.action === "select") {
-          return `    new Select(driver.findElement(By.xpath("${xpath}"))).selectByValue("${step.value || ""}");`;
-        }
-      } else if (currentLang === "py") {
-        const xpath = step.xpathLocator;
-        if (step.action === "click") {
-          return `    driver.find_element(By.XPATH, "${xpath}").click()`;
-        } else if (step.action === "fill") {
-          return `    driver.find_element(By.XPATH, "${xpath}").send_keys("${step.value || ""}")`;
-        } else if (step.action === "select") {
-          return `    Select(driver.find_element(By.XPATH, "${xpath}")).select_by_value("${step.value || ""}")`;
-        }
-      } else if (currentLang === "csharp") {
-        const xpath = step.xpathLocator;
-        if (step.action === "click") {
-          return `    driver.FindElement(By.XPath("${xpath}")).Click();`;
-        } else if (step.action === "fill") {
-          return `    driver.FindElement(By.XPath("${xpath}")).SendKeys("${step.value || ""}");`;
-        } else if (step.action === "select") {
-          return `    new SelectElement(driver.FindElement(By.XPath("${xpath}"))).SelectByValue("${step.value || ""}");`;
-        }
-      } else if (currentLang === "protractorjs") {
-        const xpath = step.xpathLocator;
-        if (step.action === "click") {
-          return `    await element(by.xpath('${xpath}')).click();`;
-        } else if (step.action === "fill") {
-          return `    await element(by.xpath('${xpath}')).sendKeys('${step.value || ""}');`;
-        }
-      } else if (currentLang === "custom") {
-        const variable = step.variableName || "ele";
-        const method = step.methodName || "ele";
-        const xpath = step.xpathLocator;
-        if (step.action === "click") {
-          return "    " + getCustomSnippet("click", "XPath", xpath, variable, method, templates);
-        } else {
-          return "    " + getCustomSnippet("sendKeys", "XPath", xpath, variable, method, templates).replaceAll("${value}", step.value || "");
-        }
-      }
-      return "";
-    }).filter(line => line !== "").join("\n");
+        return "";
+      })
+      .filter((line) => line !== "")
+      .join("\n");
 
     if (currentLang === "playwrightJS") {
       return `import { test, expect } from '@playwright/test';\n\ntest('recorded test', async ({ page }) => {\n  await page.goto('${initialUrl}');\n${formattedSteps}\n});`;
@@ -597,6 +641,7 @@ const PanelApp: React.FC = () => {
                 text: req.text,
                 labelText: req.labelText,
                 playwrightLocators: req.playwrightLocators,
+                cypressLocators: req.cypressLocators,
               });
             }
             break;
@@ -744,7 +789,7 @@ const PanelApp: React.FC = () => {
             if (result.recordedSteps) setRecordedSteps(result.recordedSteps);
             if (result.recordingUrl) setRecordingUrl(result.recordingUrl);
             setTemplates(result);
-          }
+          },
         );
       } else {
         const localLang = localStorage.getItem("langID");
@@ -755,14 +800,15 @@ const PanelApp: React.FC = () => {
           localStorage.getItem("isRecordingActive") === "true";
         setIsRecordingActive(localRecordingActive);
         const localRecordedSteps = JSON.parse(
-          localStorage.getItem("recordedSteps") || "[]"
+          localStorage.getItem("recordedSteps") || "[]",
         );
         setRecordedSteps(localRecordedSteps);
         const localRecordingUrl = localStorage.getItem("recordingUrl") || "";
         setRecordingUrl(localRecordingUrl);
         const localTemplates: ChromeStorageResult = {
           customLang:
-            (localStorage.getItem("customLang") as "jscs" | "javacs") || "javacs",
+            (localStorage.getItem("customLang") as "jscs" | "javacs") ||
+            "javacs",
           clickvalue: localStorage.getItem("clickvalue") || "",
           sendvalue: localStorage.getItem("sendvalue") || "",
           textvalue: localStorage.getItem("textvalue") || "",
@@ -1419,16 +1465,21 @@ const PanelApp: React.FC = () => {
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(5)}>
             <span style={activeTab === 5 ? styles.activeLink : styles.link}>
-              Recorder
+              Cypress
             </span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(6)}>
             <span style={activeTab === 6 ? styles.activeLink : styles.link}>
-              Tools
+              Recorder
             </span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(7)}>
             <span style={activeTab === 7 ? styles.activeLink : styles.link}>
+              Tools
+            </span>
+          </li>
+          <li style={styles.tabItem} onClick={() => handleTabChange(8)}>
+            <span style={activeTab === 8 ? styles.activeLink : styles.link}>
               About
             </span>
           </li>
@@ -1816,72 +1867,293 @@ const PanelApp: React.FC = () => {
           </div>
         )}
 
-        {/* Recorder Tab */}
+        {/* Cypress Tab */}
         {activeTab === 5 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px", height: "100%" }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {!selectedElement || !selectedElement.cypressLocators || selectedElement.cypressLocators.length === 0 ? (
+              <div style={styles.emptyState}>
+                <div style={{ fontSize: '1.8rem', marginBottom: '4px' }}>🌲</div>
+                <div style={styles.emptyTitle}>Select an element in Elements tab</div>
+                <div style={styles.emptySubtitle}>LetXPath will display Cypress-recommended locators here.</div>
+              </div>
+            ) : (
+              <div style={styles.locatorList}>
+                {selectedElement.cypressLocators.map((item, idx) => {
+                  const [, label, value] = item;
+                  return (
+                    <div key={idx} style={styles.locatorRow}>
+                      <div style={styles.labelBox}>
+                        <span style={styles.locatorLabel} title={label}>{label}</span>
+                      </div>
+                      <code 
+                        style={styles.codeSnippet} 
+                        title="Click to copy Cypress Locator" 
+                        onClick={() => copyToClipboard(value, 'Cypress locator copied!')}
+                      >
+                        {colorizePlaywright(value)}
+                      </code>
+                      <button 
+                        style={styles.btnVerifyInline}
+                        onClick={() => handleVerifyLocator(value.match(/cy\.get\('([^']+)'\)/)?.[1] || value.match(/cy\.contains\('([^']+)'\)/)?.[1] || value)}
+                        title="Verify and highlight element"
+                      >
+                        Find
+                      </button>
+                      <select 
+                        className="form-select select-sm" 
+                        style={styles.actionSelect}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                          const act = e.target.value;
+                          if (act === 'snippet') return;
+                          let code = value;
+                          if (act === 'click') {
+                            code = `${value}.click()`;
+                          } else if (act === 'type') {
+                            code = `${value}.type('text')`;
+                          } else if (act === 'select') {
+                            code = `${value}.select('value')`;
+                          }
+                          copyToClipboard(code, 'Cypress action snippet copied!');
+                          e.target.value = 'snippet';
+                        }}
+                        defaultValue="snippet"
+                      >
+                        <option value="snippet" disabled>Snippet</option>
+                        <option value="click">click</option>
+                        <option value="type">type</option>
+                        <option value="select">select</option>
+                      </select>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Recorder Tab */}
+        {activeTab === 6 && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              height: "100%",
+            }}
+          >
             {/* Control Bar */}
             <div style={styles.toolCard}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "6px" }}
+                >
                   {isRecordingActive ? (
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <span className="pulse-red-dot" style={styles.pulseRedDot}></span>
-                      <span style={{ color: "#ff4d4d", fontWeight: 600 }}>Recording...</span>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
+                      <span
+                        className="pulse-red-dot"
+                        style={styles.pulseRedDot}
+                      ></span>
+                      <span style={{ color: "#ff4d4d", fontWeight: 600 }}>
+                        Recording...
+                      </span>
                     </div>
                   ) : (
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
                       <span style={styles.greenDot}></span>
-                      <span style={{ color: "#4ade80", fontWeight: 600 }}>Idle</span>
+                      <span style={{ color: "#4ade80", fontWeight: 600 }}>
+                        Idle
+                      </span>
                     </div>
                   )}
                 </div>
                 <div style={{ display: "flex", gap: "4px" }}>
                   {isRecordingActive ? (
-                    <button style={styles.btnStopRecord} onClick={handleStopRecording}>Stop Recording</button>
+                    <button
+                      style={styles.btnStopRecord}
+                      onClick={handleStopRecording}
+                    >
+                      Stop Recording
+                    </button>
                   ) : (
-                    <button style={styles.btnStartRecord} onClick={handleStartRecording}>Start Recording</button>
+                    <button
+                      style={styles.btnStartRecord}
+                      onClick={handleStartRecording}
+                    >
+                      Start Recording
+                    </button>
                   )}
-                  <button style={styles.btnClear} onClick={handleClearRecording}>Clear</button>
+                  <button
+                    style={styles.btnClear}
+                    onClick={handleClearRecording}
+                  >
+                    Clear
+                  </button>
                 </div>
               </div>
               {recordingUrl && (
-                <div style={{ fontSize: "9px", color: "#858585", marginTop: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  Start URL: <a href={recordingUrl} target="_blank" rel="noreferrer" style={{ color: "#3794ff" }}>{recordingUrl}</a>
+                <div
+                  style={{
+                    fontSize: "9px",
+                    color: "#858585",
+                    marginTop: "4px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Start URL:{" "}
+                  <a
+                    href={recordingUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: "#3794ff" }}
+                  >
+                    {recordingUrl}
+                  </a>
                 </div>
               )}
             </div>
 
-            <div style={{ display: "flex", gap: "8px", flex: 1, minHeight: "300px" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: "8px",
+                flex: 1,
+                minHeight: "300px",
+              }}
+            >
               {/* Left Column: Recorded Steps list */}
-              <div style={{ ...styles.toolCard, flex: 1, display: "flex", flexDirection: "column" }}>
-                <div style={styles.toolTitle}>Recorded Steps ({recordedSteps.length})</div>
-                <div style={{ flex: 1, overflowY: "auto", maxHeight: "350px", marginTop: "6px", border: "1px solid #2d2d2d", borderRadius: "4px", padding: "4px", backgroundColor: "#141414" }}>
+              <div
+                style={{
+                  ...styles.toolCard,
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div style={styles.toolTitle}>
+                  Recorded Steps ({recordedSteps.length})
+                </div>
+                <div
+                  style={{
+                    flex: 1,
+                    overflowY: "auto",
+                    maxHeight: "350px",
+                    marginTop: "6px",
+                    border: "1px solid #2d2d2d",
+                    borderRadius: "4px",
+                    padding: "4px",
+                    backgroundColor: "#141414",
+                  }}
+                >
                   {recordedSteps.length === 0 ? (
-                    <div style={{ color: "#555", textAlign: "center", marginTop: "40px", fontSize: "10px" }}>
-                      No actions recorded yet.<br/>Start recording and click or type on the page elements.
+                    <div
+                      style={{
+                        color: "#555",
+                        textAlign: "center",
+                        marginTop: "40px",
+                        fontSize: "10px",
+                      }}
+                    >
+                      No actions recorded yet.
+                      <br />
+                      Start recording and click or type on the page elements.
                     </div>
                   ) : (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "4px",
+                      }}
+                    >
                       {recordedSteps.map((step, i) => (
-                        <div key={step.id} style={{ display: "flex", alignItems: "center", padding: "4px", borderBottom: "1px solid #222", gap: "6px" }}>
-                          <span style={{ color: "#858585", fontSize: "9px" }}>{i + 1}.</span>
-                          <span style={{
-                            fontSize: "9px",
-                            fontWeight: 600,
-                            padding: "1px 4px",
-                            borderRadius: "3px",
-                            backgroundColor: step.action === "click" ? "#0e639c" : "#10b981",
-                            color: "#fff"
-                          }}>{step.action.toUpperCase()}</span>
-                          <span style={{ color: "#eee", fontFamily: "monospace", fontSize: "9px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100px" }} title={step.tag}>
-                            &lt;{step.tag}{step.type ? ` type="${step.type}"` : ""}&gt;
+                        <div
+                          key={step.id}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "4px",
+                            borderBottom: "1px solid #222",
+                            gap: "6px",
+                          }}
+                        >
+                          <span style={{ color: "#858585", fontSize: "9px" }}>
+                            {i + 1}.
+                          </span>
+                          <span
+                            style={{
+                              fontSize: "9px",
+                              fontWeight: 600,
+                              padding: "1px 4px",
+                              borderRadius: "3px",
+                              backgroundColor:
+                                step.action === "click" ? "#0e639c" : "#10b981",
+                              color: "#fff",
+                            }}
+                          >
+                            {step.action.toUpperCase()}
+                          </span>
+                          <span
+                            style={{
+                              color: "#eee",
+                              fontFamily: "monospace",
+                              fontSize: "9px",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              maxWidth: "100px",
+                            }}
+                            title={step.tag}
+                          >
+                            &lt;{step.tag}
+                            {step.type ? ` type="${step.type}"` : ""}&gt;
                           </span>
                           {step.value && (
-                            <span style={{ color: "#ffaf3b", fontSize: "9px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "80px" }} title={step.value}>
+                            <span
+                              style={{
+                                color: "#ffaf3b",
+                                fontSize: "9px",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                maxWidth: "80px",
+                              }}
+                              title={step.value}
+                            >
                               "{step.value}"
                             </span>
                           )}
-                          <span style={{ color: "#858585", fontSize: "9px", marginLeft: "auto", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "120px" }} title={step.playwrightLocator || step.xpathLocator}>
+                          <span
+                            style={{
+                              color: "#858585",
+                              fontSize: "9px",
+                              marginLeft: "auto",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              maxWidth: "120px",
+                            }}
+                            title={step.playwrightLocator || step.xpathLocator}
+                          >
                             {step.playwrightLocator || step.xpathLocator}
                           </span>
                         </div>
@@ -1892,16 +2164,38 @@ const PanelApp: React.FC = () => {
               </div>
 
               {/* Right Column: Generated Code Preview */}
-              <div style={{ ...styles.toolCard, flex: 1.2, display: "flex", flexDirection: "column" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+              <div
+                style={{
+                  ...styles.toolCard,
+                  flex: 1.2,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "6px",
+                  }}
+                >
                   <div style={styles.toolTitle}>Generated Script</div>
-                  <select 
-                    className="form-select select-sm" 
-                    style={{ ...styles.actionSelect, width: "130px", margin: 0 }}
+                  <select
+                    className="form-select select-sm"
+                    style={{
+                      ...styles.actionSelect,
+                      width: "130px",
+                      margin: 0,
+                    }}
                     value={langID}
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                       setLangID(e.target.value);
-                      if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+                      if (
+                        typeof chrome !== "undefined" &&
+                        chrome.storage &&
+                        chrome.storage.local
+                      ) {
                         chrome.storage.local.set({ langID: e.target.value });
                       } else {
                         localStorage.setItem("langID", e.target.value);
@@ -1917,11 +2211,22 @@ const PanelApp: React.FC = () => {
                     <option value="custom">Custom Framework</option>
                   </select>
                 </div>
-                
-                <div style={{ flex: 1, position: "relative", display: "flex", flexDirection: "column" }}>
+
+                <div
+                  style={{
+                    flex: 1,
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
                   <textarea
                     readOnly
-                    value={generateRecordedScript(recordedSteps, recordingUrl, langID)}
+                    value={generateRecordedScript(
+                      recordedSteps,
+                      recordingUrl,
+                      langID,
+                    )}
                     style={{
                       flex: 1,
                       backgroundColor: "#141414",
@@ -1933,14 +2238,40 @@ const PanelApp: React.FC = () => {
                       fontSize: "9px",
                       resize: "none",
                       outline: "none",
-                      minHeight: "260px"
+                      minHeight: "260px",
                     }}
                   />
-                  <div style={{ display: "flex", gap: "4px", marginTop: "6px" }}>
-                    <button style={{ ...styles.btnFind, flex: 1 }} onClick={() => copyToClipboard(generateRecordedScript(recordedSteps, recordingUrl, langID), "Script copied to clipboard!")}>
+                  <div
+                    style={{ display: "flex", gap: "4px", marginTop: "6px" }}
+                  >
+                    <button
+                      style={{ ...styles.btnFind, flex: 1 }}
+                      onClick={() =>
+                        copyToClipboard(
+                          generateRecordedScript(
+                            recordedSteps,
+                            recordingUrl,
+                            langID,
+                          ),
+                          "Script copied to clipboard!",
+                        )
+                      }
+                    >
                       Copy Script
                     </button>
-                    <button style={{ ...styles.btnClear, flex: 1 }} onClick={() => handleDownloadScript(generateRecordedScript(recordedSteps, recordingUrl, langID), langID)}>
+                    <button
+                      style={{ ...styles.btnClear, flex: 1 }}
+                      onClick={() =>
+                        handleDownloadScript(
+                          generateRecordedScript(
+                            recordedSteps,
+                            recordingUrl,
+                            langID,
+                          ),
+                          langID,
+                        )
+                      }
+                    >
                       Download
                     </button>
                   </div>
@@ -1951,7 +2282,7 @@ const PanelApp: React.FC = () => {
         )}
 
         {/* Tools Tab */}
-        {activeTab === 6 && (
+        {activeTab === 7 && (
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {/* Custom Search Box */}
             <div style={styles.toolCard}>
@@ -2050,7 +2381,7 @@ const PanelApp: React.FC = () => {
         )}
 
         {/* About Tab */}
-        {activeTab === 7 && (
+        {activeTab === 8 && (
           <div style={styles.aboutCard}>
             <div
               style={{
@@ -2511,7 +2842,7 @@ const styles = {
   settingsBtn: {
     padding: "0 6px",
     cursor: "pointer",
-    fontSize: "12px",
+    fontSize: "18px",
     color: "#858585",
     display: "flex",
     alignItems: "center",

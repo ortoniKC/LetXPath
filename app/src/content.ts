@@ -19,6 +19,15 @@ import { getMethodOrVarText, getVariableAndMethodName } from './methodName';
 import { buildPlaywrightLocators } from './playwrightLocators';
 import { evaluatePlaywrightLocator } from './playwrightEvaluator';
 import { startRecording, stopRecord } from './record';
+import { buildCypressLocators } from './cypressLocators';
+
+export let selectorPriorityList = ['data-testid', 'id', 'name', 'class'];
+
+function updatePriorityList(val: string) {
+  if (val) {
+    selectorPriorityList = val.split(',').map(s => s.trim()).filter(Boolean);
+  }
+}
 
 export function sendToDev(data: any): void {
   sendMessage({ request: "fromUtilsSelector", data: data });
@@ -236,7 +245,8 @@ export function parseDOM(targetElement: HTMLElement) {
       }
 
       // Generate Playwright specific locators using the Playwright repository priority strategy
-      const pwLocators = buildPlaywrightLocators(targetElement, state.XPATHDATA, state.CSSPATHDATA);
+      const pwLocators = buildPlaywrightLocators(targetElement, state.XPATHDATA, state.CSSPATHDATA, selectorPriorityList);
+      const cyLocators = buildCypressLocators(targetElement, state.XPATHDATA, state.CSSPATHDATA, selectorPriorityList);
 
       const domInfo = {
         request: "send_to_dev",
@@ -253,7 +263,8 @@ export function parseDOM(targetElement: HTMLElement) {
         attributes: attrs,
         text: textContent,
         labelText: labelText,
-        playwrightLocators: pwLocators
+        playwrightLocators: pwLocators,
+        cypressLocators: cyLocators
       };
       
       sendMessage(domInfo);
@@ -553,29 +564,36 @@ export function getIDXPath(element: HTMLElement, tagName: string): string | null
 
 // Add all attributes xpath except filter
 export function addAllXpathAttributesBased(attribute: NamedNodeMap, tagName: string, element: HTMLElement) {
+  const getAttrPriority = (name: string): number => {
+    const idx = selectorPriorityList.indexOf(name);
+    return idx !== -1 ? idx + 1 : selectorPriorityList.length + 1;
+  };
+
   Array.prototype.slice.call(attribute).forEach(function (item: Attr) {
     if (item.value === "letX" || filterAttributesFromElement(item)) {
       return;
     }
 
+    const priority = getAttrPriority(item.name);
+
     switch (item.name) {
       case "id":
         const id = getIDXPath(element, tagName);
         if (id != null) {
-          state.XPATHDATA.push([1, "Unique ID", id]);
-          state.CSSPATHDATA.push([1, "Unique ID", `#${id}`]);
+          state.XPATHDATA.push([priority, "Unique ID", id]);
+          state.CSSPATHDATA.push([priority, "Unique ID", `#${id}`]);
         }
         break;
       case "class":
         const className = getClassXPath(element, tagName);
         if (className != null) {
-          state.XPATHDATA.push([3, "Class based XPath", className]);
+          state.XPATHDATA.push([priority, "Class based XPath", className]);
         }
         break;
       case "name":
         const name = getNameXPath(element, tagName);
         if (name != null) {
-          state.XPATHDATA.push([2, "Name based XPath", name]);
+          state.XPATHDATA.push([priority, "Name based XPath", name]);
         }
         break;
       default:
@@ -584,16 +602,16 @@ export function addAllXpathAttributesBased(attribute: NamedNodeMap, tagName: str
           const allXpathAttr = `//${tagName}[@${item.name}='${temp}']`;
           const xpathResult = getNumberOfXPath(allXpathAttr);
           if (xpathResult == 1) {
-            state.XPATHDATA.push([4, `${item.name}`, allXpathAttr]);
+            state.XPATHDATA.push([priority, `${item.name}`, allXpathAttr]);
             state.CSSPATHDATA.push([
-              4,
+              priority,
               `${item.name}`,
               `${tagName}[${item.name}='${temp}']`,
             ]);
           } else {
             const indexedXPath = addIndexToXpath(allXpathAttr);
             if (indexedXPath !== undefined && indexedXPath !== null) {
-              state.XPATHDATA.push([4, `${item.name}`, indexedXPath]);
+              state.XPATHDATA.push([priority, `${item.name}`, indexedXPath]);
             }
           }
         }
@@ -613,9 +631,12 @@ sendMessage({ request: "register_frame" }).catch(() => {});
 
 // Initialize recording state and register listener
 if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-  chrome.storage.local.get(['isRecordingActive'], (result) => {
+  chrome.storage.local.get(['isRecordingActive', 'selectorPriority'], (result) => {
     if (result.isRecordingActive) {
       startRecording();
+    }
+    if (result.selectorPriority) {
+      updatePriorityList(result.selectorPriority);
     }
   });
   
@@ -626,6 +647,9 @@ if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
       } else {
         stopRecord();
       }
+    }
+    if (changes.selectorPriority) {
+      updatePriorityList(changes.selectorPriority.newValue);
     }
   });
 }
