@@ -26,6 +26,6 @@ export const state = {
   recordArrayPOM: [] as any[],
   isRecordEnabled: false,
   isVerifyModeActive: false,
-  selectorPriorityList: ['data-testid', 'id', 'name', 'class'],
+  selectorPriorityList: ["data-testid", "id", "name", "class"],
   searchXPathArray: [] as any[],
 };

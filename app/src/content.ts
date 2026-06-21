@@ -1,31 +1,34 @@
-import { state } from './state';
-import { 
-  evaluateXPathExpression, 
-  getNumberOfXPath, 
-  filterAttributesFromElement, 
-  addIndexToXpath, 
-  addIndexToAxesXpath, 
-  frameXPath, 
-  removeletxxpath 
-} from './utils';
-import { xPathToCss } from './conversion';
-import { getAnchorXPath } from './anchorXPath';
-import { getTextBasedXPath } from './textXPath';
-import { findLabel } from './getLabel';
-import { getParent, addPreviousSibling } from './parentElements';
-import { handleTable } from './handleTable';
-import { getLongCssPath, getClassCSS, getXPathWithPosition } from './getCSS';
-import { getMethodOrVarText, getVariableAndMethodName } from './methodName';
-import { buildPlaywrightLocators } from './playwrightLocators';
-import { evaluatePlaywrightLocator } from './playwrightEvaluator';
-import { startRecording, stopRecord } from './record';
-import { buildCypressLocators } from './cypressLocators';
+import { state } from "./state";
+import {
+  evaluateXPathExpression,
+  getNumberOfXPath,
+  filterAttributesFromElement,
+  addIndexToXpath,
+  addIndexToAxesXpath,
+  frameXPath,
+  removeletxxpath,
+} from "./utils";
+import { xPathToCss } from "./conversion";
+import { getAnchorXPath } from "./anchorXPath";
+import { getTextBasedXPath } from "./textXPath";
+import { findLabel } from "./getLabel";
+import { getParent, addPreviousSibling } from "./parentElements";
+import { handleTable } from "./handleTable";
+import { getLongCssPath, getClassCSS, getXPathWithPosition } from "./getCSS";
+import { getMethodOrVarText, getVariableAndMethodName } from "./methodName";
+import { buildPlaywrightLocators } from "./playwrightLocators";
+import { evaluatePlaywrightLocator } from "./playwrightEvaluator";
+import { startRecording, stopRecord } from "./record";
+import { buildCypressLocators } from "./cypressLocators";
 
 export let selectorPriorityList = state.selectorPriorityList;
 
 function updatePriorityList(val: string) {
   if (val) {
-    state.selectorPriorityList = val.split(',').map(s => s.trim()).filter(Boolean);
+    state.selectorPriorityList = val
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
     selectorPriorityList = state.selectorPriorityList;
   }
 }
@@ -62,7 +65,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
           state.elementOwnerDocument,
           null,
           XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
-          null
+          null,
         );
         const axesCount = axesSnapshot.snapshotLength;
         if (axesCount == 0 || axesCount == undefined) {
@@ -97,9 +100,9 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
       let customCount = 0;
       let matchedElements: HTMLElement[] = [];
       let locatorType = "XPath";
-      
+
       try {
-        if (val.includes('getBy') || val.includes('locator(') || val.startsWith('page.')) {
+        if (val.includes("getBy") || val.includes("locator(") || val.startsWith("page.")) {
           locatorType = "Playwright";
           matchedElements = evaluatePlaywrightLocator(val, state.elementOwnerDocument);
           customCount = matchedElements.length;
@@ -111,7 +114,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
               state.elementOwnerDocument,
               null,
               XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
-              null
+              null,
             );
             customCount = customSnapshot.snapshotLength;
             for (let idx = 0; idx < customCount; idx++) {
@@ -129,7 +132,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
         customCount = 0;
         matchedElements = [];
       }
-      
+
       const isXPathCorrect = customCount > 0 ? `${locatorType} found` : `Wrong ${locatorType}`;
       if (customCount > 0) {
         for (const el of matchedElements) {
@@ -161,7 +164,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
   }
 };
 
-if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
   chrome.runtime.onMessage.addListener(receiver);
 }
 
@@ -172,7 +175,7 @@ window.addEventListener("DOMContentLoaded", () => {
     (event) => {
       state.targetElemt = event.target as HTMLElement;
     },
-    false
+    false,
   );
 });
 
@@ -181,7 +184,7 @@ export function buildSelectedFields(targetElement: HTMLElement) {
   if (targetElement != null) {
     try {
       state.maxIndex = 5;
-      if (targetElement.getAttribute('type') !== "hidden") {
+      if (targetElement.getAttribute("type") !== "hidden") {
         buildXpath(targetElement, 0, true);
       }
     } catch (error: any) {
@@ -210,7 +213,7 @@ export function parseDOM(targetElement: HTMLElement) {
       if (targetElement.attributes) {
         for (let i = 0; i < targetElement.attributes.length; i++) {
           const attr = targetElement.attributes[i];
-          if (attr.name !== 'letxxpath' && attr.name !== 'letcss') {
+          if (attr.name !== "letxxpath" && attr.name !== "letcss") {
             attrs[attr.name] = attr.value;
           }
         }
@@ -225,17 +228,19 @@ export function parseDOM(targetElement: HTMLElement) {
       // Find associated label text
       let labelText: string = "";
       if (targetElement.id) {
-        const associatedLabel = targetElement.ownerDocument.querySelector(`label[for="${targetElement.id}"]`);
+        const associatedLabel = targetElement.ownerDocument.querySelector(
+          `label[for="${targetElement.id}"]`,
+        );
         if (associatedLabel) {
           labelText = associatedLabel.textContent?.trim() || "";
         }
       }
       if (!labelText) {
         const precedingLabel = targetElement.previousElementSibling;
-        if (precedingLabel && precedingLabel.tagName === 'LABEL') {
+        if (precedingLabel && precedingLabel.tagName === "LABEL") {
           labelText = precedingLabel.textContent?.trim() || "";
         } else {
-          const closestLabel = targetElement.closest('label');
+          const closestLabel = targetElement.closest("label");
           if (closestLabel) {
             labelText = closestLabel.textContent?.trim() || "";
           }
@@ -246,8 +251,18 @@ export function parseDOM(targetElement: HTMLElement) {
       }
 
       // Generate Playwright specific locators using the Playwright repository priority strategy
-      const pwLocators = buildPlaywrightLocators(targetElement, state.XPATHDATA, state.CSSPATHDATA, selectorPriorityList);
-      const cyLocators = buildCypressLocators(targetElement, state.XPATHDATA, state.CSSPATHDATA, selectorPriorityList);
+      const pwLocators = buildPlaywrightLocators(
+        targetElement,
+        state.XPATHDATA,
+        state.CSSPATHDATA,
+        selectorPriorityList,
+      );
+      const cyLocators = buildCypressLocators(
+        targetElement,
+        state.XPATHDATA,
+        state.CSSPATHDATA,
+        selectorPriorityList,
+      );
 
       const domInfo = {
         request: "send_to_dev",
@@ -265,9 +280,9 @@ export function parseDOM(targetElement: HTMLElement) {
         text: textContent,
         labelText: labelText,
         playwrightLocators: pwLocators,
-        cypressLocators: cyLocators
+        cypressLocators: cyLocators,
       };
-      
+
       sendMessage(domInfo);
 
       state.atrributesArray = [];
@@ -278,7 +293,7 @@ export function parseDOM(targetElement: HTMLElement) {
 
 export async function sendMessage(msg: any): Promise<any> {
   return new Promise((resolve) => {
-    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
       chrome.runtime.sendMessage(msg, (response) => {
         resolve(response);
       });
@@ -319,25 +334,33 @@ export function buildXpath(element: HTMLElement, boolAnchor: number, _utils: boo
   try {
     const name = getMethodOrVarText(element);
     getVariableAndMethodName(name);
-    
-    state.methodName = state.methodName && state.methodName.length >= 2 && state.methodName.length < 25
-      ? state.methodName
-      : (state.methodName ? state.methodName.slice(0, 12) : 'ele');
-      
-    state.variableName = state.variableName && state.variableName.length >= 2 && state.variableName.length < 25
-      ? state.variableName
-      : (state.variableName ? state.variableName.slice(0, 12) : 'ele');
-      
-    state.variablename = state.variableName != null && state.variableName.length > 1 ? state.variableName : "ele";
-    state.methodName = state.methodName != null && state.methodName.length > 1 ? state.methodName : "ele";
+
+    state.methodName =
+      state.methodName && state.methodName.length >= 2 && state.methodName.length < 25
+        ? state.methodName
+        : state.methodName
+          ? state.methodName.slice(0, 12)
+          : "ele";
+
+    state.variableName =
+      state.variableName && state.variableName.length >= 2 && state.variableName.length < 25
+        ? state.variableName
+        : state.variableName
+          ? state.variableName.slice(0, 12)
+          : "ele";
+
+    state.variablename =
+      state.variableName != null && state.variableName.length > 1 ? state.variableName : "ele";
+    state.methodName =
+      state.methodName != null && state.methodName.length > 1 ? state.methodName : "ele";
   } catch (error) {
     state.variablename = null;
   }
-  
+
   // create an array to put available xpath - generate different type and add
   state.XPATHDATA = [];
   state.CSSPATHDATA = [];
-  
+
   // Handle SVG
   let currentElement: HTMLElement | null = element;
   if (
@@ -351,16 +374,16 @@ export function buildXpath(element: HTMLElement, boolAnchor: number, _utils: boo
       currentElement = currentElement.parentNode as HTMLElement;
     }
   }
-  
+
   // To get tag name
   const tagName = currentElement.tagName.toLowerCase();
   state.tag = tagName;
   if (currentElement.hasAttribute("type")) {
-    state.type = currentElement.getAttribute('type');
+    state.type = currentElement.getAttribute("type");
   }
 
   if (state.elementOwnerDocument.getElementsByTagName(tagName).length == 1) {
-    const idx = selectorPriorityList.indexOf('tag');
+    const idx = selectorPriorityList.indexOf("tag");
     const priority = idx !== -1 ? idx + 1 : 10;
     state.XPATHDATA.push([priority, "Unique TagName", tagName]);
   }
@@ -414,11 +437,11 @@ export function buildXpath(element: HTMLElement, boolAnchor: number, _utils: boo
       handleTable(currentElement);
     }
   } catch (error) {}
-  
+
   // Based on parent XPath
   try {
     if (state.XPATHDATA.length < 3) {
-      const idx = selectorPriorityList.indexOf('xpath');
+      const idx = selectorPriorityList.indexOf("xpath");
       const priority = idx !== -1 ? idx + 1 : 90;
       state.XPATHDATA.push([priority, "Closest ID XPath", getXPathWithPosition(currentElement)]);
     }
@@ -428,7 +451,7 @@ export function buildXpath(element: HTMLElement, boolAnchor: number, _utils: boo
     const css = getLongCssPath(currentElement);
     const csslen = css.split(">");
     if (csslen.length < 5) {
-      const idx = selectorPriorityList.indexOf('xpath');
+      const idx = selectorPriorityList.indexOf("xpath");
       const priority = idx !== -1 ? idx + 1 : 11;
       state.CSSPATHDATA.push([priority, "Closest ID CSS", css]);
     }
@@ -459,7 +482,7 @@ export function xpathFollowingSibling(preiousSiblingElement: HTMLElement, tagNam
 export function xpathText(element: HTMLElement, tagName: string) {
   const getTextXPathEle = getTextBasedXPath(element, tagName);
   if (!(getTextXPathEle === null || getTextXPathEle === undefined)) {
-    const idx = selectorPriorityList.indexOf('contains');
+    const idx = selectorPriorityList.indexOf("contains");
     const priority = idx !== -1 ? idx + 1 : 6;
     state.XPATHDATA.push([priority, "Text based XPath", getTextXPathEle]);
   }
@@ -468,26 +491,16 @@ export function xpathText(element: HTMLElement, tagName: string) {
 // To get Name based xpath - //tagName[@name='nameValue'] - index upto 3
 export function getNameXPath(element: HTMLElement, tagName: string): string | null | undefined {
   let nameBasedXpath = null;
-  const nameAttr = element.getAttribute('name');
+  const nameAttr = element.getAttribute("name");
   if (!nameAttr) return null;
   const matches = nameAttr.match(/\d{3,}/g);
-  if (
-    !(
-      nameAttr === "" ||
-      nameAttr === undefined ||
-      matches != null
-    )
-  ) {
+  if (!(nameAttr === "" || nameAttr === undefined || matches != null)) {
     const tempName = "[@name='" + nameAttr + "']";
     let tem = `//*${tempName}`;
     const count = getNumberOfXPath(tem);
     if (count == 1) {
       state.XPATHDATA.push([102, "Unique Name", nameAttr]);
-      state.CSSPATHDATA.push([
-        3,
-        "Unique Name",
-        `${tagName}[name='${nameAttr}']`,
-      ]);
+      state.CSSPATHDATA.push([3, "Unique Name", `${tagName}[name='${nameAttr}']`]);
     } else if (count !== undefined && count > 1) {
       tem = `//${tagName}${tempName}`;
       nameBasedXpath = addIndexToXpath(tem);
@@ -501,7 +514,7 @@ export function getClassXPath(element: HTMLElement, tagName: string): string | n
   getClassCSS(element);
   let classBasedXpath = null;
   const clickedItemClass = element.className;
-  if (typeof clickedItemClass !== 'string') return null;
+  if (typeof clickedItemClass !== "string") return null;
   const splitClass = clickedItemClass.trim().split(" ");
   if (splitClass.length > 2) {
     const cl = `${splitClass[0]} ${splitClass[1]}`;
@@ -572,7 +585,11 @@ export function getIDXPath(element: HTMLElement, tagName: string): string | null
 }
 
 // Add all attributes xpath except filter
-export function addAllXpathAttributesBased(attribute: NamedNodeMap, tagName: string, element: HTMLElement) {
+export function addAllXpathAttributesBased(
+  attribute: NamedNodeMap,
+  tagName: string,
+  element: HTMLElement,
+) {
   const getAttrPriority = (name: string): number => {
     const idx = selectorPriorityList.indexOf(name);
     return idx !== -1 ? idx + 1 : selectorPriorityList.length + 1;
@@ -639,19 +656,22 @@ export function addAllXpathAttributesBased(attribute: NamedNodeMap, tagName: str
 sendMessage({ request: "register_frame" }).catch(() => {});
 
 // Initialize recording state and register listener
-if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-  chrome.storage.local.get(['isRecordingActive', 'selectorPriority', 'isVerifyModeActive'], (result) => {
-    if (result.isRecordingActive) {
-      startRecording();
-    }
-    if (result.isVerifyModeActive) {
-      state.isVerifyModeActive = true;
-    }
-    if (result.selectorPriority) {
-      updatePriorityList(result.selectorPriority);
-    }
-  });
-  
+if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+  chrome.storage.local.get(
+    ["isRecordingActive", "selectorPriority", "isVerifyModeActive"],
+    (result) => {
+      if (result.isRecordingActive) {
+        startRecording();
+      }
+      if (result.isVerifyModeActive) {
+        state.isVerifyModeActive = true;
+      }
+      if (result.selectorPriority) {
+        updatePriorityList(result.selectorPriority);
+      }
+    },
+  );
+
   chrome.storage.onChanged.addListener((changes) => {
     if (changes.isRecordingActive) {
       if (changes.isRecordingActive.newValue) {
@@ -668,4 +688,3 @@ if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
     }
   });
 }
-

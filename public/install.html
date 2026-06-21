@@ -36,16 +36,8 @@
       body {
         background-color: var(--bg-color);
         background-image:
-          radial-gradient(
-            at 0% 0%,
-            rgba(99, 102, 241, 0.12) 0px,
-            transparent 50%
-          ),
-          radial-gradient(
-            at 100% 100%,
-            rgba(66, 184, 131, 0.08) 0px,
-            transparent 50%
-          );
+          radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(66, 184, 131, 0.08) 0px, transparent 50%);
         color: var(--text-main);
         font-family:
           "Outfit",
@@ -93,11 +85,7 @@
         position: absolute;
         width: 100px;
         height: 100px;
-        background: radial-gradient(
-          circle,
-          rgba(99, 102, 241, 0.45) 0%,
-          transparent 70%
-        );
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.45) 0%, transparent 70%);
         filter: blur(12px);
         z-index: 1;
         animation: pulse-glow 3s infinite alternate;
@@ -265,11 +253,7 @@
       }
 
       .step-badge {
-        background: linear-gradient(
-          135deg,
-          var(--primary) 0%,
-          var(--accent) 100%
-        );
+        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
         color: #ffffff;
         font-size: 0.75rem;
         font-weight: 700;
@@ -467,8 +451,8 @@
         </div>
         <h1 class="title">Welcome to Ortoni Studio</h1>
         <p class="subtitle">
-          Thank you for installing! Ortoni Studio is now active. Follow this
-          quick guide to start finding and testing locators like a pro.
+          Thank you for installing! Ortoni Studio is now active. Follow this quick guide to start
+          finding and testing locators like a pro.
         </p>
       </div>
 
@@ -478,8 +462,8 @@
         <div class="alert-content">
           <div class="alert-title">Restart Recommended</div>
           <div class="alert-desc">
-            Please restart your browser or reload your currently open tabs to
-            enable Ortoni Studio's DOM listeners on those pages.
+            Please restart your browser or reload your currently open tabs to enable Ortoni Studio's
+            DOM listeners on those pages.
           </div>
         </div>
       </div>
@@ -511,13 +495,10 @@
           <ul class="card-list">
             <li>Navigate to any webpage you want to automate.</li>
             <li>
-              Open DevTools (Press <strong>F12</strong> or right-click and
-              choose <strong>Inspect</strong>).
+              Open DevTools (Press <strong>F12</strong> or right-click and choose
+              <strong>Inspect</strong>).
             </li>
-            <li>
-              Select the <strong>Ortoni Studio</strong> tab located in the
-              DevTools sidebar.
-            </li>
+            <li>Select the <strong>Ortoni Studio</strong> tab located in the DevTools sidebar.</li>
           </ul>
         </div>
 
@@ -546,10 +527,7 @@
           <ul class="card-list">
             <li>Click on the inspect tool icon in DevTools.</li>
             <li>Hover over and click any element on the page.</li>
-            <li>
-              Ortoni Studio immediately locks the element and displays its
-              details.
-            </li>
+            <li>Ortoni Studio immediately locks the element and displays its details.</li>
           </ul>
         </div>
 
@@ -577,17 +555,9 @@
           </div>
           <h3 class="card-title">Copy Locators</h3>
           <ul class="card-list">
-            <li>
-              Click directly on any generated locator expression in the panel.
-            </li>
-            <li>
-              The selector (XPath, CSS, etc.) is copied to your clipboard
-              instantly.
-            </li>
-            <li>
-              Click the <strong>Find</strong> button to verify and highlight
-              elements.
-            </li>
+            <li>Click directly on any generated locator expression in the panel.</li>
+            <li>The selector (XPath, CSS, etc.) is copied to your clipboard instantly.</li>
+            <li>Click the <strong>Find</strong> button to verify and highlight elements.</li>
           </ul>
         </div>
 
@@ -615,13 +585,10 @@
           <ul class="card-list">
             <li>Click the action dropdown next to the locator.</li>
             <li>
-              Select an action snippet (e.g. <strong>click</strong>,
-              <strong>sendKeys</strong>, etc.).
+              Select an action snippet (e.g. <strong>click</strong>, <strong>sendKeys</strong>,
+              etc.).
             </li>
-            <li>
-              Get fully formatted driver code statements for Selenium or
-              Playwright.
-            </li>
+            <li>Get fully formatted driver code statements for Selenium or Playwright.</li>
           </ul>
         </div>
 
@@ -650,12 +617,9 @@
           <h3 class="card-title">Axes XPath Relations</h3>
           <ul class="card-list">
             <li>
-              Right-click the parent/source element, then the child/target
-              element on the page.
+              Right-click the parent/source element, then the child/target element on the page.
             </li>
-            <li>
-              Choose relative combinations from the Axes tab in Ortoni Studio.
-            </li>
+            <li>Choose relative combinations from the Axes tab in Ortoni Studio.</li>
             <li>Easily automate elements with dynamic properties.</li>
           </ul>
         </div>
@@ -684,13 +648,9 @@
           </div>
           <h3 class="card-title">Universal Evaluator</h3>
           <ul class="card-list">
-            <li>
-              Go to the <strong>Tools</strong> tab in the Ortoni Studio panel.
-            </li>
+            <li>Go to the <strong>Tools</strong> tab in the Ortoni Studio panel.</li>
             <li>Type or paste any XPath, CSS, or Playwright locator string.</li>
-            <li>
-              Instantly see the number of matches and highlight them on the DOM.
-            </li>
+            <li>Instantly see the number of matches and highlight them on the DOM.</li>
           </ul>
         </div>
 
@@ -718,12 +678,8 @@
           </div>
           <h3 class="card-title">Manage & Settings</h3>
           <ul class="card-list">
-            <li>
-              Click on the settings/extension icon on your Chrome toolbar.
-            </li>
-            <li>
-              Update your default code snippet targets and custom templates.
-            </li>
+            <li>Click on the settings/extension icon on your Chrome toolbar.</li>
+            <li>Update your default code snippet targets and custom templates.</li>
             <li>Set up variables naming patterns for clean script exports.</li>
           </ul>
         </div>
@@ -732,11 +688,7 @@
       <!-- Footer -->
       <div class="footer">
         <div class="btn-group">
-          <a
-            href="https://github.com/ortoniKC/LetXPath"
-            target="_blank"
-            class="btn btn-secondary"
-          >
+          <a href="https://github.com/ortoniKC/LetXPath" target="_blank" class="btn btn-secondary">
             <svg
               viewBox="0 0 24 24"
               width="20"
@@ -774,8 +726,8 @@
           </a>
         </div>
         <p class="footer-desc">
-          Ortoni Studio is 100% free and open-source. If you like the tool,
-          please support us by leaving a 5-star rating on the Chrome Web Store!
+          Ortoni Studio is 100% free and open-source. If you like the tool, please support us by
+          leaving a 5-star rating on the Chrome Web Store!
         </p>
       </div>
     </div>

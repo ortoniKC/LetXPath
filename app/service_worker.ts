@@ -5,11 +5,7 @@ function toggle() {
   if (isSource) {
     chrome.contextMenus.update("OrtoniStudio", { title: "Select Child" }, () => {});
   } else {
-    chrome.contextMenus.update(
-      "OrtoniStudio",
-      { title: "Select Parent" },
-      () => {},
-    );
+    chrome.contextMenus.update("OrtoniStudio", { title: "Select Parent" }, () => {});
   }
 }
 
@@ -21,10 +17,7 @@ async function sendMessageTotab(tabId: number, msg: any) {
   }
 }
 
-function getXPath(
-  _info: chrome.contextMenus.OnClickData,
-  tab: chrome.tabs.Tab,
-) {
+function getXPath(_info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
   const msg = { request: "context_menu_click" };
   if (tab.id !== undefined) {
     sendMessageTotab(tab.id, msg);
@@ -46,9 +39,7 @@ function sendToContentScript(request: any) {
 
 chrome.runtime.onMessage.addListener(function (message, _sender, sendResponse) {
   if (
-    ["parseAxes", "userSearchXP", "dotheconversion", "cleanhighlight"].includes(
-      message.request,
-    )
+    ["parseAxes", "userSearchXP", "dotheconversion", "cleanhighlight"].includes(message.request)
   ) {
     sendToContentScript(message);
     sendResponse("Hello");

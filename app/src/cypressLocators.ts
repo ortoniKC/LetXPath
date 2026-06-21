@@ -2,7 +2,7 @@ export function buildCypressLocators(
   element: HTMLElement,
   xpathData: [number, string, string][],
   cssData: [number, string, string][],
-  priorityList: string[]
+  priorityList: string[],
 ): [number, string, string][] {
   const list: [number, string, string][] = [];
   const doc = element.ownerDocument;
@@ -25,13 +25,13 @@ export function buildCypressLocators(
   for (const attr of priorityList) {
     const value = element.getAttribute(attr);
     if (value) {
-      let selector = '';
-      if (attr === 'id') {
+      let selector = "";
+      if (attr === "id") {
         selector = `#${CSS.escape(value)}`;
-      } else if (attr === 'class') {
+      } else if (attr === "class") {
         const classes = value.split(/\s+/).filter(Boolean);
         if (classes.length > 0) {
-          selector = `.${classes.map(c => CSS.escape(c)).join('.')}`;
+          selector = `.${classes.map((c) => CSS.escape(c)).join(".")}`;
         }
       } else {
         selector = `[${attr}="${value.replace(/"/g, '\\"')}"]`;
@@ -42,7 +42,11 @@ export function buildCypressLocators(
         if (check.unique) {
           list.push([pIdx, `cy.get ('${attr}')`, `cy.get('${selector}')`]);
         } else if (check.index !== -1) {
-          list.push([pIdx + 0.5, `cy.get ('${attr}') [eq]`, `cy.get('${selector}').eq(${check.index})`]);
+          list.push([
+            pIdx + 0.5,
+            `cy.get ('${attr}') [eq]`,
+            `cy.get('${selector}').eq(${check.index})`,
+          ]);
         }
       }
     }
@@ -50,18 +54,24 @@ export function buildCypressLocators(
   }
 
   // 2. Contains Text based locator
-  const textContent = element.textContent?.trim() || '';
+  const textContent = element.textContent?.trim() || "";
   if (textContent && textContent.length > 0 && textContent.length < 50) {
     const escapedText = textContent.replace(/'/g, "\\'");
-    const textMatches = Array.from(doc.querySelectorAll(tag)).filter(el => el.textContent?.trim() === textContent);
-    const containsIdx = priorityList.indexOf('contains');
+    const textMatches = Array.from(doc.querySelectorAll(tag)).filter(
+      (el) => el.textContent?.trim() === textContent,
+    );
+    const containsIdx = priorityList.indexOf("contains");
     const containsPriority = containsIdx !== -1 ? containsIdx + 1 : pIdx;
     if (textMatches.length === 1) {
       list.push([containsPriority, `cy.contains`, `cy.contains('${escapedText}')`]);
     } else if (textMatches.length > 1) {
       const idx = textMatches.indexOf(element);
       if (idx !== -1) {
-        list.push([containsPriority + 0.5, `cy.contains [eq]`, `cy.contains('${escapedText}').eq(${idx})`]);
+        list.push([
+          containsPriority + 0.5,
+          `cy.contains [eq]`,
+          `cy.contains('${escapedText}').eq(${idx})`,
+        ]);
       }
     }
     if (containsIdx === -1) {
@@ -71,12 +81,12 @@ export function buildCypressLocators(
 
   // 3. Fallback CSS selectors from cssData
   if (cssData && cssData.length > 0) {
-    const xpathIdx = priorityList.indexOf('xpath');
+    const xpathIdx = priorityList.indexOf("xpath");
     const fallbackPriority = xpathIdx !== -1 ? xpathIdx + 1 : pIdx;
     cssData.forEach((item) => {
       const [, label, selector] = item;
       const cypressCall = `cy.get('${selector}')`;
-      if (!list.some(l => l[2] === cypressCall)) {
+      if (!list.some((l) => l[2] === cypressCall)) {
         list.push([fallbackPriority, `cy.get (${label})`, cypressCall]);
       }
     });
@@ -87,12 +97,12 @@ export function buildCypressLocators(
 
   // 4. Fallback XPath selectors from xpathData
   if (xpathData && xpathData.length > 0) {
-    const xpathIdx = priorityList.indexOf('xpath');
+    const xpathIdx = priorityList.indexOf("xpath");
     const fallbackPriority = xpathIdx !== -1 ? xpathIdx + 1 : pIdx;
     xpathData.forEach((item) => {
       const [, label, xpath] = item;
       const cypressCall = `cy.xpath('${xpath}')`;
-      if (!list.some(l => l[2] === cypressCall)) {
+      if (!list.some((l) => l[2] === cypressCall)) {
         list.push([fallbackPriority, `cy.xpath (${label})`, cypressCall]);
       }
     });

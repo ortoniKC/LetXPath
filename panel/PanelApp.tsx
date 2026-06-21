@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  SelectedElement,
-  AxesData,
-  ChromeStorageResult,
-  DevToolsMessageRequest,
-} from "./types";
+import { SelectedElement, AxesData, ChromeStorageResult, DevToolsMessageRequest } from "./types";
 import { styles } from "./styles";
 import {
   colorizeXPath,
@@ -34,8 +29,7 @@ const PanelApp: React.FC = () => {
 
   useEffect(() => {
     if (stepsContainerRef.current) {
-      stepsContainerRef.current.scrollTop =
-        stepsContainerRef.current.scrollHeight;
+      stepsContainerRef.current.scrollTop = stepsContainerRef.current.scrollHeight;
     }
   }, [recordedSteps.length]);
 
@@ -44,8 +38,7 @@ const PanelApp: React.FC = () => {
   const [recordingUrl, setRecordingUrl] = useState<string>("");
   const [templates, setTemplates] = useState<ChromeStorageResult>({});
 
-  const [selectedElement, setSelectedElement] =
-    useState<SelectedElement | null>(null);
+  const [selectedElement, setSelectedElement] = useState<SelectedElement | null>(null);
 
   // Axes states
   const [axesData, setAxesData] = useState<AxesData | null>(null);
@@ -65,15 +58,9 @@ const PanelApp: React.FC = () => {
   // Settings & toast
   const [toast, setToast] = useState<string | null>(null);
   const [langID, setLangID] = useState<string>("playwrightJS");
-  const [selectedFrameId, setSelectedFrameId] = useState<number | undefined>(
-    undefined,
-  );
-  const [registeredFrameIds, setRegisteredFrameIds] = useState<Set<number>>(
-    new Set(),
-  );
-  const frameSearchResults = useRef<
-    Map<number, { xpath: string; count: number }>
-  >(new Map());
+  const [selectedFrameId, setSelectedFrameId] = useState<number | undefined>(undefined);
+  const [registeredFrameIds, setRegisteredFrameIds] = useState<Set<number>>(new Set());
+  const frameSearchResults = useRef<Map<number, { xpath: string; count: number }>>(new Map());
   const searchValRef = useRef<string>("");
 
   const [editedCode, setEditedCode] = useState<string>("");
@@ -150,11 +137,7 @@ const PanelApp: React.FC = () => {
 
   const handleStopRecording = () => {
     setIsRecordingActive(false);
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.storage &&
-      chrome.storage.local
-    ) {
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       chrome.storage.local.set({ isRecordingActive: false }, () => {
         sendMessageToCS({ request: "stop_recording" });
       });
@@ -166,11 +149,7 @@ const PanelApp: React.FC = () => {
 
   const handleToggleVerifyMode = (active: boolean) => {
     setIsVerifyModeActive(active);
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.storage &&
-      chrome.storage.local
-    ) {
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       chrome.storage.local.set({ isVerifyModeActive: active });
     } else {
       localStorage.setItem("isVerifyModeActive", active ? "true" : "false");
@@ -179,11 +158,7 @@ const PanelApp: React.FC = () => {
 
   const handleClearRecording = () => {
     setRecordedSteps([]);
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.storage &&
-      chrome.storage.local
-    ) {
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       chrome.storage.local.set({ recordedSteps: [] });
     } else {
       localStorage.setItem("recordedSteps", JSON.stringify([]));
@@ -224,19 +199,13 @@ const PanelApp: React.FC = () => {
 
   useEffect(() => {
     if (isAutoSyncActive) {
-      setEditedCode(
-        generateRecordedScript(recordedSteps, recordingUrl, langID, templates),
-      );
+      setEditedCode(generateRecordedScript(recordedSteps, recordingUrl, langID, templates));
     }
   }, [recordedSteps, recordingUrl, langID, isAutoSyncActive, templates]);
 
   const handleTabChange = (tabIndex: number) => {
     setActiveTab(tabIndex);
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.storage &&
-      chrome.storage.local
-    ) {
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       chrome.storage.local.set({ activeTab: tabIndex });
     } else {
       localStorage.setItem("activeTab", String(tabIndex));
@@ -244,9 +213,7 @@ const PanelApp: React.FC = () => {
   };
 
   const tabId =
-    typeof chrome !== "undefined" &&
-    chrome.devtools &&
-    chrome.devtools.inspectedWindow
+    typeof chrome !== "undefined" && chrome.devtools && chrome.devtools.inspectedWindow
       ? chrome.devtools.inspectedWindow.tabId
       : null;
 
@@ -257,17 +224,13 @@ const PanelApp: React.FC = () => {
           chrome.tabs.sendMessage(tabId, msg, { frameId }, () => {
             const err = chrome.runtime.lastError;
             if (err) {
-              console.warn(
-                `Message send failed to frame ${frameId}:`,
-                err.message,
-              );
+              console.warn(`Message send failed to frame ${frameId}:`, err.message);
               removeFrameId(frameId);
             }
           });
         });
       } else {
-        const options =
-          selectedFrameId !== undefined ? { frameId: selectedFrameId } : {};
+        const options = selectedFrameId !== undefined ? { frameId: selectedFrameId } : {};
         chrome.tabs.sendMessage(tabId, msg, options, () => {
           const err = chrome.runtime.lastError;
           if (err) {
@@ -302,12 +265,7 @@ const PanelApp: React.FC = () => {
               setSelectedFrameId(_sender.frameId);
               addFrameId(_sender.frameId);
             }
-            if (
-              req.xpathid &&
-              req.cssPath &&
-              req.tag !== undefined &&
-              req.type !== undefined
-            ) {
+            if (req.xpathid && req.cssPath && req.tag !== undefined && req.type !== undefined) {
               setSelectedElement({
                 xpathid: req.xpathid,
                 cssPath: req.cssPath,
@@ -331,10 +289,8 @@ const PanelApp: React.FC = () => {
             }
             if (req.data) {
               setAxesData(req.data);
-              if (req.data.src && req.data.src.length > 0)
-                setSelectedSrc(req.data.src[0][1]);
-              if (req.data.dst && req.data.dst.length > 0)
-                setSelectedDst(req.data.dst[0][1]);
+              if (req.data.src && req.data.src.length > 0) setSelectedSrc(req.data.src[0][1]);
+              if (req.data.dst && req.data.dst.length > 0) setSelectedDst(req.data.dst[0][1]);
               setAxesXPathResult(req.data.defaultXPath);
               handleTabChange(3); // Switch to Axes panel
             }
@@ -366,9 +322,7 @@ const PanelApp: React.FC = () => {
                     : "CSS";
 
               const status =
-                totalCount > 0
-                  ? bestXPath || `${locatorType} found`
-                  : `Wrong ${locatorType}`;
+                totalCount > 0 ? bestXPath || `${locatorType} found` : `Wrong ${locatorType}`;
 
               setSearchResult({
                 xpath: status,
@@ -398,20 +352,12 @@ const PanelApp: React.FC = () => {
       }
     };
 
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.runtime &&
-      chrome.runtime.onMessage
-    ) {
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
       chrome.runtime.onMessage.addListener(listener);
     }
 
     return () => {
-      if (
-        typeof chrome !== "undefined" &&
-        chrome.runtime &&
-        chrome.runtime.onMessage
-      ) {
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
         chrome.runtime.onMessage.removeListener(listener);
       }
     };
@@ -442,11 +388,7 @@ const PanelApp: React.FC = () => {
     document.head.appendChild(styleEl);
 
     const loadSettings = () => {
-      if (
-        typeof chrome !== "undefined" &&
-        chrome.storage &&
-        chrome.storage.local
-      ) {
+      if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
         chrome.storage.local.get(
           [
             "langID",
@@ -478,22 +420,16 @@ const PanelApp: React.FC = () => {
         if (localLang) setLangID(localLang);
         const localTab = localStorage.getItem("activeTab");
         if (localTab) setActiveTab(Number(localTab));
-        const localRecordingActive =
-          localStorage.getItem("isRecordingActive") === "true";
+        const localRecordingActive = localStorage.getItem("isRecordingActive") === "true";
         setIsRecordingActive(localRecordingActive);
-        const localVerifyActive =
-          localStorage.getItem("isVerifyModeActive") === "true";
+        const localVerifyActive = localStorage.getItem("isVerifyModeActive") === "true";
         setIsVerifyModeActive(localVerifyActive);
-        const localRecordedSteps = JSON.parse(
-          localStorage.getItem("recordedSteps") || "[]",
-        );
+        const localRecordedSteps = JSON.parse(localStorage.getItem("recordedSteps") || "[]");
         setRecordedSteps(localRecordedSteps);
         const localRecordingUrl = localStorage.getItem("recordingUrl") || "";
         setRecordingUrl(localRecordingUrl);
         const localTemplates: ChromeStorageResult = {
-          customLang:
-            (localStorage.getItem("customLang") as "jscs" | "javacs") ||
-            "javacs",
+          customLang: (localStorage.getItem("customLang") as "jscs" | "javacs") || "javacs",
           clickvalue: localStorage.getItem("clickvalue") || "",
           sendvalue: localStorage.getItem("sendvalue") || "",
           textvalue: localStorage.getItem("textvalue") || "",
@@ -532,20 +468,12 @@ const PanelApp: React.FC = () => {
         return next;
       });
     };
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.storage &&
-      chrome.storage.onChanged
-    ) {
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.onChanged) {
       chrome.storage.onChanged.addListener(storageListener);
     }
     return () => {
       document.head.removeChild(styleEl);
-      if (
-        typeof chrome !== "undefined" &&
-        chrome.storage &&
-        chrome.storage.onChanged
-      ) {
+      if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.onChanged) {
         chrome.storage.onChanged.removeListener(storageListener);
       }
     };
@@ -630,14 +558,7 @@ const PanelApp: React.FC = () => {
         str = getCypress(codeType, val);
         break;
       case "custom":
-        return getCustomSnippet(
-          actionType,
-          codeType,
-          val,
-          variable,
-          method,
-          templates,
-        );
+        return getCustomSnippet(actionType, codeType, val, variable, method, templates);
       default:
         str = getSeleniumJava(codeType, val);
         break;
@@ -688,40 +609,17 @@ const PanelApp: React.FC = () => {
     const action = e.target.value;
     if (action === "snippet") return;
 
-    const varName = selectedElement
-      ? selectedElement.variablename || "ele"
-      : "ele";
-    const methName = selectedElement
-      ? selectedElement.methodname || "ele"
-      : "ele";
+    const varName = selectedElement ? selectedElement.variablename || "ele" : "ele";
+    const methName = selectedElement ? selectedElement.methodname || "ele" : "ele";
 
     const copyProcess = (lang: string, templates: ChromeStorageResult) => {
-      const code = getSnippetCode(
-        action,
-        codeType,
-        val,
-        varName,
-        methName,
-        lang,
-        templates,
-      );
+      const code = getSnippetCode(action, codeType, val, varName, methName, lang, templates);
       copyToClipboard(code, `Snippet (${action}) copied to clipboard!`);
     };
 
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.storage &&
-      chrome.storage.local
-    ) {
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       chrome.storage.local.get(
-        [
-          "langID",
-          "customLang",
-          "clickvalue",
-          "sendvalue",
-          "textvalue",
-          "attrvalue",
-        ],
+        ["langID", "customLang", "clickvalue", "sendvalue", "textvalue", "attrvalue"],
         (result: ChromeStorageResult) => {
           copyProcess(result.langID || "javas", result);
         },
@@ -729,8 +627,7 @@ const PanelApp: React.FC = () => {
     } else {
       const localLang = localStorage.getItem("langID") || "javas";
       const localTemplates: ChromeStorageResult = {
-        customLang:
-          (localStorage.getItem("customLang") as "jscs" | "javacs") || "javacs",
+        customLang: (localStorage.getItem("customLang") as "jscs" | "javacs") || "javacs",
         clickvalue: localStorage.getItem("clickvalue") || "",
         sendvalue: localStorage.getItem("sendvalue") || "",
         textvalue: localStorage.getItem("textvalue") || "",
@@ -756,11 +653,7 @@ const PanelApp: React.FC = () => {
 
   // Open Options page
   const handleOpenSettings = () => {
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.runtime &&
-      chrome.runtime.openOptionsPage
-    ) {
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.openOptionsPage) {
       chrome.runtime.openOptionsPage();
     } else {
       window.open("../option/option.html", "_blank");
@@ -942,51 +835,31 @@ const PanelApp: React.FC = () => {
       <div style={styles.navBar}>
         <ul style={styles.tabsList}>
           <li style={styles.tabItem} onClick={() => handleTabChange(1)}>
-            <span style={activeTab === 1 ? styles.activeLink : styles.link}>
-              XPath
-            </span>
+            <span style={activeTab === 1 ? styles.activeLink : styles.link}>XPath</span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(2)}>
-            <span style={activeTab === 2 ? styles.activeLink : styles.link}>
-              CSS
-            </span>
+            <span style={activeTab === 2 ? styles.activeLink : styles.link}>CSS</span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(3)}>
-            <span style={activeTab === 3 ? styles.activeLink : styles.link}>
-              Axes
-            </span>
+            <span style={activeTab === 3 ? styles.activeLink : styles.link}>Axes</span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(4)}>
-            <span style={activeTab === 4 ? styles.activeLink : styles.link}>
-              Playwright
-            </span>
+            <span style={activeTab === 4 ? styles.activeLink : styles.link}>Playwright</span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(5)}>
-            <span style={activeTab === 5 ? styles.activeLink : styles.link}>
-              Cypress
-            </span>
+            <span style={activeTab === 5 ? styles.activeLink : styles.link}>Cypress</span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(6)}>
-            <span style={activeTab === 6 ? styles.activeLink : styles.link}>
-              Recorder
-            </span>
+            <span style={activeTab === 6 ? styles.activeLink : styles.link}>Recorder</span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(7)}>
-            <span style={activeTab === 7 ? styles.activeLink : styles.link}>
-              Tools
-            </span>
+            <span style={activeTab === 7 ? styles.activeLink : styles.link}>Tools</span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(8)}>
-            <span style={activeTab === 8 ? styles.activeLink : styles.link}>
-              About
-            </span>
+            <span style={activeTab === 8 ? styles.activeLink : styles.link}>About</span>
           </li>
         </ul>
-        <div
-          style={styles.settingsBtn}
-          onClick={handleOpenSettings}
-          title="Settings"
-        >
+        <div style={styles.settingsBtn} onClick={handleOpenSettings} title="Settings">
           ⚙
         </div>
       </div>
@@ -1000,27 +873,19 @@ const PanelApp: React.FC = () => {
             !selectedElement.xpathid ||
             selectedElement.xpathid.length === 0 ? (
               <div style={styles.emptyState}>
-                <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>
-                  🔍
-                </div>
-                <div style={styles.emptyTitle}>
-                  Select an element in Elements tab
-                </div>
+                <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>🔍</div>
+                <div style={styles.emptyTitle}>Select an element in Elements tab</div>
                 <div style={styles.emptySubtitle}>
-                  Ortoni Studio will display optimized XPaths & action snippets
-                  here.
+                  Ortoni Studio will display optimized XPaths & action snippets here.
                 </div>
               </div>
             ) : (
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: "4px" }}
-              >
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 {/* Table Info if inside table */}
                 {selectedElement.webtabledetails && (
                   <div style={styles.tableCard}>
                     <div style={styles.tableHeader}>
-                      Table Detected (
-                      {selectedElement.webtabledetails.totalTables} total)
+                      Table Detected ({selectedElement.webtabledetails.totalTables} total)
                     </div>
                     <div style={styles.tableRow}>
                       <span style={styles.tableLabel}>Table XPath:</span>
@@ -1034,9 +899,7 @@ const PanelApp: React.FC = () => {
                           )
                         }
                       >
-                        {colorizeXPath(
-                          selectedElement.webtabledetails.tableLocator,
-                        )}
+                        {colorizeXPath(selectedElement.webtabledetails.tableLocator)}
                       </code>
                     </div>
                     <div style={styles.tableRow}>
@@ -1051,9 +914,7 @@ const PanelApp: React.FC = () => {
                           )
                         }
                       >
-                        {colorizeXPath(
-                          selectedElement.webtabledetails.tableData,
-                        )}
+                        {colorizeXPath(selectedElement.webtabledetails.tableData)}
                       </code>
                     </div>
                   </div>
@@ -1073,9 +934,7 @@ const PanelApp: React.FC = () => {
                         <code
                           style={styles.codeSnippet}
                           title="Click to copy locator"
-                          onClick={() =>
-                            copyToClipboard(value, "Locator copied!")
-                          }
+                          onClick={() => copyToClipboard(value, "Locator copied!")}
                         >
                           {colorizeXPath(value)}
                         </code>
@@ -1097,10 +956,7 @@ const PanelApp: React.FC = () => {
                           <option value="snippet" disabled>
                             Snippet
                           </option>
-                          {getActionsForTag(
-                            selectedElement.tag,
-                            selectedElement.type,
-                          ).map(
+                          {getActionsForTag(selectedElement.tag, selectedElement.type).map(
                             (act) =>
                               act !== "snippet" && (
                                 <option key={act} value={act}>
@@ -1125,12 +981,8 @@ const PanelApp: React.FC = () => {
             !selectedElement.cssPath ||
             selectedElement.cssPath.length === 0 ? (
               <div style={styles.emptyState}>
-                <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>
-                  🎨
-                </div>
-                <div style={styles.emptyTitle}>
-                  Select an element in Elements tab
-                </div>
+                <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>🎨</div>
+                <div style={styles.emptyTitle}>Select an element in Elements tab</div>
                 <div style={styles.emptySubtitle}>
                   Ortoni Studio will display optimized CSS selectors here.
                 </div>
@@ -1149,9 +1001,7 @@ const PanelApp: React.FC = () => {
                       <code
                         style={styles.codeSnippet}
                         title="Click to copy CSS"
-                        onClick={() =>
-                          copyToClipboard(value, "CSS Path copied!")
-                        }
+                        onClick={() => copyToClipboard(value, "CSS Path copied!")}
                       >
                         {colorizeCSS(value)}
                       </code>
@@ -1173,10 +1023,7 @@ const PanelApp: React.FC = () => {
                         <option value="snippet" disabled>
                           Snippet
                         </option>
-                        {getActionsForTag(
-                          selectedElement.tag,
-                          selectedElement.type,
-                        ).map(
+                        {getActionsForTag(selectedElement.tag, selectedElement.type).map(
                           (act) =>
                             act !== "snippet" && (
                               <option key={act} value={act}>
@@ -1198,14 +1045,11 @@ const PanelApp: React.FC = () => {
           <div>
             {!axesData ? (
               <div style={styles.emptyState}>
-                <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>
-                  🔗
-                </div>
+                <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>🔗</div>
                 <div style={styles.emptyTitle}>Axes-based dynamic locator</div>
                 <div style={styles.emptySubtitle}>
-                  Right click on the page context menu and select{" "}
-                  <strong>Parent Element</strong>, then{" "}
-                  <strong>Child Element</strong>.
+                  Right click on the page context menu and select <strong>Parent Element</strong>,
+                  then <strong>Child Element</strong>.
                 </div>
               </div>
             ) : (
@@ -1223,9 +1067,7 @@ const PanelApp: React.FC = () => {
                   <code
                     style={styles.axesResultCode}
                     title="Click to copy Axes XPath"
-                    onClick={() =>
-                      copyToClipboard(axesXPathResult, "Axes XPath copied!")
-                    }
+                    onClick={() => copyToClipboard(axesXPathResult, "Axes XPath copied!")}
                   >
                     {colorizeXPath(axesXPathResult)}
                   </code>
@@ -1296,15 +1138,10 @@ const PanelApp: React.FC = () => {
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             {!selectedElement || !selectedElement.tag ? (
               <div style={styles.emptyState}>
-                <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>
-                  🎭
-                </div>
-                <div style={styles.emptyTitle}>
-                  Select an element in Elements tab
-                </div>
+                <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>🎭</div>
+                <div style={styles.emptyTitle}>Select an element in Elements tab</div>
                 <div style={styles.emptySubtitle}>
-                  Ortoni Studio will display Playwright-recommended locators
-                  here.
+                  Ortoni Studio will display Playwright-recommended locators here.
                 </div>
               </div>
             ) : (
@@ -1326,9 +1163,7 @@ const PanelApp: React.FC = () => {
                       <code
                         style={styles.codeSnippet}
                         title="Click to copy Playwright Locator"
-                        onClick={() =>
-                          copyToClipboard(value, "Playwright locator copied!")
-                        }
+                        onClick={() => copyToClipboard(value, "Playwright locator copied!")}
                       >
                         {colorizePlaywright(value)}
                       </code>
@@ -1350,14 +1185,13 @@ const PanelApp: React.FC = () => {
                         <option value="snippet" disabled>
                           Snippet
                         </option>
-                        {getPlaywrightActions(
-                          selectedElement.tag,
-                          selectedElement.type,
-                        ).map((act) => (
-                          <option key={act} value={act}>
-                            {act}
-                          </option>
-                        ))}
+                        {getPlaywrightActions(selectedElement.tag, selectedElement.type).map(
+                          (act) => (
+                            <option key={act} value={act}>
+                              {act}
+                            </option>
+                          ),
+                        )}
                       </select>
                     </div>
                   );
@@ -1374,12 +1208,8 @@ const PanelApp: React.FC = () => {
             !selectedElement.cypressLocators ||
             selectedElement.cypressLocators.length === 0 ? (
               <div style={styles.emptyState}>
-                <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>
-                  🌲
-                </div>
-                <div style={styles.emptyTitle}>
-                  Select an element in Elements tab
-                </div>
+                <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>🌲</div>
+                <div style={styles.emptyTitle}>Select an element in Elements tab</div>
                 <div style={styles.emptySubtitle}>
                   Ortoni Studio will display Cypress-recommended locators here.
                 </div>
@@ -1398,9 +1228,7 @@ const PanelApp: React.FC = () => {
                       <code
                         style={styles.codeSnippet}
                         title="Click to copy Cypress Locator"
-                        onClick={() =>
-                          copyToClipboard(value, "Cypress locator copied!")
-                        }
+                        onClick={() => copyToClipboard(value, "Cypress locator copied!")}
                       >
                         {colorizePlaywright(value)}
                       </code>
@@ -1431,10 +1259,7 @@ const PanelApp: React.FC = () => {
                           } else if (act === "select") {
                             code = `${value}.select('value')`;
                           }
-                          copyToClipboard(
-                            code,
-                            "Cypress action snippet copied!",
-                          );
+                          copyToClipboard(code, "Cypress action snippet copied!");
                           e.target.value = "snippet";
                         }}
                         defaultValue="snippet"
@@ -1473,9 +1298,7 @@ const PanelApp: React.FC = () => {
                   alignItems: "center",
                 }}
               >
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "6px" }}
-                >
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   {isRecordingActive ? (
                     <div
                       style={{
@@ -1484,13 +1307,8 @@ const PanelApp: React.FC = () => {
                         gap: "6px",
                       }}
                     >
-                      <span
-                        className="pulse-red-dot"
-                        style={styles.pulseRedDot}
-                      ></span>
-                      <span style={{ color: "#ff4d4d", fontWeight: 600 }}>
-                        Recording...
-                      </span>
+                      <span className="pulse-red-dot" style={styles.pulseRedDot}></span>
+                      <span style={{ color: "#ff4d4d", fontWeight: 600 }}>Recording...</span>
                     </div>
                   ) : (
                     <div
@@ -1501,15 +1319,11 @@ const PanelApp: React.FC = () => {
                       }}
                     >
                       <span style={styles.greenDot}></span>
-                      <span style={{ color: "#4ade80", fontWeight: 600 }}>
-                        Idle
-                      </span>
+                      <span style={{ color: "#4ade80", fontWeight: 600 }}>Idle</span>
                     </div>
                   )}
                 </div>
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
-                >
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <label
                     className="form-switch"
                     style={{
@@ -1538,24 +1352,15 @@ const PanelApp: React.FC = () => {
                   </label>
                   <div style={{ display: "flex", gap: "4px" }}>
                     {isRecordingActive ? (
-                      <button
-                        style={styles.btnStopRecord}
-                        onClick={handleStopRecording}
-                      >
+                      <button style={styles.btnStopRecord} onClick={handleStopRecording}>
                         Stop Recording
                       </button>
                     ) : (
-                      <button
-                        style={styles.btnStartRecord}
-                        onClick={handleStartRecording}
-                      >
+                      <button style={styles.btnStartRecord} onClick={handleStartRecording}>
                         Start Recording
                       </button>
                     )}
-                    <button
-                      style={styles.btnClear}
-                      onClick={handleClearRecording}
-                    >
+                    <button style={styles.btnClear} onClick={handleClearRecording}>
                       Clear
                     </button>
                   </div>
@@ -1602,9 +1407,7 @@ const PanelApp: React.FC = () => {
                   flexDirection: "column",
                 }}
               >
-                <div style={styles.toolTitle}>
-                  Recorded Steps ({recordedSteps.length})
-                </div>
+                <div style={styles.toolTitle}>Recorded Steps ({recordedSteps.length})</div>
                 <div
                   ref={stepsContainerRef}
                   style={{
@@ -1650,9 +1453,7 @@ const PanelApp: React.FC = () => {
                             gap: "6px",
                           }}
                         >
-                          <span style={{ color: "#858585", fontSize: "9px" }}>
-                            {i + 1}.
-                          </span>
+                          <span style={{ color: "#858585", fontSize: "9px" }}>{i + 1}.</span>
                           <span
                             style={{
                               fontSize: "9px",
@@ -1749,11 +1550,7 @@ const PanelApp: React.FC = () => {
                     value={langID}
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                       setLangID(e.target.value);
-                      if (
-                        typeof chrome !== "undefined" &&
-                        chrome.storage &&
-                        chrome.storage.local
-                      ) {
+                      if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
                         chrome.storage.local.set({ langID: e.target.value });
                       } else {
                         localStorage.setItem("langID", e.target.value);
@@ -1805,9 +1602,7 @@ const PanelApp: React.FC = () => {
                           width: "6px",
                           height: "6px",
                           borderRadius: "50%",
-                          backgroundColor: isAutoSyncActive
-                            ? "#4ade80"
-                            : "#ff9800",
+                          backgroundColor: isAutoSyncActive ? "#4ade80" : "#ff9800",
                           display: "inline-block",
                         }}
                       />
@@ -1872,14 +1667,10 @@ const PanelApp: React.FC = () => {
                         <input
                           type="checkbox"
                           checked={isAutoSyncActive}
-                          onChange={(e) =>
-                            setIsAutoSyncActive(e.target.checked)
-                          }
+                          onChange={(e) => setIsAutoSyncActive(e.target.checked)}
                         />
                         <i className="form-icon"></i>
-                        <span style={{ fontSize: "10px", marginLeft: "4px" }}>
-                          Auto Sync
-                        </span>
+                        <span style={{ fontSize: "10px", marginLeft: "4px" }}>Auto Sync</span>
                       </label>
                     </div>
                   </div>
@@ -1905,8 +1696,7 @@ const PanelApp: React.FC = () => {
                         backgroundColor: "#1a1a1a",
                         color: "#6e7681",
                         textAlign: "right",
-                        fontFamily:
-                          "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
+                        fontFamily: "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
                         fontSize: "10px",
                         lineHeight: "1.6",
                         userSelect: "none",
@@ -1944,8 +1734,7 @@ const PanelApp: React.FC = () => {
                           padding: "6px 8px",
                           backgroundColor: "#1e1e1e",
                           color: "#d4d4d4",
-                          fontFamily:
-                            "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
+                          fontFamily: "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
                           fontSize: "10px",
                           lineHeight: "1.6",
                           whiteSpace: "pre",
@@ -1974,8 +1763,7 @@ const PanelApp: React.FC = () => {
                           caretColor: "#cccccc",
                           border: "none",
                           padding: "6px 8px",
-                          fontFamily:
-                            "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
+                          fontFamily: "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
                           fontSize: "10px",
                           lineHeight: "1.6",
                           resize: "none",
@@ -1990,17 +1778,10 @@ const PanelApp: React.FC = () => {
                   </div>
 
                   {/* Copy / Download Footer */}
-                  <div
-                    style={{ display: "flex", gap: "4px", marginTop: "6px" }}
-                  >
+                  <div style={{ display: "flex", gap: "4px", marginTop: "6px" }}>
                     <button
                       style={{ ...styles.btnFind, flex: 1 }}
-                      onClick={() =>
-                        copyToClipboard(
-                          editedCode,
-                          "Script copied to clipboard!",
-                        )
-                      }
+                      onClick={() => copyToClipboard(editedCode, "Script copied to clipboard!")}
                     >
                       Copy Script
                     </button>
@@ -2024,12 +1805,9 @@ const PanelApp: React.FC = () => {
             <div style={styles.toolCard}>
               <div style={styles.toolTitle}>Universal Locator Evaluator</div>
               <div style={styles.toolDesc}>
-                Evaluate, test, and highlight XPaths, CSS, and Playwright
-                locators.
+                Evaluate, test, and highlight XPaths, CSS, and Playwright locators.
               </div>
-              <div
-                style={{ display: "flex", gap: "4px", alignItems: "stretch" }}
-              >
+              <div style={{ display: "flex", gap: "4px", alignItems: "stretch" }}>
                 <input
                   type="text"
                   className="form-input"
@@ -2051,13 +1829,7 @@ const PanelApp: React.FC = () => {
                 </button>
               </div>
               {searchResult && (
-                <div
-                  style={
-                    searchResult.count > 0
-                      ? styles.searchSuccess
-                      : styles.searchFail
-                  }
-                >
+                <div style={searchResult.count > 0 ? styles.searchSuccess : styles.searchFail}>
                   Matched elements: <strong>{searchResult.count}</strong>
                 </div>
               )}
@@ -2067,12 +1839,9 @@ const PanelApp: React.FC = () => {
             <div style={styles.toolCard}>
               <div style={styles.toolTitle}>XPath to CSS Converter</div>
               <div style={styles.toolDesc}>
-                Convert standard XPath queries directly into CSS selectors
-                (Beta).
+                Convert standard XPath queries directly into CSS selectors (Beta).
               </div>
-              <div
-                style={{ display: "flex", gap: "4px", alignItems: "stretch" }}
-              >
+              <div style={{ display: "flex", gap: "4px", alignItems: "stretch" }}>
                 <input
                   type="text"
                   className="form-input"
@@ -2104,9 +1873,7 @@ const PanelApp: React.FC = () => {
                   <code
                     style={styles.convertCode}
                     title="Click to copy CSS Selector"
-                    onClick={() =>
-                      copyToClipboard(convertResult, "Converted CSS copied!")
-                    }
+                    onClick={() => copyToClipboard(convertResult, "Converted CSS copied!")}
                   >
                     {colorizeCSS(convertResult)}
                   </code>
@@ -2159,8 +1926,8 @@ const PanelApp: React.FC = () => {
                 margin: "6px 0",
               }}
             >
-              A premium, lightweight developer tool built to accelerate locator
-              building and CSS/XPath generation for test automation.
+              A premium, lightweight developer tool built to accelerate locator building and
+              CSS/XPath generation for test automation.
             </p>
 
             <div style={styles.divider} />
@@ -2174,17 +1941,8 @@ const PanelApp: React.FC = () => {
                 alignItems: "center",
               }}
             >
-              <a
-                href="https://youtube.com/@letcode"
-                target="_blank"
-                title="YouTube Channel"
-              >
-                <svg
-                  className="social-svg-icon youtube"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                >
+              <a href="https://youtube.com/@letcode" target="_blank" title="YouTube Channel">
+                <svg className="social-svg-icon youtube" width="16" height="16" viewBox="0 0 24 24">
                   <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.518 3.545 12 3.545 12 3.545s-7.518 0-9.388.507a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.87.507 9.388.507 9.388.507s7.518 0 9.388-.507a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                 </svg>
               </a>
@@ -2193,12 +1951,7 @@ const PanelApp: React.FC = () => {
                 target="_blank"
                 title="GitHub Repository"
               >
-                <svg
-                  className="social-svg-icon github"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="social-svg-icon github" width="16" height="16" viewBox="0 0 24 24">
                   <path d="M12 0C5.37 0 0 5.37 0 12c0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.82 1.102.82 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.3 24 12c0-6.63-5.37-12-12-12z" />
                 </svg>
               </a>
@@ -2216,17 +1969,8 @@ const PanelApp: React.FC = () => {
                   <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                 </svg>
               </a>
-              <a
-                href="https://letcode.in"
-                target="_blank"
-                title="LetCode Website"
-              >
-                <svg
-                  className="social-svg-icon globe"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                >
+              <a href="https://letcode.in" target="_blank" title="LetCode Website">
+                <svg className="social-svg-icon globe" width="16" height="16" viewBox="0 0 24 24">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
                 </svg>
               </a>
@@ -2235,12 +1979,7 @@ const PanelApp: React.FC = () => {
                 target="_blank"
                 title="Rate on Chrome Web Store"
               >
-                <svg
-                  className="social-svg-icon star"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="social-svg-icon star" width="16" height="16" viewBox="0 0 24 24">
                   <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                 </svg>
               </a>
@@ -2262,9 +2001,7 @@ const PanelApp: React.FC = () => {
               >
                 Our Automation Tools
               </div>
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: "4px" }}
-              >
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 <a
                   href="https://github.com/ortoniKC/ortoni-report"
                   target="_blank"
@@ -2308,8 +2045,7 @@ const PanelApp: React.FC = () => {
                       lineHeight: "1.2",
                     }}
                   >
-                    Sleek, feature-rich HTML reporter for Playwright test
-                    results.
+                    Sleek, feature-rich HTML reporter for Playwright test results.
                   </div>
                 </a>
 
@@ -2356,8 +2092,7 @@ const PanelApp: React.FC = () => {
                       lineHeight: "1.2",
                     }}
                   >
-                    VS Code extension to run Playwright & Cucumber tests
-                    instantly.
+                    VS Code extension to run Playwright & Cucumber tests instantly.
                   </div>
                 </a>
               </div>
@@ -2405,18 +2140,13 @@ const PanelApp: React.FC = () => {
                       maxWidth: "140px",
                     }}
                   >
-                    Ortoni Studio is free & open-source. Consider donating to
-                    help maintain it!
+                    Ortoni Studio is free & open-source. Consider donating to help maintain it!
                   </div>
                 </div>
 
                 {/* QR Code trigger-zoomable wrapper */}
                 <div className="qr-wrapper" title="Hover to enlarge QR Code">
-                  <img
-                    src="../assets/ortoni.png"
-                    alt="Donate UPI QR Code"
-                    className="qr-image"
-                  />
+                  <img src="../assets/ortoni.png" alt="Donate UPI QR Code" className="qr-image" />
                 </div>
               </div>
 
@@ -2431,9 +2161,7 @@ const PanelApp: React.FC = () => {
                 <span style={{ color: "#858585", fontSize: "9px" }}>UPI:</span>
                 <div
                   className="upi-copy-badge"
-                  onClick={() =>
-                    copyToClipboard("ortoni@ybl", "UPI ID copied to clipboard!")
-                  }
+                  onClick={() => copyToClipboard("ortoni@ybl", "UPI ID copied to clipboard!")}
                   title="Click to copy UPI ID"
                 >
                   <span>ortoni@ybl</span>
@@ -2447,14 +2175,7 @@ const PanelApp: React.FC = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <rect
-                      x="9"
-                      y="9"
-                      width="13"
-                      height="13"
-                      rx="2"
-                      ry="2"
-                    ></rect>
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                   </svg>
                 </div>

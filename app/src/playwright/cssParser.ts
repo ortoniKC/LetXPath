@@ -44,12 +44,10 @@ export function parseCSS(
   let tokens: css.CSSTokenInterface[];
   try {
     tokens = css.tokenize(selector);
-    if (!(tokens[tokens.length - 1] instanceof css.EOFToken))
-      tokens.push(new css.EOFToken());
+    if (!(tokens[tokens.length - 1] instanceof css.EOFToken)) tokens.push(new css.EOFToken());
   } catch (err: any) {
     const newMessage =
-      err.message +
-      ` while parsing css selector "${selector}". Did you mean to CSS.escape it?`;
+      err.message + ` while parsing css selector "${selector}". Did you mean to CSS.escape it?`;
     const index = (err.stack || "").indexOf(err.message);
     if (index !== -1)
       err.stack =
@@ -134,8 +132,7 @@ export function parseCSS(
 
   function isClauseCombinator(p = pos) {
     return (
-      tokens[p] instanceof css.DelimToken &&
-      [">", "+", "~"].includes(tokens[p].value as string)
+      tokens[p] instanceof css.DelimToken && [">", "+", "~"].includes(tokens[p].value as string)
     );
   }
 
@@ -208,10 +205,7 @@ export function parseCSS(
         rawCSSString += tokens[pos++].toSource();
       } else if (tokens[pos] instanceof css.HashToken) {
         rawCSSString += tokens[pos++].toSource();
-      } else if (
-        tokens[pos] instanceof css.DelimToken &&
-        tokens[pos].value === "."
-      ) {
+      } else if (tokens[pos] instanceof css.DelimToken && tokens[pos].value === ".") {
         pos++;
         if (isIdent()) rawCSSString += "." + tokens[pos++].toSource();
         else throw unexpected();

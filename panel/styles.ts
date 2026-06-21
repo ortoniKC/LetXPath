@@ -42,8 +42,7 @@ export const styles = {
     minHeight: "100vh",
     display: "flex",
     flexDirection: "column" as const,
-    fontFamily:
-      'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: "11px",
   },
   navBar: {

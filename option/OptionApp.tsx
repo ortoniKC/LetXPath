@@ -11,8 +11,7 @@ interface TemplateGroup {
 
 const DEFAULT_TEMPLATES: Record<"jscs" | "javacs", TemplateGroup> = {
   jscs: {
-    click:
-      "private ${vn} = ${lc};\nasync clickOn${mn}(){\n  await this.click(this.${vn})\n}",
+    click: "private ${vn} = ${lc};\nasync clickOn${mn}(){\n  await this.click(this.${vn})\n}",
     send: "private ${vn} = ${lc};\nasync enter${mn}(value){\n  await this.sendKeys(this.${vn}, value)\n}",
     text: "private ${vn} = ${lc};\nasync get${mn}Text(){\n  return await this.getText(this.${vn})\n}",
     attr: "private ${vn} = ${lc};\nasync get${mn}Attr(attribute){\n  return await this.getAttribute(this.${vn}, attribute)\n}",
@@ -104,18 +103,16 @@ const FRAMEWORKS: FrameworkOption[] = [
 ];
 
 const OptionApp: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<
-    "general" | "selectors" | "templates" | "about"
-  >("general");
+  const [activeTab, setActiveTab] = useState<"general" | "selectors" | "templates" | "about">(
+    "general",
+  );
   const [langID, setLangID] = useState<string>("javas");
   const [customLang, setCustomLang] = useState<"jscs" | "javacs">("javacs");
   const [clickvalue, setClickvalue] = useState<string>("");
   const [sendvalue, setSendvalue] = useState<string>("");
   const [textvalue, setTextvalue] = useState<string>("");
   const [attrvalue, setAttrvalue] = useState<string>("");
-  const [selectorPriority, setSelectorPriority] = useState<string>(
-    "data-testid, id, name, class",
-  );
+  const [selectorPriority, setSelectorPriority] = useState<string>("data-testid, id, name, class");
 
   // Interactive Tags manager state
   const [tagList, setTagList] = useState<string[]>([]);
@@ -137,11 +134,7 @@ const OptionApp: React.FC = () => {
         .filter((s) => s.length > 0);
     };
 
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.storage &&
-      chrome.storage.local
-    ) {
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       chrome.storage.local.get(
         [
           "langID",
@@ -156,8 +149,7 @@ const OptionApp: React.FC = () => {
           if (result.langID) setLangID(result.langID);
           if (result.customLang) setCustomLang(result.customLang);
 
-          const priority =
-            result.selectorPriority || "data-testid, id, name, class";
+          const priority = result.selectorPriority || "data-testid, id, name, class";
           setSelectorPriority(priority);
           setTagList(parseTags(priority));
 
@@ -186,33 +178,18 @@ const OptionApp: React.FC = () => {
       );
     } else {
       // Dev LocalStorage Fallback
-      const localCustomLang =
-        (localStorage.getItem("customLang") as "jscs" | "javacs") || "javacs";
+      const localCustomLang = (localStorage.getItem("customLang") as "jscs" | "javacs") || "javacs";
       setLangID(localStorage.getItem("langID") || "javas");
       setCustomLang(localCustomLang);
 
-      const priority =
-        localStorage.getItem("selectorPriority") ||
-        "data-testid, id, name, class";
+      const priority = localStorage.getItem("selectorPriority") || "data-testid, id, name, class";
       setSelectorPriority(priority);
       setTagList(parseTags(priority));
 
-      setClickvalue(
-        localStorage.getItem("clickvalue") ||
-          DEFAULT_TEMPLATES[localCustomLang].click,
-      );
-      setSendvalue(
-        localStorage.getItem("sendvalue") ||
-          DEFAULT_TEMPLATES[localCustomLang].send,
-      );
-      setTextvalue(
-        localStorage.getItem("textvalue") ||
-          DEFAULT_TEMPLATES[localCustomLang].text,
-      );
-      setAttrvalue(
-        localStorage.getItem("attrvalue") ||
-          DEFAULT_TEMPLATES[localCustomLang].attr,
-      );
+      setClickvalue(localStorage.getItem("clickvalue") || DEFAULT_TEMPLATES[localCustomLang].click);
+      setSendvalue(localStorage.getItem("sendvalue") || DEFAULT_TEMPLATES[localCustomLang].send);
+      setTextvalue(localStorage.getItem("textvalue") || DEFAULT_TEMPLATES[localCustomLang].text);
+      setAttrvalue(localStorage.getItem("attrvalue") || DEFAULT_TEMPLATES[localCustomLang].attr);
     }
   }, []);
 
@@ -236,11 +213,7 @@ const OptionApp: React.FC = () => {
       selectorPriority,
     };
 
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.storage &&
-      chrome.storage.local
-    ) {
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       chrome.storage.local.set(data, () => {
         showToast("Settings saved successfully!", "success");
       });
@@ -257,11 +230,7 @@ const OptionApp: React.FC = () => {
     const priorityStr = newTags.join(", ");
     setSelectorPriority(priorityStr);
 
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.storage &&
-      chrome.storage.local
-    ) {
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       chrome.storage.local.set({ selectorPriority: priorityStr });
     } else {
       localStorage.setItem("selectorPriority", priorityStr);
@@ -322,11 +291,7 @@ const OptionApp: React.FC = () => {
       .filter((s) => s.length > 0);
     setTagList(parsed);
 
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.storage &&
-      chrome.storage.local
-    ) {
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       chrome.storage.local.set({ selectorPriority: val });
     } else {
       localStorage.setItem("selectorPriority", val);
@@ -361,12 +326,7 @@ const OptionApp: React.FC = () => {
   };
 
   // Compile individual templates
-  const compileTemplate = (
-    tmpl: string,
-    vn: string,
-    lc: string,
-    mn: string,
-  ): string => {
+  const compileTemplate = (tmpl: string, vn: string, lc: string, mn: string): string => {
     if (!tmpl) return "";
     return tmpl
       .replace(/\${vn}/g, vn)
@@ -549,9 +509,7 @@ const OptionApp: React.FC = () => {
           >
             {toast.type === "success" ? "✓" : "ℹ"}
           </span>
-          <span
-            style={{ fontWeight: "500", color: "#fff", fontSize: "13.5px" }}
-          >
+          <span style={{ fontWeight: "500", color: "#fff", fontSize: "13.5px" }}>
             {toast.message}
           </span>
           <button
@@ -590,14 +548,9 @@ const OptionApp: React.FC = () => {
               style={{
                 ...styles.sidebarLink,
                 backgroundColor:
-                  activeTab === "general"
-                    ? "rgba(79, 70, 229, 0.12)"
-                    : "transparent",
+                  activeTab === "general" ? "rgba(79, 70, 229, 0.12)" : "transparent",
                 color: activeTab === "general" ? "#38bdf8" : "#8b949e",
-                borderLeft:
-                  activeTab === "general"
-                    ? "4px solid #4f46e5"
-                    : "4px solid transparent",
+                borderLeft: activeTab === "general" ? "4px solid #4f46e5" : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>⚙️</span> Snippet Framework
@@ -608,18 +561,13 @@ const OptionApp: React.FC = () => {
               style={{
                 ...styles.sidebarLink,
                 backgroundColor:
-                  activeTab === "selectors"
-                    ? "rgba(79, 70, 229, 0.12)"
-                    : "transparent",
+                  activeTab === "selectors" ? "rgba(79, 70, 229, 0.12)" : "transparent",
                 color: activeTab === "selectors" ? "#38bdf8" : "#8b949e",
                 borderLeft:
-                  activeTab === "selectors"
-                    ? "4px solid #4f46e5"
-                    : "4px solid transparent",
+                  activeTab === "selectors" ? "4px solid #4f46e5" : "4px solid transparent",
               }}
             >
-              <span style={{ marginRight: "10px" }}>🎯</span> Selector
-              Priorities
+              <span style={{ marginRight: "10px" }}>🎯</span> Selector Priorities
             </button>
             <button
               className="sidebar-btn"
@@ -627,14 +575,10 @@ const OptionApp: React.FC = () => {
               style={{
                 ...styles.sidebarLink,
                 backgroundColor:
-                  activeTab === "templates"
-                    ? "rgba(79, 70, 229, 0.12)"
-                    : "transparent",
+                  activeTab === "templates" ? "rgba(79, 70, 229, 0.12)" : "transparent",
                 color: activeTab === "templates" ? "#38bdf8" : "#8b949e",
                 borderLeft:
-                  activeTab === "templates"
-                    ? "4px solid #4f46e5"
-                    : "4px solid transparent",
+                  activeTab === "templates" ? "4px solid #4f46e5" : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>📝</span> Custom Templates
@@ -644,15 +588,9 @@ const OptionApp: React.FC = () => {
               onClick={() => setActiveTab("about")}
               style={{
                 ...styles.sidebarLink,
-                backgroundColor:
-                  activeTab === "about"
-                    ? "rgba(79, 70, 229, 0.12)"
-                    : "transparent",
+                backgroundColor: activeTab === "about" ? "rgba(79, 70, 229, 0.12)" : "transparent",
                 color: activeTab === "about" ? "#38bdf8" : "#8b949e",
-                borderLeft:
-                  activeTab === "about"
-                    ? "4px solid #4f46e5"
-                    : "4px solid transparent",
+                borderLeft: activeTab === "about" ? "4px solid #4f46e5" : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>ℹ️</span> About Extension
@@ -660,9 +598,7 @@ const OptionApp: React.FC = () => {
           </div>
 
           <div style={styles.sidebarFooter}>
-            <div style={{ fontSize: "11px", color: "#484f58" }}>
-              Ortoni Studio Project
-            </div>
+            <div style={{ fontSize: "11px", color: "#484f58" }}>Ortoni Studio Project</div>
             <div
               style={{
                 fontSize: "12px",
@@ -684,8 +620,7 @@ const OptionApp: React.FC = () => {
               <div style={styles.sectionHeader}>
                 <h1 style={styles.mainTitle}>Snippet Frameworks</h1>
                 <p style={styles.mainSubtitle}>
-                  Choose the default test automation framework generated when
-                  copying locators.
+                  Choose the default test automation framework generated when copying locators.
                 </p>
               </div>
 
@@ -712,9 +647,7 @@ const OptionApp: React.FC = () => {
                       className={`framework-card ${isActive ? "active" : ""}`}
                       style={{
                         ...styles.frameworkCard,
-                        border: isActive
-                          ? "1px solid #4f46e5"
-                          : "1px solid #21262d",
+                        border: isActive ? "1px solid #4f46e5" : "1px solid #21262d",
                       }}
                     >
                       <div style={styles.cardHighlightDot} />
@@ -730,9 +663,7 @@ const OptionApp: React.FC = () => {
                       </div>
                       <div style={{ flex: 1 }}>
                         <div style={styles.cardFrameworkName}>{f.name}</div>
-                        <div style={styles.cardFrameworkSubtitle}>
-                          {f.subtitle}
-                        </div>
+                        <div style={styles.cardFrameworkSubtitle}>{f.subtitle}</div>
                       </div>
                       {isActive && <div style={styles.cardActiveCheck}>✓</div>}
                     </div>
@@ -763,9 +694,7 @@ const OptionApp: React.FC = () => {
                       Output Syntax Preview ({langID})
                     </span>
                   </div>
-                  <div style={{ fontSize: "11px", color: "#58a6ff" }}>
-                    Auto-compiles instantly
-                  </div>
+                  <div style={{ fontSize: "11px", color: "#58a6ff" }}>Auto-compiles instantly</div>
                 </div>
                 <div style={styles.previewBody}>
                   <pre style={styles.codePre}>
@@ -782,8 +711,7 @@ const OptionApp: React.FC = () => {
               <div style={styles.sectionHeader}>
                 <h1 style={styles.mainTitle}>Attribute Prioritization</h1>
                 <p style={styles.mainSubtitle}>
-                  Define the order in which HTML attributes are queried to find
-                  unique web elements.
+                  Define the order in which HTML attributes are queried to find unique web elements.
                 </p>
               </div>
 
@@ -829,18 +757,13 @@ const OptionApp: React.FC = () => {
                     >
                       Drag-style order list. Use the{" "}
                       <strong style={{ color: "#58a6ff" }}>left (◂)</strong> and{" "}
-                      <strong style={{ color: "#58a6ff" }}>right (▸)</strong>{" "}
-                      buttons on each badge to change priorities. Ortoni Studio
-                      evaluates from left to right.
+                      <strong style={{ color: "#58a6ff" }}>right (▸)</strong> buttons on each badge
+                      to change priorities. Ortoni Studio evaluates from left to right.
                     </div>
 
                     <div style={styles.priorityPillContainer}>
                       {tagList.map((tag, idx) => (
-                        <div
-                          key={tag + idx}
-                          className="priority-pill"
-                          style={styles.priorityPill}
-                        >
+                        <div key={tag + idx} className="priority-pill" style={styles.priorityPill}>
                           <div
                             style={{
                               display: "flex",
@@ -857,11 +780,7 @@ const OptionApp: React.FC = () => {
                             >
                               {idx + 1}
                             </span>
-                            <span
-                              style={{ color: "#ffffff", fontWeight: "500" }}
-                            >
-                              {tag}
-                            </span>
+                            <span style={{ color: "#ffffff", fontWeight: "500" }}>{tag}</span>
                           </div>
 
                           <div
@@ -891,10 +810,7 @@ const OptionApp: React.FC = () => {
                               style={{
                                 ...styles.pillButton,
                                 opacity: idx === tagList.length - 1 ? 0.3 : 1,
-                                cursor:
-                                  idx === tagList.length - 1
-                                    ? "not-allowed"
-                                    : "pointer",
+                                cursor: idx === tagList.length - 1 ? "not-allowed" : "pointer",
                               }}
                               title="Decrease priority"
                             >
@@ -996,13 +912,12 @@ const OptionApp: React.FC = () => {
                     lineHeight: "1.6",
                   }}
                 >
-                  When Ortoni Studio scans a web element on a page, it loops
-                  through your prioritized list of attributes. If it finds a
-                  unique element using the highest priority attribute (e.g.{" "}
-                  <code style={styles.codeText}>data-testid</code>), it creates
-                  a selector instantly. If that fails or is non-unique, it
-                  proceeds to the next attribute in the list. Setting test-ids
-                  at the top ensures robust locator generation.
+                  When Ortoni Studio scans a web element on a page, it loops through your
+                  prioritized list of attributes. If it finds a unique element using the highest
+                  priority attribute (e.g. <code style={styles.codeText}>data-testid</code>), it
+                  creates a selector instantly. If that fails or is non-unique, it proceeds to the
+                  next attribute in the list. Setting test-ids at the top ensures robust locator
+                  generation.
                 </div>
               </div>
             </div>
@@ -1014,8 +929,8 @@ const OptionApp: React.FC = () => {
               <div style={styles.sectionHeader}>
                 <h1 style={styles.mainTitle}>Custom Page Object Templates</h1>
                 <p style={styles.mainSubtitle}>
-                  Configure dynamic structural templates to match your internal
-                  framework design patterns.
+                  Configure dynamic structural templates to match your internal framework design
+                  patterns.
                 </p>
               </div>
 
@@ -1075,9 +990,7 @@ const OptionApp: React.FC = () => {
                     <div>
                       <div style={styles.textareaHeader}>
                         <span>Click Template</span>
-                        <span style={styles.textareaTag}>
-                          {"${vn}, ${lc}, ${mn}"}
-                        </span>
+                        <span style={styles.textareaTag}>{"${vn}, ${lc}, ${mn}"}</span>
                       </div>
                       <textarea
                         className="form-textarea"
@@ -1092,9 +1005,7 @@ const OptionApp: React.FC = () => {
                     <div>
                       <div style={styles.textareaHeader}>
                         <span>sendKeys Template</span>
-                        <span style={styles.textareaTag}>
-                          {"${vn}, ${lc}, ${mn}"}
-                        </span>
+                        <span style={styles.textareaTag}>{"${vn}, ${lc}, ${mn}"}</span>
                       </div>
                       <textarea
                         className="form-textarea"
@@ -1109,9 +1020,7 @@ const OptionApp: React.FC = () => {
                     <div>
                       <div style={styles.textareaHeader}>
                         <span>getText Template</span>
-                        <span style={styles.textareaTag}>
-                          {"${vn}, ${lc}, ${mn}"}
-                        </span>
+                        <span style={styles.textareaTag}>{"${vn}, ${lc}, ${mn}"}</span>
                       </div>
                       <textarea
                         className="form-textarea"
@@ -1126,9 +1035,7 @@ const OptionApp: React.FC = () => {
                     <div>
                       <div style={styles.textareaHeader}>
                         <span>getAttribute Template</span>
-                        <span style={styles.textareaTag}>
-                          {"${vn}, ${lc}, ${mn}"}
-                        </span>
+                        <span style={styles.textareaTag}>{"${vn}, ${lc}, ${mn}"}</span>
                       </div>
                       <textarea
                         className="form-textarea"
@@ -1140,11 +1047,7 @@ const OptionApp: React.FC = () => {
                       />
                     </div>
 
-                    <button
-                      type="submit"
-                      className="btn-gradient"
-                      style={{ marginTop: "10px" }}
-                    >
+                    <button type="submit" className="btn-gradient" style={{ marginTop: "10px" }}>
                       💾 Save Custom Templates
                     </button>
                   </form>
@@ -1176,12 +1079,8 @@ const OptionApp: React.FC = () => {
                         color: "#8b949e",
                       }}
                     >
-                      Mock Element:{" "}
-                      <code style={{ color: "#58a6ff" }}>button#login-btn</code>
-                      , locator:{" "}
-                      <code style={{ color: "#58a6ff" }}>
-                        "//button[@id='login']"
-                      </code>
+                      Mock Element: <code style={{ color: "#58a6ff" }}>button#login-btn</code>,
+                      locator: <code style={{ color: "#58a6ff" }}>"//button[@id='login']"</code>
                     </p>
 
                     <div
@@ -1192,9 +1091,7 @@ const OptionApp: React.FC = () => {
                       }}
                     >
                       <div>
-                        <div style={styles.compilerLabel}>
-                          Compiled Click Action
-                        </div>
+                        <div style={styles.compilerLabel}>Compiled Click Action</div>
                         <div style={styles.compilerBox}>
                           <pre style={{ margin: 0 }}>
                             <code>
@@ -1207,9 +1104,7 @@ const OptionApp: React.FC = () => {
                                     : `By.xpath("//button[@id='login']")`,
                                   "LoginBtn",
                                 ),
-                                customLang === "jscs"
-                                  ? "protractorjs"
-                                  : "javas",
+                                customLang === "jscs" ? "protractorjs" : "javas",
                               )}
                             </code>
                           </pre>
@@ -1217,9 +1112,7 @@ const OptionApp: React.FC = () => {
                       </div>
 
                       <div>
-                        <div style={styles.compilerLabel}>
-                          Compiled SendKeys Action
-                        </div>
+                        <div style={styles.compilerLabel}>Compiled SendKeys Action</div>
                         <div style={styles.compilerBox}>
                           <pre style={{ margin: 0 }}>
                             <code>
@@ -1232,9 +1125,7 @@ const OptionApp: React.FC = () => {
                                     : `By.xpath("//button[@id='login']")`,
                                   "LoginBtn",
                                 ),
-                                customLang === "jscs"
-                                  ? "protractorjs"
-                                  : "javas",
+                                customLang === "jscs" ? "protractorjs" : "javas",
                               )}
                             </code>
                           </pre>
@@ -1242,9 +1133,7 @@ const OptionApp: React.FC = () => {
                       </div>
 
                       <div>
-                        <div style={styles.compilerLabel}>
-                          Compiled GetText Action
-                        </div>
+                        <div style={styles.compilerLabel}>Compiled GetText Action</div>
                         <div style={styles.compilerBox}>
                           <pre style={{ margin: 0 }}>
                             <code>
@@ -1257,9 +1146,7 @@ const OptionApp: React.FC = () => {
                                     : `By.xpath("//button[@id='login']")`,
                                   "LoginBtn",
                                 ),
-                                customLang === "jscs"
-                                  ? "protractorjs"
-                                  : "javas",
+                                customLang === "jscs" ? "protractorjs" : "javas",
                               )}
                             </code>
                           </pre>
@@ -1300,9 +1187,7 @@ const OptionApp: React.FC = () => {
                       </div>
                       <div style={styles.tokenRow}>
                         <code style={styles.tokenCode}>{"${mn}"}</code>
-                        <div style={styles.tokenDesc}>
-                          Method suffix string (e.g. LoginButton).
-                        </div>
+                        <div style={styles.tokenDesc}>Method suffix string (e.g. LoginButton).</div>
                       </div>
                     </div>
                   </div>
@@ -1317,8 +1202,7 @@ const OptionApp: React.FC = () => {
               <div style={styles.sectionHeader}>
                 <h1 style={styles.mainTitle}>About Ortoni Studio</h1>
                 <p style={styles.mainSubtitle}>
-                  Learn more about the extension and get resources for
-                  automation testing.
+                  Learn more about the extension and get resources for automation testing.
                 </p>
               </div>
 
@@ -1338,8 +1222,7 @@ const OptionApp: React.FC = () => {
                       width: "64px",
                       height: "64px",
                       borderRadius: "16px",
-                      background:
-                        "linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)",
+                      background: "linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -1385,21 +1268,12 @@ const OptionApp: React.FC = () => {
                     paddingLeft: "20px",
                   }}
                 >
+                  <li>Generate reliable XPath expressions & CSS locators instantly.</li>
                   <li>
-                    Generate reliable XPath expressions & CSS locators
-                    instantly.
+                    Support for Cypress, Playwright, Selenium (Java, C#, Python), and Protractor.
                   </li>
-                  <li>
-                    Support for Cypress, Playwright, Selenium (Java, C#,
-                    Python), and Protractor.
-                  </li>
-                  <li>
-                    Interactive smart recorder which compiles script actions
-                    into full tests.
-                  </li>
-                  <li>
-                    Dynamic WebTable parsing and locator prioritization setup.
-                  </li>
+                  <li>Interactive smart recorder which compiles script actions into full tests.</li>
+                  <li>Dynamic WebTable parsing and locator prioritization setup.</li>
                   <li>100% open-source and local storage secured.</li>
                 </ul>
 
@@ -1466,9 +1340,9 @@ const OptionApp: React.FC = () => {
                     lineHeight: "1.5",
                   }}
                 >
-                  If you find Ortoni Studio helpful, please consider leaving a
-                  review on the Chrome Web Store or giving our GitHub repository
-                  a star. It helps other developers find the tool!
+                  If you find Ortoni Studio helpful, please consider leaving a review on the Chrome
+                  Web Store or giving our GitHub repository a star. It helps other developers find
+                  the tool!
                 </div>
               </div>
             </div>
@@ -1484,8 +1358,7 @@ const styles = {
     backgroundColor: "#080b10",
     minHeight: "100vh",
     position: "relative" as const,
-    fontFamily:
-      "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     color: "#c9d1d9",
     boxSizing: "border-box" as const,
   },

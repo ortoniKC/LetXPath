@@ -5,7 +5,7 @@ export function isValidXPath(expr: string): boolean {
     expr.length ===
       expr.replace(
         /[-_\w:.]+\(\)\s*=|=\s*[-_\w:.]+\(\)|\sor\s|\sand\s|\[(?:[^\/\]]+[\/\[]\/?.+)+\]|starts-with\(|\[.*last\(\)\s*[-\+<>=].+\]|number\(\)|not\(|count\(|text\(|first\(|normalize-space|[^\/]following-sibling|concat\(|descendant::|parent::|self::|child::|/gi,
-        ""
+        "",
       ).length
   );
 }
@@ -33,15 +33,12 @@ export function getValidationRegex(): RegExp {
   };
 
   Object.keys(subRegexes).forEach((key) => {
-    regex = regex.replace(
-      new RegExp("%\\(" + key + "\\)s", "gi"),
-      subRegexes[key]
-    );
+    regex = regex.replace(new RegExp("%\\(" + key + "\\)s", "gi"), subRegexes[key]);
   });
 
   regex = regex.replace(
     /\?P<node>|\?P<idvalue>|\?P<nav>|\?P<tag>|\?P<matched>|\?P<mattr>|\?P<mvalue>|\?P<contained>|\?P<cattr>|\?P<cvalue>|\?P<nth>/gi,
-    ""
+    "",
   );
 
   return new RegExp(regex, "gi");
@@ -50,7 +47,7 @@ export function getValidationRegex(): RegExp {
 export function preParseXpath(expr: string): string {
   return expr.replace(
     /contains\s*\(\s*concat\(["']\s+["']\s*,\s*@class\s*,\s*["']\s+["']\)\s*,\s*["']\s+([a-zA-Z0-9-_]+)\s+["']\)/gi,
-    '@class="$1"'
+    '@class="$1"',
   );
 }
 
@@ -109,36 +106,21 @@ export function xPathToCss(expr: string): string {
 
       if (match["contained"]) {
         if (match["cattr"].indexOf("@") === 0) {
-          attr =
-            "[" +
-            match["cattr"].replace(/^@/, "") +
-            '*="' +
-            match["cvalue"] +
-            '"]';
+          attr = "[" + match["cattr"].replace(/^@/, "") + '*="' + match["cvalue"] + '"]';
         }
       } else if (match["matched"]) {
         switch (match["mattr"]) {
           case "@id":
-            attr =
-              "#" +
-              match["mvalue"].replace(/^\s+|\s+$/, "").replace(/\s/g, "#");
+            attr = "#" + match["mvalue"].replace(/^\s+|\s+$/, "").replace(/\s/g, "#");
             break;
           case "@class":
-            attr =
-              "." +
-              match["mvalue"].replace(/^\s+|\s+$/, "").replace(/\s/g, ".");
+            attr = "." + match["mvalue"].replace(/^\s+|\s+$/, "").replace(/\s/g, ".");
             break;
           default:
             if (match["mvalue"].indexOf(" ") !== -1) {
-              match["mvalue"] =
-                '"' + match["mvalue"].replace(/^\s+|\s+$/, "") + '"';
+              match["mvalue"] = '"' + match["mvalue"].replace(/^\s+|\s+$/, "") + '"';
             }
-            attr =
-              "[" +
-              match["mattr"].replace("@", "") +
-              '="' +
-              match["mvalue"] +
-              '"]';
+            attr = "[" + match["mattr"].replace("@", "") + '="' + match["mvalue"] + '"]';
             break;
         }
       } else if (match["idvalue"]) {

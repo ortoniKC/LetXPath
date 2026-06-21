@@ -45,12 +45,7 @@ function namechar(code: number) {
   return namestartchar(code) || digit(code) || code === 0x2d;
 }
 function nonprintable(code: number) {
-  return (
-    between(code, 0, 8) ||
-    code === 0xb ||
-    between(code, 0xe, 0x1f) ||
-    code === 0x7f
-  );
+  return between(code, 0, 8) || code === 0xb || between(code, 0xe, 0x1f) || code === 0x7f;
 }
 function newline(code: number) {
   return code === 0xa;
@@ -80,10 +75,7 @@ function preprocess(str: string): number[] {
     }
     if (code === 0xd || code === 0xc) code = 0xa;
     if (code === 0x0) code = 0xfffd;
-    if (
-      between(code, 0xd800, 0xdbff) &&
-      between(str.charCodeAt(i + 1), 0xdc00, 0xdfff)
-    ) {
+    if (between(code, 0xd800, 0xdbff) && between(str.charCodeAt(i + 1), 0xdc00, 0xdfff)) {
       // Decode a surrogate pair into an astral codepoint.
       const lead = code - 0xd800;
       const trail = str.charCodeAt(i + 1) - 0xdc00;
@@ -129,8 +121,7 @@ export function tokenize(str1: string): CSSTokenInterface[] {
   };
   const next = function (num?: number) {
     if (num === undefined) num = 1;
-    if (num > 3)
-      throw "Spec Error: no more than three codepoints of lookahead.";
+    if (num > 3) throw "Spec Error: no more than three codepoints of lookahead.";
     return codepoint(i + num);
   };
   const consume = function (num?: number): boolean {
@@ -175,8 +166,7 @@ export function tokenize(str1: string): CSSTokenInterface[] {
     } else if (code === 0x23) {
       if (namechar(next()) || areAValidEscape(next(1), next(2))) {
         const token = new HashToken("");
-        if (wouldStartAnIdentifier(next(1), next(2), next(3)))
-          token.type = "id";
+        if (wouldStartAnIdentifier(next(1), next(2), next(3))) token.type = "id";
         token.value = consumeAName();
         return token;
       } else {
@@ -356,9 +346,7 @@ export function tokenize(str1: string): CSSTokenInterface[] {
     }
   };
 
-  const consumeAStringToken = function (
-    endingCodePoint?: number,
-  ): CSSParserToken {
+  const consumeAStringToken = function (endingCodePoint?: number): CSSParserToken {
     if (endingCodePoint === undefined) endingCodePoint = code;
     let string = "";
     while (consume()) {
@@ -395,12 +383,7 @@ export function tokenize(str1: string): CSSTokenInterface[] {
           consumeTheRemnantsOfABadURL();
           return new BadURLToken();
         }
-      } else if (
-        code === 0x22 ||
-        code === 0x27 ||
-        code === 0x28 ||
-        nonprintable(code)
-      ) {
+      } else if (code === 0x22 || code === 0x27 || code === 0x28 || nonprintable(code)) {
         parseerror();
         consumeTheRemnantsOfABadURL();
         return new BadURLToken();
@@ -462,8 +445,7 @@ export function tokenize(str1: string): CSSTokenInterface[] {
   };
 
   const wouldStartAnIdentifier = function (c1: number, c2: number, c3: number) {
-    if (c1 === 0x2d)
-      return namestartchar(c2) || c2 === 0x2d || areAValidEscape(c2, c3);
+    if (c1 === 0x2d) return namestartchar(c2) || c2 === 0x2d || areAValidEscape(c2, c3);
     else if (namestartchar(c1)) return true;
     else if (c1 === 0x5c) return areAValidEscape(c1, c2);
     else return false;
@@ -540,11 +522,7 @@ export function tokenize(str1: string): CSSTokenInterface[] {
         consume();
         repr += stringFromCode(code);
       }
-    } else if (
-      (c1 === 0x45 || c1 === 0x65) &&
-      (c2 === 0x2b || c2 === 0x2d) &&
-      digit(c3)
-    ) {
+    } else if ((c1 === 0x45 || c1 === 0x65) && (c2 === 0x2b || c2 === 0x2d) && digit(c3)) {
       consume();
       repr += stringFromCode(code);
       consume();
@@ -583,8 +561,7 @@ export function tokenize(str1: string): CSSTokenInterface[] {
   while (!eof(next())) {
     tokens.push(consumeAToken());
     iterationCount++;
-    if (iterationCount > str.length * 2)
-      throw new Error("I'm infinite-looping!");
+    if (iterationCount > str.length * 2) throw new Error("I'm infinite-looping!");
   }
   return tokens;
 }
@@ -751,8 +728,7 @@ export class DelimToken extends CSSParserToken {
   }
 
   override toJSON() {
-    const json =
-      this.constructor.prototype.constructor.prototype.toJSON.call(this);
+    const json = this.constructor.prototype.constructor.prototype.toJSON.call(this);
     json.value = this.value;
     return json;
   }
@@ -770,8 +746,7 @@ export abstract class StringValuedToken extends CSSParserToken {
   }
 
   override toJSON() {
-    const json =
-      this.constructor.prototype.constructor.prototype.toJSON.call(this);
+    const json = this.constructor.prototype.constructor.prototype.toJSON.call(this);
     json.value = this.value;
     return json;
   }
@@ -838,8 +813,7 @@ export class HashToken extends StringValuedToken {
   }
 
   override toJSON() {
-    const json =
-      this.constructor.prototype.constructor.prototype.toJSON.call(this);
+    const json = this.constructor.prototype.constructor.prototype.toJSON.call(this);
     json.value = this.value;
     json.type = this.type;
     return json;
@@ -915,8 +889,7 @@ export class PercentageToken extends CSSParserToken {
     return "PERCENTAGE(" + this.value + ")";
   }
   override toJSON() {
-    const json =
-      this.constructor.prototype.constructor.prototype.toJSON.call(this);
+    const json = this.constructor.prototype.constructor.prototype.toJSON.call(this);
     json.value = this.value;
     json.repr = this.repr;
     return json;
@@ -943,8 +916,7 @@ export class DimensionToken extends CSSParserToken {
     return "DIM(" + this.value + "," + this.unit + ")";
   }
   override toJSON() {
-    const json =
-      this.constructor.prototype.constructor.prototype.toJSON.call(this);
+    const json = this.constructor.prototype.constructor.prototype.toJSON.call(this);
     json.value = this.value;
     json.type = this.type;
     json.repr = this.repr;
@@ -973,9 +945,7 @@ function escapeIdent(string: string) {
   for (let i = 0; i < string.length; i++) {
     const code = string.charCodeAt(i);
     if (code === 0x0)
-      throw new InvalidCharacterError(
-        "Invalid character: the input contains U+0000.",
-      );
+      throw new InvalidCharacterError("Invalid character: the input contains U+0000.");
 
     if (
       between(code, 0x1, 0x1f) ||
@@ -1007,9 +977,7 @@ function escapeHash(string: string) {
   for (let i = 0; i < string.length; i++) {
     const code = string.charCodeAt(i);
     if (code === 0x0)
-      throw new InvalidCharacterError(
-        "Invalid character: the input contains U+0000.",
-      );
+      throw new InvalidCharacterError("Invalid character: the input contains U+0000.");
 
     if (
       code >= 0x80 ||
@@ -1032,12 +1000,9 @@ function escapeString(string: string) {
     const code = string.charCodeAt(i);
 
     if (code === 0x0)
-      throw new InvalidCharacterError(
-        "Invalid character: the input contains U+0000.",
-      );
+      throw new InvalidCharacterError("Invalid character: the input contains U+0000.");
 
-    if (between(code, 0x1, 0x1f) || code === 0x7f)
-      result += "\\" + code.toString(16) + " ";
+    if (between(code, 0x1, 0x1f) || code === 0x7f) result += "\\" + code.toString(16) + " ";
     else if (code === 0x22 || code === 0x5c) result += "\\" + string[i];
     else result += string[i];
   }

@@ -32,13 +32,7 @@ const kNestedSelectorNames = new Set([
   "below",
   "near",
 ]);
-const kNestedSelectorNamesWithDistance = new Set([
-  "left-of",
-  "right-of",
-  "above",
-  "below",
-  "near",
-]);
+const kNestedSelectorNamesWithDistance = new Set(["left-of", "right-of", "above", "below", "near"]);
 
 export type ParsedSelectorPart = {
   name: string;
@@ -101,24 +95,15 @@ export function parseSelector(selector: string): ParsedSelector {
           unescaped.length > 2 ||
           typeof unescaped[0] !== "string"
         )
-          throw new InvalidSelectorError(
-            `Malformed selector: ${part.name}=` + part.body,
-          );
+          throw new InvalidSelectorError(`Malformed selector: ${part.name}=` + part.body);
         innerSelector = unescaped[0];
         if (unescaped.length === 2) {
-          if (
-            typeof unescaped[1] !== "number" ||
-            !kNestedSelectorNamesWithDistance.has(part.name)
-          )
-            throw new InvalidSelectorError(
-              `Malformed selector: ${part.name}=` + part.body,
-            );
+          if (typeof unescaped[1] !== "number" || !kNestedSelectorNamesWithDistance.has(part.name))
+            throw new InvalidSelectorError(`Malformed selector: ${part.name}=` + part.body);
           distance = unescaped[1];
         }
       } catch (e) {
-        throw new InvalidSelectorError(
-          `Malformed selector: ${part.name}=` + part.body,
-        );
+        throw new InvalidSelectorError(`Malformed selector: ${part.name}=` + part.body);
       }
       const nested = {
         name: part.name,
@@ -127,13 +112,8 @@ export function parseSelector(selector: string): ParsedSelector {
       };
       const lastFrame = [...nested.body.parsed.parts]
         .reverse()
-        .find(
-          (part) =>
-            part.name === "internal:control" && part.body === "enter-frame",
-        );
-      const lastFrameIndex = lastFrame
-        ? nested.body.parsed.parts.indexOf(lastFrame)
-        : -1;
+        .find((part) => part.name === "internal:control" && part.body === "enter-frame");
+      const lastFrameIndex = lastFrame ? nested.body.parsed.parts.indexOf(lastFrame) : -1;
       // Allow nested selectors to start with the same frame selector.
       if (
         lastFrameIndex !== -1 &&
@@ -149,9 +129,7 @@ export function parseSelector(selector: string): ParsedSelector {
     parts.push({ ...part, source: part.body });
   }
   if (kNestedSelectorNames.has(parts[0].name))
-    throw new InvalidSelectorError(
-      `"${parts[0].name}" selector cannot be first`,
-    );
+    throw new InvalidSelectorError(`"${parts[0].name}" selector cannot be first`);
   return {
     capture: parsedStrings.capture,
     parts,
@@ -185,23 +163,15 @@ export function splitSelectorByFrame(selectorText: string): ParsedSelector[] {
       `Selector cannot end with entering frame, while parsing selector ${selectorText}`,
     );
   result.push(chunk);
-  if (
-    typeof selector.capture === "number" &&
-    typeof result[result.length - 1].capture !== "number"
-  )
+  if (typeof selector.capture === "number" && typeof result[result.length - 1].capture !== "number")
     throw new InvalidSelectorError(
       `Can not capture the selector before diving into the frame. Only use * after the last frame has been selected`,
     );
   return result;
 }
 
-function selectorPartsEqual(
-  list1: ParsedSelectorPart[],
-  list2: ParsedSelectorPart[],
-) {
-  return (
-    stringifySelector({ parts: list1 }) === stringifySelector({ parts: list2 })
-  );
+function selectorPartsEqual(list1: ParsedSelectorPart[], list2: ParsedSelectorPart[]) {
+  return stringifySelector({ parts: list1 }) === stringifySelector({ parts: list2 });
 }
 
 export function stringifySelector(
@@ -214,10 +184,7 @@ export function stringifySelector(
       let includeEngine = true;
       if (!forceEngineName && i !== selector.capture) {
         if (p.name === "css") includeEngine = false;
-        else if (
-          (p.name === "xpath" && p.source.startsWith("//")) ||
-          p.source.startsWith("..")
-        )
+        else if ((p.name === "xpath" && p.source.startsWith("//")) || p.source.startsWith(".."))
           includeEngine = false;
       }
       const prefix = includeEngine ? p.name + "=" : "";
@@ -259,18 +226,10 @@ function parseSelectorString(selector: string): ParsedSelectorStrings {
     ) {
       name = part.substring(0, eqIndex).trim();
       body = part.substring(eqIndex + 1);
-    } else if (
-      part.length > 1 &&
-      part[0] === '"' &&
-      part[part.length - 1] === '"'
-    ) {
+    } else if (part.length > 1 && part[0] === '"' && part[part.length - 1] === '"') {
       name = "text";
       body = part;
-    } else if (
-      part.length > 1 &&
-      part[0] === "'" &&
-      part[part.length - 1] === "'"
-    ) {
+    } else if (part.length > 1 && part[0] === "'" && part[part.length - 1] === "'") {
       name = "text";
       body = part;
     } else if (/^\(*\/\//.test(part) || part.startsWith("..")) {
@@ -291,9 +250,7 @@ function parseSelectorString(selector: string): ParsedSelectorStrings {
     result.parts.push({ name, body });
     if (capture) {
       if (result.capture !== undefined)
-        throw new InvalidSelectorError(
-          `Only one of the selectors can capture using * modifier`,
-        );
+        throw new InvalidSelectorError(`Only one of the selectors can capture using * modifier`);
       result.capture = result.parts.length - 1;
     }
   };
@@ -337,14 +294,7 @@ function parseSelectorString(selector: string): ParsedSelectorStrings {
   return result;
 }
 
-export type AttributeSelectorOperator =
-  | "<truthy>"
-  | "="
-  | "*="
-  | "|="
-  | "^="
-  | "$="
-  | "~=";
+export type AttributeSelectorOperator = "<truthy>" | "=" | "*=" | "|=" | "^=" | "$=" | "~=";
 export type AttributeSelectorPart = {
   name: string;
   jsonPath: string[];
@@ -454,8 +404,7 @@ export function parseAttributeSelector(
   function readAttributeToken() {
     let token = "";
     skipSpaces();
-    if (next() === `'` || next() === `"`)
-      token = readQuotedString(next()).slice(1, -1);
+    if (next() === `'` || next() === `"`) token = readQuotedString(next()).slice(1, -1);
     else token = readIdentifier();
     if (!token) syntaxError("parsing property path");
     return token;
@@ -466,8 +415,7 @@ export function parseAttributeSelector(
     let op = "";
     if (!EOL) op += eat1();
     if (!EOL && op !== "=") op += eat1();
-    if (!["=", "*=", "^=", "$=", "|=", "~="].includes(op))
-      syntaxError("parsing operator");
+    if (!["=", "*=", "^=", "$=", "|=", "~="].includes(op)) syntaxError("parsing operator");
     return op as AttributeSelectorOperator;
   }
 
@@ -521,11 +469,7 @@ export function parseAttributeSelector(
       }
     } else {
       value = "";
-      while (
-        !EOL &&
-        (isCSSNameChar(next()) || next() === "+" || next() === ".")
-      )
-        value += eat1();
+      while (!EOL && (isCSSNameChar(next()) || next() === "+" || next() === ".")) value += eat1();
       if (value === "true") {
         value = true;
       } else if (value === "false") {

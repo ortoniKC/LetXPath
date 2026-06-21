@@ -1,8 +1,13 @@
-import { state } from './state';
-import { evaluateXPathExpression, getNumberOfXPath, addIndexToXpath } from './utils';
-import { sendMessage } from './content';
+import { state } from "./state";
+import { evaluateXPathExpression, getNumberOfXPath, addIndexToXpath } from "./utils";
+import { sendMessage } from "./content";
 
-export function getAnchorXPath(getsingleXPath: any, tagArr: string[], dupArray: any[], element: HTMLElement): void {
+export function getAnchorXPath(
+  getsingleXPath: any,
+  tagArr: string[],
+  dupArray: any[],
+  element: HTMLElement,
+): void {
   if (dupArray.length == 0) {
     const r = evaluateXPathExpression("//*[@letxxpath='letX']");
     const a = r?.singleNodeValue as HTMLElement | null;
@@ -36,9 +41,7 @@ export function getAnchorXPath(getsingleXPath: any, tagArr: string[], dupArray: 
     const secondElement = `*[@letxxpath='letX']`;
     if (getNumberOfXPath(`${firstElement}/following::${secondElement}`) == 1) {
       state.setPreOrFol = "/following::";
-    } else if (
-      getNumberOfXPath(`${firstElement}/preceding::${secondElement}`) == 1
-    ) {
+    } else if (getNumberOfXPath(`${firstElement}/preceding::${secondElement}`) == 1) {
       state.setPreOrFol = "/preceding::";
     } else {
       state.setPreOrFol = null;
@@ -69,7 +72,7 @@ export function getAnchorXPath(getsingleXPath: any, tagArr: string[], dupArray: 
     state.tagArrHolder = [];
     dupArray.length = 0;
   }
-  
+
   function extractXPathFormArray(sxp: any, anchorArr: any[], tag: string) {
     for (const key in sxp) {
       const xpathNumber = sxp[key][0];
@@ -122,8 +125,15 @@ export function getAnchorXPath(getsingleXPath: any, tagArr: string[], dupArray: 
       }
     }
   }
-  
-  function pushXPath(xpathData: string, anchorArr: any[], tag: string, attr: string, number: number, xpathValue: any) {
+
+  function pushXPath(
+    xpathData: string,
+    anchorArr: any[],
+    tag: string,
+    attr: string,
+    number: number,
+    xpathValue: any,
+  ) {
     if (xpathData.startsWith("//") || xpathData.startsWith("(")) {
       if (xpathData.startsWith("//")) {
         xpathData = xpathData.substring(2, xpathData.length);
