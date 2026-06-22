@@ -50,6 +50,10 @@ export const RecordingApp: React.FC = () => {
         setStatus("idle");
         setDuration(0);
 
+        if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
+          chrome.runtime.sendMessage({ action: "RECORDING_STOPPED" });
+        }
+
         // Close window shortly after download starts
         setTimeout(() => {
           window.close();
@@ -61,6 +65,10 @@ export const RecordingApp: React.FC = () => {
 
       setStatus("recording");
       setDuration(0);
+
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
+        chrome.runtime.sendMessage({ action: "RECORDING_STARTED" });
+      }
 
       durationIntervalRef.current = setInterval(() => {
         setDuration((prev) => prev + 1);
@@ -89,11 +97,24 @@ export const RecordingApp: React.FC = () => {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Clean up recording interval on unmount
+  // Listen for stop requests and clean up interval on unmount
   useEffect(() => {
+    const handleRuntimeMessage = (message: any) => {
+      if (message.action === "STOP_RECORDING") {
+        stopRecording();
+      }
+    };
+
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
+      chrome.runtime.onMessage.addListener(handleRuntimeMessage);
+    }
+
     return () => {
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
+      }
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
       }
     };
   }, []);

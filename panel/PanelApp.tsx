@@ -38,6 +38,9 @@ const PanelApp: React.FC = () => {
   const [recordingUrl, setRecordingUrl] = useState<string>("");
   const [templates, setTemplates] = useState<ChromeStorageResult>({});
 
+  const [isScreenRecording, setIsScreenRecording] = useState<boolean>(false);
+  const recordingWindowIdRef = useRef<number | null>(null);
+
   const [selectedElement, setSelectedElement] = useState<SelectedElement | null>(null);
 
   // Axes states
@@ -149,13 +152,20 @@ const PanelApp: React.FC = () => {
 
   const handleStartScreenRecording = () => {
     if (typeof chrome !== "undefined" && chrome.windows && chrome.windows.create) {
-      chrome.windows.create({
-        url: chrome.runtime.getURL("panel/recording.html"),
-        type: "popup",
-        width: 340,
-        height: 200,
-        focused: true,
-      });
+      chrome.windows.create(
+        {
+          url: chrome.runtime.getURL("panel/recording.html"),
+          type: "popup",
+          width: 340,
+          height: 200,
+          focused: true,
+        },
+        (win) => {
+          if (win && win.id) {
+            recordingWindowIdRef.current = win.id;
+          }
+        }
+      );
       showToast("Screen recorder window opened");
     } else {
       window.open(
@@ -164,6 +174,16 @@ const PanelApp: React.FC = () => {
         "width=340,height=200",
       );
       showToast("Screen recorder window opened (mock)");
+      setIsScreenRecording(true);
+    }
+  };
+
+  const handleStopScreenRecording = () => {
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
+      chrome.runtime.sendMessage({ action: "STOP_RECORDING" });
+    } else {
+      setIsScreenRecording(false);
+      showToast("Video recording saved successfully! (mock)");
     }
   };
 
@@ -222,6 +242,40 @@ const PanelApp: React.FC = () => {
       setEditedCode(generateRecordedScript(recordedSteps, recordingUrl, langID, templates));
     }
   }, [recordedSteps, recordingUrl, langID, isAutoSyncActive, templates]);
+
+  useEffect(() => {
+    const handleRuntimeMessage = (message: any) => {
+      if (message.action === "RECORDING_STARTED") {
+        setIsScreenRecording(true);
+      } else if (message.action === "RECORDING_STOPPED") {
+        setIsScreenRecording(false);
+        recordingWindowIdRef.current = null;
+      }
+    };
+
+    const handleWindowRemoved = (windowId: number) => {
+      if (recordingWindowIdRef.current !== null && windowId === recordingWindowIdRef.current) {
+        setIsScreenRecording(false);
+        recordingWindowIdRef.current = null;
+      }
+    };
+
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
+      chrome.runtime.onMessage.addListener(handleRuntimeMessage);
+    }
+    if (typeof chrome !== "undefined" && chrome.windows && chrome.windows.onRemoved) {
+      chrome.windows.onRemoved.addListener(handleWindowRemoved);
+    }
+
+    return () => {
+      if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
+      }
+      if (typeof chrome !== "undefined" && chrome.windows && chrome.windows.onRemoved) {
+        chrome.windows.onRemoved.removeListener(handleWindowRemoved);
+      }
+    };
+  }, []);
 
   const handleTabChange = (tabIndex: number) => {
     setActiveTab(tabIndex);
@@ -1393,9 +1447,16 @@ const PanelApp: React.FC = () => {
                       }}
                     />
 
-                    <button style={styles.btnStartVideo} onClick={handleStartScreenRecording}>
-                      Record Video
-                    </button>
+                    {isScreenRecording ? (
+                      <button style={styles.btnStopVideo} onClick={handleStopScreenRecording}>
+                        <span style={styles.redDotRecording}></span>
+                        Stop Video
+                      </button>
+                    ) : (
+                      <button style={styles.btnStartVideo} onClick={handleStartScreenRecording}>
+                        Record Video
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
