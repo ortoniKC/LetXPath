@@ -12,6 +12,7 @@ export default defineConfig({
         content: resolve(__dirname, "app/src/content.ts"),
         service_worker: resolve(__dirname, "app/service_worker.ts"),
         devtools: resolve(__dirname, "app/devtools/devtools.ts"),
+        recording: resolve(__dirname, "panel/recording.html"),
       },
       output: {
         entryFileNames: (chunkInfo) => {
