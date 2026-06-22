@@ -156,8 +156,8 @@ const PanelApp: React.FC = () => {
         {
           url: chrome.runtime.getURL("panel/recording.html"),
           type: "popup",
-          width: 340,
-          height: 200,
+          width: 600,
+          height: 400,
           focused: true,
         },
         (win) => {
@@ -171,7 +171,7 @@ const PanelApp: React.FC = () => {
       window.open(
         chrome.runtime.getURL("panel/recording.html"),
         "Ortoni Screen Recorder",
-        "width=340,height=200",
+        "width=600,height=400",
       );
       showToast("Screen recorder window opened (mock)");
       setIsScreenRecording(true);
