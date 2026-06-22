@@ -38,6 +38,13 @@ const PanelApp: React.FC = () => {
   const [recordingUrl, setRecordingUrl] = useState<string>("");
   const [templates, setTemplates] = useState<ChromeStorageResult>({});
 
+  // Screen recording states and refs
+  const [isScreenRecording, setIsScreenRecording] = useState<boolean>(false);
+  const [screenRecordingDuration, setScreenRecordingDuration] = useState<number>(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
+  const durationIntervalRef = useRef<any>(null);
+
   const [selectedElement, setSelectedElement] = useState<SelectedElement | null>(null);
 
   // Axes states
@@ -146,6 +153,95 @@ const PanelApp: React.FC = () => {
       console.log("Mock stopped recording");
     }
   };
+
+  const handleStartScreenRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: true,
+      });
+
+      recordedChunksRef.current = [];
+      const options = { mimeType: "video/webm; codecs=vp9" };
+      const mediaRecorder = new MediaRecorder(stream, options);
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          recordedChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        if (durationIntervalRef.current) {
+          clearInterval(durationIntervalRef.current);
+          durationIntervalRef.current = null;
+        }
+
+        stream.getTracks().forEach((track) => track.stop());
+
+        const blob = new Blob(recordedChunksRef.current, {
+          type: "video/webm",
+        });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        const now = new Date();
+        const timestamp = now.toISOString().replace(/[:.]/g, "-");
+        a.download = `ortoni-studio-recording-${timestamp}.webm`;
+        a.click();
+        URL.revokeObjectURL(url);
+        setIsScreenRecording(false);
+        setScreenRecordingDuration(0);
+        showToast("Video recording saved successfully!");
+      };
+
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start(1000); // chunk every 1 sec
+
+      setScreenRecordingDuration(0);
+      setIsScreenRecording(true);
+      showToast("Video recording started. Select stream source...");
+
+      durationIntervalRef.current = setInterval(() => {
+        setScreenRecordingDuration((prev) => prev + 1);
+      }, 1000);
+
+      // Listen to track ending (e.g. if user stops sharing using browser chrome UI button)
+      stream.getVideoTracks()[0].onended = () => {
+        handleStopScreenRecording();
+      };
+    } catch (err: any) {
+      console.error("Screen recording access denied or error:", err);
+      // Don't show toast if user cancelled share dialog
+      if (err.name !== "NotAllowedError") {
+        showToast(`Video recording error: ${err.message || err}`);
+      }
+      setIsScreenRecording(false);
+      setScreenRecordingDuration(0);
+    }
+  };
+
+  const handleStopScreenRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+    }
+  };
+
+  const formatDuration = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // Clean up recording interval on unmount
+  useEffect(() => {
+    return () => {
+      if (durationIntervalRef.current) {
+        clearInterval(durationIntervalRef.current);
+      }
+    };
+  }, []);
 
   const handleToggleVerifyMode = (active: boolean) => {
     setIsVerifyModeActive(active);
@@ -1350,7 +1446,7 @@ const PanelApp: React.FC = () => {
                       Verify Mode
                     </span>
                   </label>
-                  <div style={{ display: "flex", gap: "4px" }}>
+                  <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
                     {isRecordingActive ? (
                       <button style={styles.btnStopRecord} onClick={handleStopRecording}>
                         Stop Recording
@@ -1363,6 +1459,26 @@ const PanelApp: React.FC = () => {
                     <button style={styles.btnClear} onClick={handleClearRecording}>
                       Clear
                     </button>
+
+                    <div
+                      style={{
+                        width: "1px",
+                        backgroundColor: "#3c3c3c",
+                        height: "14px",
+                        margin: "0 6px",
+                      }}
+                    />
+
+                    {isScreenRecording ? (
+                      <button style={styles.btnStopVideo} onClick={handleStopScreenRecording}>
+                        <span style={styles.redDotRecording}></span>
+                        Stop Video ({formatDuration(screenRecordingDuration)})
+                      </button>
+                    ) : (
+                      <button style={styles.btnStartVideo} onClick={handleStartScreenRecording}>
+                        Record Video
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
