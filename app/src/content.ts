@@ -49,6 +49,7 @@ function clearExistingHighlights(): void {
 
 // used to send/receive message with in extension
 const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) => {
+  let handled = false;
   switch (message.request) {
     case "dotheconversion":
       const input = message.data;
@@ -57,6 +58,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
         request: "conversion",
         output: output,
       });
+      handled = true;
       break;
     case "parseAxes":
       try {
@@ -88,6 +90,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
           }
         }
       } catch (error) {}
+      handled = true;
       break;
     case "context_menu_click":
       if (state.targetElemt) {
@@ -95,6 +98,7 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
       }
       state.atrributesArray = [];
       state.webTableDetails = null;
+      handled = true;
       break;
     case "userSearchXP":
       const val = message.data.trim();
@@ -150,18 +154,26 @@ const receiver = (message: any, _sender: any, sendResponse: (r: any) => void) =>
           count: customCount,
         },
       });
+      handled = true;
       break;
     case "cleanhighlight":
       clearExistingHighlights();
+      handled = true;
       break;
     case "start_recording":
       startRecording();
+      handled = true;
       break;
     case "stop_recording":
       stopRecord();
+      handled = true;
       break;
     default:
-      if (sendResponse) sendResponse(true);
+      break;
+  }
+
+  if (sendResponse) {
+    sendResponse({ success: true, handled });
   }
 };
 
