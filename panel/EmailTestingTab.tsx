@@ -100,17 +100,19 @@ export const EmailTestingTab: React.FC = () => {
   // Helper to post-process raw HTML body so that all links securely open in new tabs
   const postProcessHtml = (html: string): string => {
     if (!html) return "";
-    const helperScript = `
-      <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          const links = document.getElementsByTagName('a');
-          for (let i = 0; i < links.length; i++) {
-            links[i].setAttribute('target', '_blank');
-          }
-        });
-      </script>
-    `;
-    return html + helperScript;
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      const links = doc.getElementsByTagName("a");
+      for (let i = 0; i < links.length; i++) {
+        links[i].setAttribute("target", "_blank");
+        links[i].setAttribute("rel", "noopener noreferrer");
+      }
+      return doc.documentElement.outerHTML;
+    } catch (e) {
+      console.error("Error post-processing HTML:", e);
+      return html;
+    }
   };
 
   // Fetch email list
