@@ -33,6 +33,9 @@ export interface ChromeStorageResult {
   sendvalue?: string;
   textvalue?: string;
   attrvalue?: string;
+  emailProvider?: string;
+  mailosaurApiKey?: string;
+  mailosaurServerId?: string;
 }
 
 export interface DevToolsMessageRequest {

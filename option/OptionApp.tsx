@@ -33,6 +33,9 @@ interface ChromeStorageResult {
   textvalue?: string;
   attrvalue?: string;
   selectorPriority?: string;
+  emailProvider?: string;
+  mailosaurApiKey?: string;
+  mailosaurServerId?: string;
 }
 
 interface FrameworkOption {
@@ -103,9 +106,14 @@ const FRAMEWORKS: FrameworkOption[] = [
 ];
 
 const OptionApp: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"general" | "selectors" | "templates" | "about">(
+  const [activeTab, setActiveTab] = useState<"general" | "selectors" | "templates" | "emails" | "about">(
     "general",
   );
+
+  // Email Opt Testing State
+  const [emailProvider, setEmailProvider] = useState<"inboxkitten" | "maildrop" | "mailosaur">("inboxkitten");
+  const [mailosaurApiKey, setMailosaurApiKey] = useState<string>("");
+  const [mailosaurServerId, setMailosaurServerId] = useState<string>("");
   const [langID, setLangID] = useState<string>("javas");
   const [customLang, setCustomLang] = useState<"jscs" | "javacs">("javacs");
   const [clickvalue, setClickvalue] = useState<string>("");
@@ -144,10 +152,16 @@ const OptionApp: React.FC = () => {
           "textvalue",
           "attrvalue",
           "selectorPriority",
+          "emailProvider",
+          "mailosaurApiKey",
+          "mailosaurServerId",
         ],
         (result: ChromeStorageResult) => {
           if (result.langID) setLangID(result.langID);
           if (result.customLang) setCustomLang(result.customLang);
+          if (result.emailProvider) setEmailProvider(result.emailProvider as any);
+          if (result.mailosaurApiKey) setMailosaurApiKey(result.mailosaurApiKey);
+          if (result.mailosaurServerId) setMailosaurServerId(result.mailosaurServerId);
 
           const priority = result.selectorPriority || "data-testid, id, name, class";
           setSelectorPriority(priority);
@@ -181,6 +195,9 @@ const OptionApp: React.FC = () => {
       const localCustomLang = (localStorage.getItem("customLang") as "jscs" | "javacs") || "javacs";
       setLangID(localStorage.getItem("langID") || "javas");
       setCustomLang(localCustomLang);
+      setEmailProvider((localStorage.getItem("emailProvider") as any) || "inboxkitten");
+      setMailosaurApiKey(localStorage.getItem("mailosaurApiKey") || "");
+      setMailosaurServerId(localStorage.getItem("mailosaurServerId") || "");
 
       const priority = localStorage.getItem("selectorPriority") || "data-testid, id, name, class";
       setSelectorPriority(priority);
@@ -222,6 +239,26 @@ const OptionApp: React.FC = () => {
         localStorage.setItem(key, data[key as keyof typeof data] as string),
       );
       showToast("Settings saved to localStorage!", "info");
+    }
+  };
+
+  const handleSaveEmails = (e: React.FormEvent) => {
+    e.preventDefault();
+    const data = {
+      emailProvider,
+      mailosaurApiKey,
+      mailosaurServerId,
+    };
+
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set(data, () => {
+        showToast("Email settings saved successfully!", "success");
+      });
+    } else {
+      Object.keys(data).forEach((key) =>
+        localStorage.setItem(key, data[key as keyof typeof data] as string),
+      );
+      showToast("Email settings saved to localStorage!", "info");
     }
   };
 
@@ -582,6 +619,20 @@ const OptionApp: React.FC = () => {
               }}
             >
               <span style={{ marginRight: "10px" }}>📝</span> Custom Templates
+            </button>
+            <button
+              className="sidebar-btn"
+              onClick={() => setActiveTab("emails")}
+              style={{
+                ...styles.sidebarLink,
+                backgroundColor:
+                  activeTab === "emails" ? "rgba(79, 70, 229, 0.12)" : "transparent",
+                color: activeTab === "emails" ? "#38bdf8" : "#8b949e",
+                borderLeft:
+                  activeTab === "emails" ? "4px solid #4f46e5" : "4px solid transparent",
+              }}
+            >
+              <span style={{ marginRight: "10px" }}>✉️</span> Email Testing
             </button>
             <button
               className="sidebar-btn"
@@ -1196,6 +1247,147 @@ const OptionApp: React.FC = () => {
             </div>
           )}
 
+          {/* TAB: EMAIL TESTING */}
+          {activeTab === "emails" && (
+            <div style={styles.tabContent}>
+              <div style={styles.sectionHeader}>
+                <h1 style={styles.mainTitle}>Email Opt Testing Settings</h1>
+                <p style={styles.mainSubtitle}>
+                  Choose your disposable email service provider and configure API access keys.
+                </p>
+              </div>
+
+              <div style={styles.card}>
+                <h3 style={styles.cardTitle}>Choose Email Provider</h3>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "24px" }}>
+                  <div
+                    onClick={() => setEmailProvider("inboxkitten")}
+                    style={{
+                      border: emailProvider === "inboxkitten" ? "2px solid #4f46e5" : "1px solid #21262d",
+                      borderRadius: "8px",
+                      padding: "16px",
+                      cursor: "pointer",
+                      backgroundColor: emailProvider === "inboxkitten" ? "rgba(79, 70, 229, 0.08)" : "#0d1117",
+                      transition: "all 0.2s",
+                      boxShadow: emailProvider === "inboxkitten" ? "0 0 10px rgba(79, 70, 229, 0.2)" : "none",
+                    }}
+                  >
+                    <div style={{ fontSize: "24px", marginBottom: "8px" }}>🐱</div>
+                    <div style={{ fontWeight: "bold", fontSize: "14px", color: "#ffffff", marginBottom: "4px" }}>Inbox Kitten</div>
+                    <div style={{ fontSize: "11px", color: "#8b949e", lineHeight: "1.4" }}>
+                      Public boxes at @inboxkitten.com. Completely free, requires no setup.
+                    </div>
+                  </div>
+
+                  <div
+                    onClick={() => setEmailProvider("maildrop")}
+                    style={{
+                      border: emailProvider === "maildrop" ? "2px solid #4f46e5" : "1px solid #21262d",
+                      borderRadius: "8px",
+                      padding: "16px",
+                      cursor: "pointer",
+                      backgroundColor: emailProvider === "maildrop" ? "rgba(79, 70, 229, 0.08)" : "#0d1117",
+                      transition: "all 0.2s",
+                      boxShadow: emailProvider === "maildrop" ? "0 0 10px rgba(79, 70, 229, 0.2)" : "none",
+                    }}
+                  >
+                    <div style={{ fontSize: "24px", marginBottom: "8px" }}>💧</div>
+                    <div style={{ fontWeight: "bold", fontSize: "14px", color: "#ffffff", marginBottom: "4px" }}>Maildrop</div>
+                    <div style={{ fontSize: "11px", color: "#8b949e", lineHeight: "1.4" }}>
+                      Public boxes at @maildrop.cc. High performance, supports GraphQL.
+                    </div>
+                  </div>
+
+                  <div
+                    onClick={() => setEmailProvider("mailosaur")}
+                    style={{
+                      border: emailProvider === "mailosaur" ? "2px solid #4f46e5" : "1px solid #21262d",
+                      borderRadius: "8px",
+                      padding: "16px",
+                      cursor: "pointer",
+                      backgroundColor: emailProvider === "mailosaur" ? "rgba(79, 70, 229, 0.08)" : "#0d1117",
+                      transition: "all 0.2s",
+                      boxShadow: emailProvider === "mailosaur" ? "0 0 10px rgba(79, 70, 229, 0.2)" : "none",
+                    }}
+                  >
+                    <div style={{ fontSize: "24px", marginBottom: "8px" }}>🦖</div>
+                    <div style={{ fontWeight: "bold", fontSize: "14px", color: "#ffffff", marginBottom: "4px" }}>Mailosaur</div>
+                    <div style={{ fontSize: "11px", color: "#8b949e", lineHeight: "1.4" }}>
+                      Secure testing server at @mailosaur.net. Requires API key & Server ID.
+                    </div>
+                  </div>
+                </div>
+
+                {emailProvider === "mailosaur" && (
+                  <div style={{ borderTop: "1px solid #21262d", paddingTop: "20px" }}>
+                    <h4 style={{ color: "#ffffff", fontSize: "13px", margin: "0 0 12px 0" }}>Mailosaur Credentials</h4>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
+                      <div>
+                        <label style={{ display: "block", color: "#8b949e", fontSize: "11px", marginBottom: "6px" }}>
+                          Mailosaur API Key
+                        </label>
+                        <input
+                          type="password"
+                          value={mailosaurApiKey}
+                          onChange={(e) => setMailosaurApiKey(e.target.value)}
+                          placeholder="Your Mailosaur API Key..."
+                          style={{
+                            width: "100%",
+                            padding: "8px 12px",
+                            backgroundColor: "#0d1117",
+                            border: "1px solid #30363d",
+                            borderRadius: "6px",
+                            color: "#c9d1d9",
+                            fontSize: "12px",
+                            boxSizing: "border-box" as const,
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: "block", color: "#8b949e", fontSize: "11px", marginBottom: "6px" }}>
+                          Mailosaur Server ID
+                        </label>
+                        <input
+                          type="text"
+                          value={mailosaurServerId}
+                          onChange={(e) => setMailosaurServerId(e.target.value)}
+                          placeholder="Your Mailosaur Server ID..."
+                          style={{
+                            width: "100%",
+                            padding: "8px 12px",
+                            backgroundColor: "#0d1117",
+                            border: "1px solid #30363d",
+                            borderRadius: "6px",
+                            color: "#c9d1d9",
+                            fontSize: "12px",
+                            boxSizing: "border-box" as const,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  onClick={handleSaveEmails}
+                  style={{
+                    backgroundColor: "#238636",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "6px",
+                    padding: "8px 16px",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    boxShadow: "0 2px 4px rgba(35, 134, 54, 0.2)",
+                  }}
+                >
+                  Save Configuration
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* TAB 4: ABOUT PAGE */}
           {activeTab === "about" && (
             <div style={styles.tabContent}>
@@ -1559,6 +1751,12 @@ const styles = {
     borderRadius: "12px",
     padding: "24px",
     boxSizing: "border-box" as const,
+  },
+  cardTitle: {
+    fontSize: "16px",
+    fontWeight: "bold",
+    color: "#ffffff",
+    margin: "0 0 16px 0",
   },
   infoCard: {
     backgroundColor: "#161b22",

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { SelectedElement, AxesData, ChromeStorageResult, DevToolsMessageRequest } from "./types";
 import { styles } from "./styles";
+import { EmailTestingTab } from "./EmailTestingTab";
 import {
   colorizeXPath,
   colorizeCSS,
@@ -928,6 +929,9 @@ const PanelApp: React.FC = () => {
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(7)}>
             <span style={activeTab === 7 ? styles.activeLink : styles.link}>Tools</span>
+          </li>
+          <li style={styles.tabItem} onClick={() => handleTabChange(9)}>
+            <span style={activeTab === 9 ? styles.activeLink : styles.link}>Emails</span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(8)}>
             <span style={activeTab === 8 ? styles.activeLink : styles.link}>About</span>
@@ -2287,6 +2291,11 @@ const PanelApp: React.FC = () => {
               Created with ❤️ by Koushik Chatterjee. Licensed under MIT.
             </div>
           </div>
+        )}
+
+        {/* Email Opt Testing Tab */}
+        {activeTab === 9 && (
+          <EmailTestingTab />
         )}
       </div>
     </div>
