@@ -37,7 +37,21 @@ function sendToContentScript(request: any) {
   }
 }
 
-chrome.runtime.onMessage.addListener(function (message, _sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (sender.tab) {
+    // Relay message from content script to DevTools panel / other extension contexts
+    const relayedMessage = {
+      ...message,
+      senderMetadata: {
+        tabId: sender.tab.id,
+        frameId: sender.frameId,
+      },
+    };
+    chrome.runtime.sendMessage(relayedMessage).catch(() => {});
+    sendResponse("relayed");
+    return;
+  }
+
   if (
     ["parseAxes", "userSearchXP", "dotheconversion", "cleanhighlight"].includes(message.request)
   ) {

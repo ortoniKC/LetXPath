@@ -329,16 +329,20 @@ const PanelApp: React.FC = () => {
       setToast(null);
 
       try {
+        const frameId = req.senderMetadata?.frameId !== undefined
+          ? req.senderMetadata.frameId
+          : (_sender && _sender.frameId !== undefined ? _sender.frameId : undefined);
+
         switch (req.request) {
           case "register_frame":
-            if (_sender && _sender.frameId !== undefined) {
-              addFrameId(_sender.frameId);
+            if (frameId !== undefined) {
+              addFrameId(frameId);
             }
             break;
           case "send_to_dev":
-            if (_sender && _sender.frameId !== undefined) {
-              setSelectedFrameId(_sender.frameId);
-              addFrameId(_sender.frameId);
+            if (frameId !== undefined) {
+              setSelectedFrameId(frameId);
+              addFrameId(frameId);
             }
             if (req.xpathid && req.cssPath && req.tag !== undefined && req.type !== undefined) {
               setSelectedElement({
@@ -358,9 +362,9 @@ const PanelApp: React.FC = () => {
             }
             break;
           case "anchor":
-            if (_sender && _sender.frameId !== undefined) {
-              setSelectedFrameId(_sender.frameId);
-              addFrameId(_sender.frameId);
+            if (frameId !== undefined) {
+              setSelectedFrameId(frameId);
+              addFrameId(frameId);
             }
             if (req.data) {
               setAxesData(req.data);
@@ -374,8 +378,8 @@ const PanelApp: React.FC = () => {
             if (req.data) setAxesXPathResult(req.data);
             break;
           case "customSearchResult":
-            if (req.data && _sender && _sender.frameId !== undefined) {
-              frameSearchResults.current.set(_sender.frameId, req.data);
+            if (req.data && frameId !== undefined) {
+              frameSearchResults.current.set(frameId, req.data);
 
               let totalCount = 0;
               let bestXPath = "";

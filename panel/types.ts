@@ -55,6 +55,10 @@ export interface DevToolsMessageRequest {
   playwrightLocators?: [number, string, string, string, string, string][];
   cypressLocators?: [number, string, string][];
   step?: any;
+  senderMetadata?: {
+    tabId?: number;
+    frameId?: number;
+  };
 }
 
 export interface TemplateGroup {
