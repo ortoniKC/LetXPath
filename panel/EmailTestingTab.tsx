@@ -18,7 +18,6 @@ export const EmailTestingTab: React.FC = () => {
   const [mailosaurServer, setMailosaurServer] = useState<string>("");
 
   const [inboxName, setInboxName] = useState<string>("");
-  const [emailAddress, setEmailAddress] = useState<string>("");
   const [messages, setMessages] = useState<EmailMessage[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<EmailMessage | null>(null);
   const [emailHtml, setEmailHtml] = useState<string | null>(null);
@@ -29,8 +28,16 @@ export const EmailTestingTab: React.FC = () => {
   const [toast, setToast] = useState<string | null>(null);
 
   const autoRefreshIntervalRef = useRef<any>(null);
+  const activeMessageIdRef = useRef<string | null>(null);
 
-  // Load provider configurations from storage
+  // Compute emailAddress dynamically as a derived state
+  const emailAddress = provider === "inboxkitten"
+    ? `${inboxName}@inboxkitten.com`
+    : provider === "maildrop"
+    ? `${inboxName}@maildrop.cc`
+    : `${inboxName}.${mailosaurServer || "server"}@mailosaur.net`;
+
+  // Load provider configurations from storage on mount
   const loadConfig = () => {
     if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       chrome.storage.local.get(
@@ -47,7 +54,6 @@ export const EmailTestingTab: React.FC = () => {
             chrome.storage.local.set({ emailInboxName: name });
           }
           setInboxName(name);
-          updateEmailAddress(name, prov, result.mailosaurServerId || "");
         }
       );
     } else {
@@ -62,24 +68,12 @@ export const EmailTestingTab: React.FC = () => {
         localStorage.setItem("emailInboxName", name);
       }
       setInboxName(name);
-      updateEmailAddress(name, prov, localStorage.getItem("mailosaurServerId") || "");
-    }
-  };
-
-  const updateEmailAddress = (name: string, prov: string, serverId: string) => {
-    if (prov === "inboxkitten") {
-      setEmailAddress(`${name}@inboxkitten.com`);
-    } else if (prov === "maildrop") {
-      setEmailAddress(`${name}@maildrop.cc`);
-    } else if (prov === "mailosaur") {
-      setEmailAddress(`${name}.${serverId || "server"}@mailosaur.net`);
     }
   };
 
   const handleGenerateNew = () => {
     const newName = generateRandomInboxName();
     setInboxName(newName);
-    updateEmailAddress(newName, provider, mailosaurServer);
     setMessages([]);
     setSelectedMessage(null);
     setEmailHtml(null);
@@ -103,9 +97,27 @@ export const EmailTestingTab: React.FC = () => {
     setTimeout(() => setToast(null), 2500);
   };
 
+  // Helper to post-process raw HTML body so that all links securely open in new tabs
+  const postProcessHtml = (html: string): string => {
+    if (!html) return "";
+    const helperScript = `
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const links = document.getElementsByTagName('a');
+          for (let i = 0; i < links.length; i++) {
+            links[i].setAttribute('target', '_blank');
+          }
+        });
+      </script>
+    `;
+    return html + helperScript;
+  };
+
   // Fetch email list
   const fetchEmails = async (silent = false) => {
     if (!inboxName) return;
+    const currentInbox = inboxName;
+    const currentProvider = provider;
     if (!silent) setIsLoading(true);
 
     try {
@@ -113,14 +125,17 @@ export const EmailTestingTab: React.FC = () => {
         const res = await fetch(`https://inboxkitten.com/api/v1/mail/list?recipient=${inboxName}`);
         if (!res.ok) throw new Error("Failed to fetch InboxKitten emails");
         const data = await res.json();
-        const formatted: EmailMessage[] = (data || []).map((item: any) => ({
-          id: item.id,
-          sender: item.message?.headers?.from || "Unknown Sender",
-          subject: item.message?.headers?.subject || "(No Subject)",
-          date: item.timestamp ? new Date(item.timestamp * 1000).toLocaleString() : "Unknown Time",
-          rawObject: item,
-        }));
-        setMessages(formatted);
+        
+        if (inboxName === currentInbox && provider === currentProvider) {
+          const formatted: EmailMessage[] = (data || []).map((item: any) => ({
+            id: item.id,
+            sender: item.message?.headers?.from || "Unknown Sender",
+            subject: item.message?.headers?.subject || "(No Subject)",
+            date: item.timestamp ? new Date(item.timestamp * 1000).toLocaleString() : "Unknown Time",
+            rawObject: item,
+          }));
+          setMessages(formatted);
+        }
       } else if (provider === "maildrop") {
         const res = await fetch("https://api.maildrop.cc/graphql", {
           method: "POST",
@@ -131,15 +146,21 @@ export const EmailTestingTab: React.FC = () => {
         });
         if (!res.ok) throw new Error("Failed to fetch Maildrop emails");
         const json = await res.json();
-        const list = json.data?.inbox || [];
-        const formatted: EmailMessage[] = list.map((item: any) => ({
-          id: item.id,
-          sender: item.headerfrom || "Unknown Sender",
-          subject: item.subject || "(No Subject)",
-          date: item.date ? new Date(item.date).toLocaleString() : "Unknown Time",
-          rawObject: item,
-        }));
-        setMessages(formatted);
+        if (json.errors && json.errors.length > 0) {
+          throw new Error(json.errors[0].message || "Maildrop GraphQL Error");
+        }
+        
+        if (inboxName === currentInbox && provider === currentProvider) {
+          const list = json.data?.inbox || [];
+          const formatted: EmailMessage[] = list.map((item: any) => ({
+            id: item.id,
+            sender: item.headerfrom || "Unknown Sender",
+            subject: item.subject || "(No Subject)",
+            date: item.date ? new Date(item.date).toLocaleString() : "Unknown Time",
+            rawObject: item,
+          }));
+          setMessages(formatted);
+        }
       } else if (provider === "mailosaur") {
         if (!mailosaurKey || !mailosaurServer) {
           throw new Error("Mailosaur API Key and Server ID are required in Settings!");
@@ -153,26 +174,30 @@ export const EmailTestingTab: React.FC = () => {
         if (!res.ok) throw new Error("Failed to fetch Mailosaur emails");
         const json = await res.json();
         const list = json.items || [];
-        // Filter messages to only match our generated name prefix
-        const formatted: EmailMessage[] = list
-          .filter((item: any) => {
-            const toEmail = item.to?.[0]?.email || "";
-            return toEmail.startsWith(inboxName);
-          })
-          .map((item: any) => ({
-            id: item.id,
-            sender: item.from?.[0]?.name ? `${item.from[0].name} <${item.from[0].email}>` : item.from?.[0]?.email || "Unknown Sender",
-            subject: item.subject || "(No Subject)",
-            date: item.received ? new Date(item.received).toLocaleString() : "Unknown Time",
-            rawObject: item,
-          }));
-        setMessages(formatted);
+        
+        if (inboxName === currentInbox && provider === currentProvider) {
+          const formatted: EmailMessage[] = list
+            .filter((item: any) => {
+              const toEmail = item.to?.[0]?.email || "";
+              return toEmail.startsWith(inboxName);
+            })
+            .map((item: any) => ({
+              id: item.id,
+              sender: item.from?.[0]?.name ? `${item.from[0].name} <${item.from[0].email}>` : item.from?.[0]?.email || "Unknown Sender",
+              subject: item.subject || "(No Subject)",
+              date: item.received ? new Date(item.received).toLocaleString() : "Unknown Time",
+              rawObject: item,
+            }));
+          setMessages(formatted);
+        }
       }
     } catch (err: any) {
       console.error(err);
       if (!silent) showToastMessage(err.message || "Failed to fetch emails");
     } finally {
-      if (!silent) setIsLoading(false);
+      if (inboxName === currentInbox && provider === currentProvider && !silent) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -181,6 +206,8 @@ export const EmailTestingTab: React.FC = () => {
     setSelectedMessage(msg);
     setIsLoadingBody(true);
     setEmailHtml(null);
+    const currentMessageId = msg.id;
+    activeMessageIdRef.current = msg.id;
 
     try {
       if (provider === "inboxkitten") {
@@ -193,7 +220,10 @@ export const EmailTestingTab: React.FC = () => {
         );
         if (!res.ok) throw new Error("Failed to fetch InboxKitten body");
         const html = await res.text();
-        setEmailHtml(html);
+        
+        if (activeMessageIdRef.current === currentMessageId) {
+          setEmailHtml(postProcessHtml(html));
+        }
       } else if (provider === "maildrop") {
         const res = await fetch("https://api.maildrop.cc/graphql", {
           method: "POST",
@@ -204,9 +234,16 @@ export const EmailTestingTab: React.FC = () => {
         });
         if (!res.ok) throw new Error("Failed to fetch Maildrop body");
         const json = await res.json();
+        if (json.errors && json.errors.length > 0) {
+          throw new Error(json.errors[0].message || "Maildrop GraphQL Error");
+        }
         const html = json.data?.message?.html || "<p>No body returned.</p>";
-        setEmailHtml(html);
+        
+        if (activeMessageIdRef.current === currentMessageId) {
+          setEmailHtml(postProcessHtml(html));
+        }
       } else if (provider === "mailosaur") {
+        if (!mailosaurKey) throw new Error("Mailosaur API Key is required to view email body!");
         const auth = btoa(`${mailosaurKey}:`);
         const res = await fetch(`https://mailosaur.com/api/messages/${msg.id}`, {
           headers: {
@@ -216,19 +253,53 @@ export const EmailTestingTab: React.FC = () => {
         if (!res.ok) throw new Error("Failed to fetch Mailosaur body");
         const json = await res.json();
         const html = json.html?.body || `<pre>${json.text?.body || "No content"}</pre>`;
-        setEmailHtml(html);
+        
+        if (activeMessageIdRef.current === currentMessageId) {
+          setEmailHtml(postProcessHtml(html));
+        }
       }
     } catch (err: any) {
       console.error(err);
-      showToastMessage(err.message || "Failed to load email body");
+      if (activeMessageIdRef.current === currentMessageId) {
+        showToastMessage(err.message || "Failed to load email body");
+      }
     } finally {
-      setIsLoadingBody(false);
+      if (activeMessageIdRef.current === currentMessageId) {
+        setIsLoadingBody(false);
+      }
     }
   };
 
-  // On mount: load configs
+  // On mount: load configurations
   useEffect(() => {
     loadConfig();
+  }, []);
+
+  // Listen to local storage settings changes to dynamically synchronize credentials/settings
+  useEffect(() => {
+    const handleStorageChange = (changes: any, areaName: string) => {
+      if (areaName === "local") {
+        if (changes.emailProvider) {
+          setProvider(changes.emailProvider.newValue);
+        }
+        if (changes.mailosaurApiKey) {
+          setMailosaurKey(changes.mailosaurApiKey.newValue);
+        }
+        if (changes.mailosaurServerId) {
+          setMailosaurServer(changes.mailosaurServerId.newValue);
+        }
+        if (changes.emailInboxName) {
+          setInboxName(changes.emailInboxName.newValue);
+        }
+      }
+    };
+
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.onChanged) {
+      chrome.storage.onChanged.addListener(handleStorageChange);
+      return () => {
+        chrome.storage.onChanged.removeListener(handleStorageChange);
+      };
+    }
   }, []);
 
   // On config loaded & inboxName populated: fetch email list
@@ -497,7 +568,7 @@ const styles = {
     fontSize: "10px",
     fontWeight: 600,
     cursor: "pointer",
-    boxShadow: "0 2px 4px rgba(79, 70, 229, 0.2)",
+    boxShadow: "0 2px 4px rgba(79, 229, 229, 0.2)",
     outline: "none",
   },
   btnSec: {
