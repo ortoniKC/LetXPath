@@ -443,7 +443,7 @@ const PanelApp: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Inject animation styles for recorder red dot
+    // Inject animation styles for recorder red dot and general panel tabs/rows
     const styleEl = document.createElement("style");
     styleEl.innerHTML = `
       @keyframes pulseRed {
@@ -462,6 +462,82 @@ const PanelApp: React.FC = () => {
       }
       .pulse-red-dot {
         animation: pulseRed 1.5s infinite;
+      }
+
+      /* Tab Content transitions */
+      @keyframes tabFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .tab-content-animate {
+        animation: tabFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+
+      /* Staggered locator rows waterfall */
+      @keyframes rowFadeIn {
+        from {
+          opacity: 0;
+          transform: translateX(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      .locator-row-animate {
+        opacity: 0;
+        animation: rowFadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        transition: all 0.18s ease-in-out;
+      }
+      .locator-row-animate:hover {
+        background-color: #252526 !important;
+        transform: translateX(2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Toast pop transition */
+      @keyframes toastPop {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, 12px) scale(0.96);
+        }
+        100% {
+          opacity: 1;
+          transform: translate(-50%, 0) scale(1);
+        }
+      }
+      .toast-pop-animate {
+        animation: toastPop 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.15) forwards;
+      }
+
+      /* Hover slider decoration for navbar links */
+      .nav-tab-item {
+        position: relative;
+        transition: all 0.2s ease;
+      }
+      .nav-tab-item::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background-color: #0e639c;
+        transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(-50%);
+      }
+      .nav-tab-item:hover::after {
+        width: 80%;
+      }
+      .nav-tab-item.active-tab::after {
+        width: 100%;
+        background-color: #0e639c;
       }
     `;
     document.head.appendChild(styleEl);
@@ -905,7 +981,7 @@ const PanelApp: React.FC = () => {
       />
 
       {toast && (
-        <div style={styles.toast}>
+        <div className="toast-pop-animate" style={styles.toast}>
           <span>{toast}</span>
         </div>
       )}
@@ -914,31 +990,76 @@ const PanelApp: React.FC = () => {
       <div style={styles.navBar}>
         <ul style={styles.tabsList}>
           <li style={styles.tabItem} onClick={() => handleTabChange(1)}>
-            <span style={activeTab === 1 ? styles.activeLink : styles.link}>XPath</span>
+            <span
+              className={`nav-tab-item ${activeTab === 1 ? "active-tab" : ""}`}
+              style={activeTab === 1 ? styles.activeLink : styles.link}
+            >
+              XPath
+            </span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(2)}>
-            <span style={activeTab === 2 ? styles.activeLink : styles.link}>CSS</span>
+            <span
+              className={`nav-tab-item ${activeTab === 2 ? "active-tab" : ""}`}
+              style={activeTab === 2 ? styles.activeLink : styles.link}
+            >
+              CSS
+            </span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(3)}>
-            <span style={activeTab === 3 ? styles.activeLink : styles.link}>Axes</span>
+            <span
+              className={`nav-tab-item ${activeTab === 3 ? "active-tab" : ""}`}
+              style={activeTab === 3 ? styles.activeLink : styles.link}
+            >
+              Axes
+            </span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(4)}>
-            <span style={activeTab === 4 ? styles.activeLink : styles.link}>Playwright</span>
+            <span
+              className={`nav-tab-item ${activeTab === 4 ? "active-tab" : ""}`}
+              style={activeTab === 4 ? styles.activeLink : styles.link}
+            >
+              Playwright
+            </span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(5)}>
-            <span style={activeTab === 5 ? styles.activeLink : styles.link}>Cypress</span>
+            <span
+              className={`nav-tab-item ${activeTab === 5 ? "active-tab" : ""}`}
+              style={activeTab === 5 ? styles.activeLink : styles.link}
+            >
+              Cypress
+            </span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(6)}>
-            <span style={activeTab === 6 ? styles.activeLink : styles.link}>Recorder</span>
+            <span
+              className={`nav-tab-item ${activeTab === 6 ? "active-tab" : ""}`}
+              style={activeTab === 6 ? styles.activeLink : styles.link}
+            >
+              Recorder
+            </span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(7)}>
-            <span style={activeTab === 7 ? styles.activeLink : styles.link}>Tools</span>
+            <span
+              className={`nav-tab-item ${activeTab === 7 ? "active-tab" : ""}`}
+              style={activeTab === 7 ? styles.activeLink : styles.link}
+            >
+              Tools
+            </span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(9)}>
-            <span style={activeTab === 9 ? styles.activeLink : styles.link}>Emails</span>
+            <span
+              className={`nav-tab-item ${activeTab === 9 ? "active-tab" : ""}`}
+              style={activeTab === 9 ? styles.activeLink : styles.link}
+            >
+              Emails
+            </span>
           </li>
           <li style={styles.tabItem} onClick={() => handleTabChange(8)}>
-            <span style={activeTab === 8 ? styles.activeLink : styles.link}>About</span>
+            <span
+              className={`nav-tab-item ${activeTab === 8 ? "active-tab" : ""}`}
+              style={activeTab === 8 ? styles.activeLink : styles.link}
+            >
+              About
+            </span>
           </li>
         </ul>
         <div style={styles.settingsBtn} onClick={handleOpenSettings} title="Settings">
@@ -950,7 +1071,7 @@ const PanelApp: React.FC = () => {
       <div style={styles.contentBody}>
         {/* XPath Tab */}
         {activeTab === 1 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div className="tab-content-animate" style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             {!selectedElement ||
             !selectedElement.xpathid ||
             selectedElement.xpathid.length === 0 ? (
@@ -1007,7 +1128,7 @@ const PanelApp: React.FC = () => {
                   {selectedElement.xpathid.map((item, idx) => {
                     const [, label, value] = item;
                     return (
-                      <div key={idx} style={styles.locatorRow}>
+                      <div className="locator-row-animate" key={idx} style={{ ...styles.locatorRow, animationDelay: `${idx * 0.04}s` }}>
                         <div style={styles.labelBox}>
                           <span style={styles.locatorLabel} title={label}>
                             {label}
@@ -1058,7 +1179,7 @@ const PanelApp: React.FC = () => {
 
         {/* CSS Tab */}
         {activeTab === 2 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div className="tab-content-animate" style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             {!selectedElement ||
             !selectedElement.cssPath ||
             selectedElement.cssPath.length === 0 ? (
@@ -1074,7 +1195,7 @@ const PanelApp: React.FC = () => {
                 {selectedElement.cssPath.map((item, idx) => {
                   const [, label, value] = item;
                   return (
-                    <div key={idx} style={styles.locatorRow}>
+                    <div className="locator-row-animate" key={idx} style={{ ...styles.locatorRow, animationDelay: `${idx * 0.04}s` }}>
                       <div style={styles.labelBox}>
                         <span style={styles.locatorLabel} title={label}>
                           {label}
@@ -1124,7 +1245,7 @@ const PanelApp: React.FC = () => {
 
         {/* Axes Tab */}
         {activeTab === 3 && (
-          <div>
+          <div className="tab-content-animate">
             {!axesData ? (
               <div style={styles.emptyState}>
                 <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>🔗</div>
@@ -1217,7 +1338,7 @@ const PanelApp: React.FC = () => {
 
         {/* Playwright Tab */}
         {activeTab === 4 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div className="tab-content-animate" style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             {!selectedElement || !selectedElement.tag ? (
               <div style={styles.emptyState}>
                 <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>🎭</div>
@@ -1236,7 +1357,7 @@ const PanelApp: React.FC = () => {
                   else if (playLang === "java") value = javaVal;
                   else if (playLang === "csharp") value = csVal;
                   return (
-                    <div key={idx} style={styles.locatorRow}>
+                    <div className="locator-row-animate" key={idx} style={{ ...styles.locatorRow, animationDelay: `${idx * 0.04}s` }}>
                       <div style={styles.labelBox}>
                         <span style={styles.locatorLabel} title={label}>
                           {label}
@@ -1285,7 +1406,7 @@ const PanelApp: React.FC = () => {
 
         {/* Cypress Tab */}
         {activeTab === 5 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div className="tab-content-animate" style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             {!selectedElement ||
             !selectedElement.cypressLocators ||
             selectedElement.cypressLocators.length === 0 ? (
@@ -1301,7 +1422,7 @@ const PanelApp: React.FC = () => {
                 {selectedElement.cypressLocators.map((item, idx) => {
                   const [, label, value] = item;
                   return (
-                    <div key={idx} style={styles.locatorRow}>
+                    <div className="locator-row-animate" key={idx} style={{ ...styles.locatorRow, animationDelay: `${idx * 0.04}s` }}>
                       <div style={styles.labelBox}>
                         <span style={styles.locatorLabel} title={label}>
                           {label}
@@ -1364,6 +1485,7 @@ const PanelApp: React.FC = () => {
         {/* Recorder Tab */}
         {activeTab === 6 && (
           <div
+            className="tab-content-animate"
             style={{
               display: "flex",
               flexDirection: "column",
@@ -1902,7 +2024,7 @@ const PanelApp: React.FC = () => {
 
         {/* Tools Tab */}
         {activeTab === 7 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div className="tab-content-animate" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {/* Custom Search Box */}
             <div style={styles.toolCard}>
               <div style={styles.toolTitle}>Universal Locator Evaluator</div>
@@ -1987,7 +2109,7 @@ const PanelApp: React.FC = () => {
 
         {/* About Tab */}
         {activeTab === 8 && (
-          <div style={styles.aboutCard}>
+          <div className="tab-content-animate" style={styles.aboutCard}>
             <div
               style={{
                 display: "flex",
@@ -2299,7 +2421,9 @@ const PanelApp: React.FC = () => {
 
         {/* Email Opt Testing Tab */}
         {activeTab === 9 && (
-          <EmailTestingTab />
+          <div className="tab-content-animate" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+            <EmailTestingTab />
+          </div>
         )}
       </div>
     </div>

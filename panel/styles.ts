@@ -122,7 +122,7 @@ export const styles = {
     height: "100%",
     display: "flex",
     alignItems: "center",
-    borderBottom: "2px solid #0e639c",
+    borderBottom: "2px solid transparent",
     textDecoration: "none",
   },
   settingsBtn: {
