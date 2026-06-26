@@ -188,12 +188,7 @@ export const RecorderTab: React.FC<RecorderTabProps> = ({
             }}
           >
             Start URL:{" "}
-            <a
-              href={recordingUrl}
-              target="_blank"
-              rel="noreferrer"
-              style={{ color: "#3794ff" }}
-            >
+            <a href={recordingUrl} target="_blank" rel="noreferrer" style={{ color: "#3794ff" }}>
               {recordingUrl}
             </a>
           </div>
@@ -450,12 +445,7 @@ export const RecorderTab: React.FC<RecorderTabProps> = ({
                     }}
                     onClick={() => {
                       setEditedCode(
-                        generateRecordedScript(
-                          recordedSteps,
-                          recordingUrl,
-                          langID,
-                          templates,
-                        ),
+                        generateRecordedScript(recordedSteps, recordingUrl, langID, templates),
                       );
                       setIsAutoSyncActive(true);
                     }}

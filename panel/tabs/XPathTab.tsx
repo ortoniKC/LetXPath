@@ -20,11 +20,7 @@ export const XPathTab: React.FC<XPathTabProps> = ({
   handleVerifyLocator,
   handleActionSelect,
 }) => {
-  if (
-    !selectedElement ||
-    !selectedElement.xpathid ||
-    selectedElement.xpathid.length === 0
-  ) {
+  if (!selectedElement || !selectedElement.xpathid || selectedElement.xpathid.length === 0) {
     return (
       <div style={styles.emptyState}>
         <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>🔍</div>
@@ -68,10 +64,7 @@ export const XPathTab: React.FC<XPathTabProps> = ({
               style={styles.tableCode}
               title="Click to copy Row Locator"
               onClick={() =>
-                copyToClipboard(
-                  selectedElement.webtabledetails!.tableData,
-                  "Row Locator copied!",
-                )
+                copyToClipboard(selectedElement.webtabledetails!.tableData, "Row Locator copied!")
               }
             >
               {colorizeXPath(selectedElement.webtabledetails.tableData)}

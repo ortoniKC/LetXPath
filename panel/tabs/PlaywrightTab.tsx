@@ -8,10 +8,7 @@ interface PlaywrightTabProps {
   langID: string;
   copyToClipboard: (value: string, message: string) => void;
   handleVerifyLocator: (value: string) => void;
-  handlePlaywrightActionSelect: (
-    e: React.ChangeEvent<HTMLSelectElement>,
-    jsVal: string,
-  ) => void;
+  handlePlaywrightActionSelect: (e: React.ChangeEvent<HTMLSelectElement>, jsVal: string) => void;
 }
 
 export const PlaywrightTab: React.FC<PlaywrightTabProps> = ({
@@ -95,13 +92,11 @@ export const PlaywrightTab: React.FC<PlaywrightTabProps> = ({
                 <option value="snippet" disabled>
                   Snippet
                 </option>
-                {getPlaywrightActions(selectedElement.tag, selectedElement.type).map(
-                  (act) => (
-                    <option key={act} value={act}>
-                      {act}
-                    </option>
-                  ),
-                )}
+                {getPlaywrightActions(selectedElement.tag, selectedElement.type).map((act) => (
+                  <option key={act} value={act}>
+                    {act}
+                  </option>
+                ))}
               </select>
             </div>
           );

@@ -31,11 +31,12 @@ export const EmailTestingTab: React.FC = () => {
   const activeMessageIdRef = useRef<string | null>(null);
 
   // Compute emailAddress dynamically as a derived state
-  const emailAddress = provider === "inboxkitten"
-    ? `${inboxName}@inboxkitten.com`
-    : provider === "maildrop"
-    ? `${inboxName}@maildrop.cc`
-    : `${inboxName}.${mailosaurServer || "server"}@mailosaur.net`;
+  const emailAddress =
+    provider === "inboxkitten"
+      ? `${inboxName}@inboxkitten.com`
+      : provider === "maildrop"
+        ? `${inboxName}@maildrop.cc`
+        : `${inboxName}.${mailosaurServer || "server"}@mailosaur.net`;
 
   // Load provider configurations from storage on mount
   const loadConfig = () => {
@@ -54,7 +55,7 @@ export const EmailTestingTab: React.FC = () => {
             chrome.storage.local.set({ emailInboxName: name });
           }
           setInboxName(name);
-        }
+        },
       );
     } else {
       const prov = (localStorage.getItem("emailProvider") as any) || "inboxkitten";
@@ -127,13 +128,15 @@ export const EmailTestingTab: React.FC = () => {
         const res = await fetch(`https://inboxkitten.com/api/v1/mail/list?recipient=${inboxName}`);
         if (!res.ok) throw new Error("Failed to fetch InboxKitten emails");
         const data = await res.json();
-        
+
         if (inboxName === currentInbox && provider === currentProvider) {
           const formatted: EmailMessage[] = (data || []).map((item: any) => ({
             id: item.id,
             sender: item.message?.headers?.from || "Unknown Sender",
             subject: item.message?.headers?.subject || "(No Subject)",
-            date: item.timestamp ? new Date(item.timestamp * 1000).toLocaleString() : "Unknown Time",
+            date: item.timestamp
+              ? new Date(item.timestamp * 1000).toLocaleString()
+              : "Unknown Time",
             rawObject: item,
           }));
           setMessages(formatted);
@@ -151,7 +154,7 @@ export const EmailTestingTab: React.FC = () => {
         if (json.errors && json.errors.length > 0) {
           throw new Error(json.errors[0].message || "Maildrop GraphQL Error");
         }
-        
+
         if (inboxName === currentInbox && provider === currentProvider) {
           const list = json.data?.inbox || [];
           const formatted: EmailMessage[] = list.map((item: any) => ({
@@ -176,7 +179,7 @@ export const EmailTestingTab: React.FC = () => {
         if (!res.ok) throw new Error("Failed to fetch Mailosaur emails");
         const json = await res.json();
         const list = json.items || [];
-        
+
         if (inboxName === currentInbox && provider === currentProvider) {
           const formatted: EmailMessage[] = list
             .filter((item: any) => {
@@ -185,7 +188,9 @@ export const EmailTestingTab: React.FC = () => {
             })
             .map((item: any) => ({
               id: item.id,
-              sender: item.from?.[0]?.name ? `${item.from[0].name} <${item.from[0].email}>` : item.from?.[0]?.email || "Unknown Sender",
+              sender: item.from?.[0]?.name
+                ? `${item.from[0].name} <${item.from[0].email}>`
+                : item.from?.[0]?.email || "Unknown Sender",
               subject: item.subject || "(No Subject)",
               date: item.received ? new Date(item.received).toLocaleString() : "Unknown Time",
               rawObject: item,
@@ -218,11 +223,11 @@ export const EmailTestingTab: React.FC = () => {
         if (!storageKey) throw new Error("Missing storage key for InboxKitten email");
 
         const res = await fetch(
-          `https://inboxkitten.com/api/v1/mail/getHtml?key=${storageKey}&region=${storageRegion || "us-east4"}`
+          `https://inboxkitten.com/api/v1/mail/getHtml?key=${storageKey}&region=${storageRegion || "us-east4"}`,
         );
         if (!res.ok) throw new Error("Failed to fetch InboxKitten body");
         const html = await res.text();
-        
+
         if (activeMessageIdRef.current === currentMessageId) {
           setEmailHtml(postProcessHtml(html));
         }
@@ -240,7 +245,7 @@ export const EmailTestingTab: React.FC = () => {
           throw new Error(json.errors[0].message || "Maildrop GraphQL Error");
         }
         const html = json.data?.message?.html || "<p>No body returned.</p>";
-        
+
         if (activeMessageIdRef.current === currentMessageId) {
           setEmailHtml(postProcessHtml(html));
         }
@@ -255,7 +260,7 @@ export const EmailTestingTab: React.FC = () => {
         if (!res.ok) throw new Error("Failed to fetch Mailosaur body");
         const json = await res.json();
         const html = json.html?.body || `<pre>${json.text?.body || "No content"}</pre>`;
-        
+
         if (activeMessageIdRef.current === currentMessageId) {
           setEmailHtml(postProcessHtml(html));
         }
@@ -372,7 +377,11 @@ export const EmailTestingTab: React.FC = () => {
           <button style={styles.btnIcon} onClick={handleCopyToClipboard} title="Copy Address">
             📋
           </button>
-          <button style={styles.btnPrimary} onClick={handleGenerateNew} title="Generate New Address">
+          <button
+            style={styles.btnPrimary}
+            onClick={handleGenerateNew}
+            title="Generate New Address"
+          >
             🔄 New Address
           </button>
         </div>
@@ -387,11 +396,7 @@ export const EmailTestingTab: React.FC = () => {
             />
             Auto-Refresh (10s)
           </label>
-          <button
-            style={styles.btnPrimary}
-            onClick={() => fetchEmails(false)}
-            disabled={isLoading}
-          >
+          <button style={styles.btnPrimary} onClick={() => fetchEmails(false)} disabled={isLoading}>
             {isLoading ? "Fetching..." : "Refresh Inbox"}
           </button>
         </div>
@@ -404,13 +409,24 @@ export const EmailTestingTab: React.FC = () => {
           {isLoading && messages.length === 0 ? (
             <div style={styles.loaderCenter}>
               <div style={styles.spinner}></div>
-              <p style={{ fontSize: "11px", color: "var(--text-secondary)", marginTop: "10px" }}>Loading inbox...</p>
+              <p style={{ fontSize: "11px", color: "var(--text-secondary)", marginTop: "10px" }}>
+                Loading inbox...
+              </p>
             </div>
           ) : messages.length === 0 ? (
             <div style={styles.emptyInbox}>
               <div style={styles.pulseDot}></div>
-              <p style={{ fontWeight: 600, fontSize: "12px", color: "var(--text-primary)" }}>Waiting for incoming emails...</p>
-              <p style={{ fontSize: "10px", color: "var(--text-secondary)", textAlign: "center", marginTop: "4px" }}>
+              <p style={{ fontWeight: 600, fontSize: "12px", color: "var(--text-primary)" }}>
+                Waiting for incoming emails...
+              </p>
+              <p
+                style={{
+                  fontSize: "10px",
+                  color: "var(--text-secondary)",
+                  textAlign: "center",
+                  marginTop: "4px",
+                }}
+              >
                 Send a message to <code>{emailAddress}</code> to see it appear here.
               </p>
             </div>
@@ -424,15 +440,27 @@ export const EmailTestingTab: React.FC = () => {
                     onClick={() => selectMessage(msg)}
                     style={{
                       ...styles.messageCard,
-                      border: isSelected ? "1px solid var(--color-primary)" : "1px solid var(--border-color)",
-                      backgroundColor: isSelected ? "var(--color-primary-tint)" : "var(--bg-secondary)",
+                      border: isSelected
+                        ? "1px solid var(--color-primary)"
+                        : "1px solid var(--border-color)",
+                      backgroundColor: isSelected
+                        ? "var(--color-primary-tint)"
+                        : "var(--bg-secondary)",
                     }}
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "4px",
+                      }}
+                    >
                       <span style={styles.senderText} title={msg.sender}>
                         {msg.sender.replace(/<.*>/, "").trim() || msg.sender}
                       </span>
-                      <span style={styles.dateText}>{msg.date.split(",")[1]?.trim() || msg.date}</span>
+                      <span style={styles.dateText}>
+                        {msg.date.split(",")[1]?.trim() || msg.date}
+                      </span>
                     </div>
                     <div style={styles.subjectText}>{msg.subject}</div>
                   </div>
@@ -447,12 +475,16 @@ export const EmailTestingTab: React.FC = () => {
           {!selectedMessage ? (
             <div style={styles.emptyViewer}>
               <div style={{ fontSize: "32px", marginBottom: "8px" }}>✉️</div>
-              <p style={{ fontSize: "12px", color: "var(--text-secondary)" }}>Select an email from the list to preview</p>
+              <p style={{ fontSize: "12px", color: "var(--text-secondary)" }}>
+                Select an email from the list to preview
+              </p>
             </div>
           ) : isLoadingBody ? (
             <div style={styles.loaderCenter}>
               <div style={styles.spinner}></div>
-              <p style={{ fontSize: "11px", color: "var(--text-secondary)", marginTop: "10px" }}>Loading message body...</p>
+              <p style={{ fontSize: "11px", color: "var(--text-secondary)", marginTop: "10px" }}>
+                Loading message body...
+              </p>
             </div>
           ) : (
             <div style={styles.viewerContainer}>
@@ -475,7 +507,9 @@ export const EmailTestingTab: React.FC = () => {
                     style={styles.bodyIframe}
                   />
                 ) : (
-                  <div style={{ padding: "20px", textAlign: "center", color: "var(--text-secondary)" }}>
+                  <div
+                    style={{ padding: "20px", textAlign: "center", color: "var(--text-secondary)" }}
+                  >
                     Failed to render email content.
                   </div>
                 )}

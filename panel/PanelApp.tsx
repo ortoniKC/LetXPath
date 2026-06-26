@@ -184,7 +184,7 @@ const PanelApp: React.FC = () => {
           if (win && win.id) {
             recordingWindowIdRef.current = win.id;
           }
-        }
+        },
       );
       showToast("Screen recorder window opened");
     } else {
@@ -348,9 +348,12 @@ const PanelApp: React.FC = () => {
       setToast(null);
 
       try {
-        const frameId = req.senderMetadata?.frameId !== undefined
-          ? req.senderMetadata.frameId
-          : (_sender && _sender.frameId !== undefined ? _sender.frameId : undefined);
+        const frameId =
+          req.senderMetadata?.frameId !== undefined
+            ? req.senderMetadata.frameId
+            : _sender && _sender.frameId !== undefined
+              ? _sender.frameId
+              : undefined;
 
         switch (req.request) {
           case "register_frame":
@@ -1119,7 +1122,11 @@ const PanelApp: React.FC = () => {
           </li>
         </ul>
         <div style={{ display: "flex", alignItems: "center", height: "100%" }}>
-          <div style={styles.themeToggleBtn} onClick={toggleTheme} title={`Switch to ${theme === "light" ? "dark" : "light"} theme`}>
+          <div
+            style={styles.themeToggleBtn}
+            onClick={toggleTheme}
+            title={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
+          >
             {theme === "light" ? "🌙" : "☀️"}
           </div>
           <div style={styles.settingsBtn} onClick={handleOpenSettings} title="Settings">
@@ -1226,13 +1233,14 @@ const PanelApp: React.FC = () => {
         )}
 
         {/* About Tab */}
-        {activeTab === 8 && (
-          <AboutTab copyToClipboard={copyToClipboard} />
-        )}
+        {activeTab === 8 && <AboutTab copyToClipboard={copyToClipboard} />}
 
         {/* Email Opt Testing Tab */}
         {activeTab === 9 && (
-          <div className="tab-content-animate" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          <div
+            className="tab-content-animate"
+            style={{ display: "flex", flexDirection: "column", height: "100%" }}
+          >
             <EmailTestingTab />
           </div>
         )}

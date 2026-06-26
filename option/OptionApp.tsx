@@ -48,12 +48,14 @@ interface ChromeStorageResult {
 
 const OptionApp: React.FC = () => {
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [activeTab, setActiveTab] = useState<"general" | "selectors" | "templates" | "emails" | "about">(
-    "general",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "general" | "selectors" | "templates" | "emails" | "about"
+  >("general");
 
   // Email Opt Testing State
-  const [emailProvider, setEmailProvider] = useState<"inboxkitten" | "maildrop" | "mailosaur">("inboxkitten");
+  const [emailProvider, setEmailProvider] = useState<"inboxkitten" | "maildrop" | "mailosaur">(
+    "inboxkitten",
+  );
   const [mailosaurApiKey, setMailosaurApiKey] = useState<string>("");
   const [mailosaurServerId, setMailosaurServerId] = useState<string>("");
   const [langID, setLangID] = useState<string>("javas");
@@ -600,7 +602,10 @@ const OptionApp: React.FC = () => {
                 backgroundColor:
                   activeTab === "general" ? "var(--color-primary-tint)" : "transparent",
                 color: activeTab === "general" ? "var(--color-primary)" : "var(--text-secondary)",
-                borderLeft: activeTab === "general" ? "4px solid var(--color-primary)" : "4px solid transparent",
+                borderLeft:
+                  activeTab === "general"
+                    ? "4px solid var(--color-primary)"
+                    : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>⚙️</span> Snippet Framework
@@ -614,7 +619,9 @@ const OptionApp: React.FC = () => {
                   activeTab === "selectors" ? "var(--color-primary-tint)" : "transparent",
                 color: activeTab === "selectors" ? "var(--color-primary)" : "var(--text-secondary)",
                 borderLeft:
-                  activeTab === "selectors" ? "4px solid var(--color-primary)" : "4px solid transparent",
+                  activeTab === "selectors"
+                    ? "4px solid var(--color-primary)"
+                    : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>🎯</span> Selector Priorities
@@ -628,7 +635,9 @@ const OptionApp: React.FC = () => {
                   activeTab === "templates" ? "var(--color-primary-tint)" : "transparent",
                 color: activeTab === "templates" ? "var(--color-primary)" : "var(--text-secondary)",
                 borderLeft:
-                  activeTab === "templates" ? "4px solid var(--color-primary)" : "4px solid transparent",
+                  activeTab === "templates"
+                    ? "4px solid var(--color-primary)"
+                    : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>📝</span> Custom Templates
@@ -642,7 +651,9 @@ const OptionApp: React.FC = () => {
                   activeTab === "emails" ? "var(--color-primary-tint)" : "transparent",
                 color: activeTab === "emails" ? "var(--color-primary)" : "var(--text-secondary)",
                 borderLeft:
-                  activeTab === "emails" ? "4px solid var(--color-primary)" : "4px solid transparent",
+                  activeTab === "emails"
+                    ? "4px solid var(--color-primary)"
+                    : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>✉️</span> Email Testing
@@ -652,9 +663,13 @@ const OptionApp: React.FC = () => {
               onClick={() => setActiveTab("about")}
               style={{
                 ...styles.sidebarLink,
-                backgroundColor: activeTab === "about" ? "var(--color-primary-tint)" : "transparent",
+                backgroundColor:
+                  activeTab === "about" ? "var(--color-primary-tint)" : "transparent",
                 color: activeTab === "about" ? "var(--color-primary)" : "var(--text-secondary)",
-                borderLeft: activeTab === "about" ? "4px solid var(--color-primary)" : "4px solid transparent",
+                borderLeft:
+                  activeTab === "about"
+                    ? "4px solid var(--color-primary)"
+                    : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>ℹ️</span> About Extension
@@ -662,7 +677,9 @@ const OptionApp: React.FC = () => {
           </div>
 
           <div style={styles.sidebarFooter}>
-            <div style={{ fontSize: "11px", color: "var(--text-secondary)" }}>Ortoni Studio Project</div>
+            <div style={{ fontSize: "11px", color: "var(--text-secondary)" }}>
+              Ortoni Studio Project
+            </div>
             <div
               style={{
                 fontSize: "12px",

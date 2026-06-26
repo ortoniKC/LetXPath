@@ -20,11 +20,7 @@ export const CSSTab: React.FC<CSSTabProps> = ({
   handleVerifyLocator,
   handleActionSelect,
 }) => {
-  if (
-    !selectedElement ||
-    !selectedElement.cssPath ||
-    selectedElement.cssPath.length === 0
-  ) {
+  if (!selectedElement || !selectedElement.cssPath || selectedElement.cssPath.length === 0) {
     return (
       <div style={styles.emptyState}>
         <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>🎨</div>

@@ -34,11 +34,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
               key={f.id}
               onClick={() => {
                 setLangID(f.id);
-                if (
-                  typeof chrome !== "undefined" &&
-                  chrome.storage &&
-                  chrome.storage.local
-                ) {
+                if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
                   chrome.storage.local.set({ langID: f.id });
                 } else {
                   localStorage.setItem("langID", f.id);
@@ -97,9 +93,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
               Output Syntax Preview ({langID})
             </span>
           </div>
-          <div style={{ fontSize: "11px", color: "#58a6ff" }}>
-            Auto-compiles instantly
-          </div>
+          <div style={{ fontSize: "11px", color: "#58a6ff" }}>Auto-compiles instantly</div>
         </div>
         <div style={styles.previewBody}>
           <pre style={styles.codePre}>

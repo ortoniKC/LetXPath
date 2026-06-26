@@ -192,11 +192,21 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
               }}
             >
               Mock Element:{" "}
-              <code style={{ color: "var(--color-primary)", backgroundColor: "var(--color-primary-tint)" }}>
+              <code
+                style={{
+                  color: "var(--color-primary)",
+                  backgroundColor: "var(--color-primary-tint)",
+                }}
+              >
                 button#login-btn
               </code>
               , locator:{" "}
-              <code style={{ color: "var(--color-primary)", backgroundColor: "var(--color-primary-tint)" }}>
+              <code
+                style={{
+                  color: "var(--color-primary)",
+                  backgroundColor: "var(--color-primary-tint)",
+                }}
+              >
                 "//button[@id='login']"
               </code>
             </p>

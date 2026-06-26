@@ -45,9 +45,7 @@ export const ToolsTab: React.FC<ToolsTabProps> = ({
             style={styles.toolInput}
             placeholder="Type locator (e.g. //input, #id, or page.getByRole('button'))"
             value={searchVal}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setSearchVal(e.target.value)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchVal(e.target.value)}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
               e.key === "Enter" && handleCustomSearch()
             }
@@ -79,9 +77,7 @@ export const ToolsTab: React.FC<ToolsTabProps> = ({
             style={styles.toolInput}
             placeholder="Enter XPath to convert"
             value={convertVal}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setConvertVal(e.target.value)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConvertVal(e.target.value)}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
               e.key === "Enter" && handleConvertXPath()
             }

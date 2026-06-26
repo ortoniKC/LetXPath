@@ -81,8 +81,8 @@ export const SelectorsTab: React.FC<SelectorsTabProps> = ({
             >
               Drag-style order list. Use the{" "}
               <strong style={{ color: "var(--color-primary)" }}>left (◂)</strong> and{" "}
-              <strong style={{ color: "var(--color-primary)" }}>right (▸)</strong> buttons on each badge
-              to change priorities. Ortoni Studio evaluates from left to right.
+              <strong style={{ color: "var(--color-primary)" }}>right (▸)</strong> buttons on each
+              badge to change priorities. Ortoni Studio evaluates from left to right.
             </div>
 
             <div style={styles.priorityPillContainer}>
@@ -206,7 +206,13 @@ export const SelectorsTab: React.FC<SelectorsTabProps> = ({
               }}
             >
               Recommended:{" "}
-              <code style={{ color: "var(--color-primary)", backgroundColor: "var(--color-primary-tint)", border: "1px solid var(--border-color)" }}>
+              <code
+                style={{
+                  color: "var(--color-primary)",
+                  backgroundColor: "var(--color-primary-tint)",
+                  border: "1px solid var(--border-color)",
+                }}
+              >
                 data-testid, data-cy, id, name, class
               </code>
             </div>
@@ -236,12 +242,11 @@ export const SelectorsTab: React.FC<SelectorsTabProps> = ({
             lineHeight: "1.6",
           }}
         >
-          When Ortoni Studio scans a web element on a page, it loops through your
-          prioritized list of attributes. If it finds a unique element using the highest
-          priority attribute (e.g. <code style={styles.codeText}>data-testid</code>), it
-          creates a selector instantly. If that fails or is non-unique, it proceeds to the
-          next attribute in the list. Setting test-ids at the top ensures robust locator
-          generation.
+          When Ortoni Studio scans a web element on a page, it loops through your prioritized list
+          of attributes. If it finds a unique element using the highest priority attribute (e.g.{" "}
+          <code style={styles.codeText}>data-testid</code>), it creates a selector instantly. If
+          that fails or is non-unique, it proceeds to the next attribute in the list. Setting
+          test-ids at the top ensures robust locator generation.
         </div>
       </div>
     </div>

@@ -28,8 +28,8 @@ export const AxesTab: React.FC<AxesTabProps> = ({
         <div style={{ fontSize: "1.8rem", marginBottom: "4px" }}>🔗</div>
         <div style={styles.emptyTitle}>Axes-based dynamic locator</div>
         <div style={styles.emptySubtitle}>
-          Right click on the page context menu and select <strong>Parent Element</strong>,
-          then <strong>Child Element</strong>.
+          Right click on the page context menu and select <strong>Parent Element</strong>, then{" "}
+          <strong>Child Element</strong>.
         </div>
       </div>
     );

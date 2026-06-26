@@ -55,9 +55,7 @@ export const EmailsTab: React.FC<EmailsTabProps> = ({
                   : "var(--bg-secondary)",
               transition: "all 0.2s",
               boxShadow:
-                emailProvider === "inboxkitten"
-                  ? "0 4px 12px var(--color-primary-tint)"
-                  : "none",
+                emailProvider === "inboxkitten" ? "0 4px 12px var(--color-primary-tint)" : "none",
             }}
           >
             <div style={{ fontSize: "24px", marginBottom: "8px" }}>🐱</div>
@@ -66,9 +64,7 @@ export const EmailsTab: React.FC<EmailsTabProps> = ({
                 fontWeight: "bold",
                 fontSize: "14px",
                 color:
-                  emailProvider === "inboxkitten"
-                    ? "var(--color-primary)"
-                    : "var(--text-primary)",
+                  emailProvider === "inboxkitten" ? "var(--color-primary)" : "var(--text-primary)",
                 marginBottom: "4px",
               }}
             >
@@ -90,14 +86,10 @@ export const EmailsTab: React.FC<EmailsTabProps> = ({
               padding: "16px",
               cursor: "pointer",
               backgroundColor:
-                emailProvider === "maildrop"
-                  ? "var(--color-primary-tint)"
-                  : "var(--bg-secondary)",
+                emailProvider === "maildrop" ? "var(--color-primary-tint)" : "var(--bg-secondary)",
               transition: "all 0.2s",
               boxShadow:
-                emailProvider === "maildrop"
-                  ? "0 4px 12px var(--color-primary-tint)"
-                  : "none",
+                emailProvider === "maildrop" ? "0 4px 12px var(--color-primary-tint)" : "none",
             }}
           >
             <div style={{ fontSize: "24px", marginBottom: "8px" }}>💧</div>
@@ -106,9 +98,7 @@ export const EmailsTab: React.FC<EmailsTabProps> = ({
                 fontWeight: "bold",
                 fontSize: "14px",
                 color:
-                  emailProvider === "maildrop"
-                    ? "var(--color-primary)"
-                    : "var(--text-primary)",
+                  emailProvider === "maildrop" ? "var(--color-primary)" : "var(--text-primary)",
                 marginBottom: "4px",
               }}
             >
@@ -130,14 +120,10 @@ export const EmailsTab: React.FC<EmailsTabProps> = ({
               padding: "16px",
               cursor: "pointer",
               backgroundColor:
-                emailProvider === "mailosaur"
-                  ? "var(--color-primary-tint)"
-                  : "var(--bg-secondary)",
+                emailProvider === "mailosaur" ? "var(--color-primary-tint)" : "var(--bg-secondary)",
               transition: "all 0.2s",
               boxShadow:
-                emailProvider === "mailosaur"
-                  ? "0 4px 12px var(--color-primary-tint)"
-                  : "none",
+                emailProvider === "mailosaur" ? "0 4px 12px var(--color-primary-tint)" : "none",
             }}
           >
             <div style={{ fontSize: "24px", marginBottom: "8px" }}>🦖</div>
@@ -146,9 +132,7 @@ export const EmailsTab: React.FC<EmailsTabProps> = ({
                 fontWeight: "bold",
                 fontSize: "14px",
                 color:
-                  emailProvider === "mailosaur"
-                    ? "var(--color-primary)"
-                    : "var(--text-primary)",
+                  emailProvider === "mailosaur" ? "var(--color-primary)" : "var(--text-primary)",
                 marginBottom: "4px",
               }}
             >

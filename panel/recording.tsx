@@ -124,10 +124,26 @@ export const RecordingApp: React.FC = () => {
       <div style={styles.card}>
         <div style={styles.header}>
           <div style={styles.brandIcon}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12 8C9.79 8 8 9.79 8 12C8 14.21 9.79 16 12 16C14.21 16 16 14.21 16 12C16 9.79 14.21 8 12 8Z" fill="url(#brandGrad)"/>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12 8C9.79 8 8 9.79 8 12C8 14.21 9.79 16 12 16C14.21 16 16 14.21 16 12C16 9.79 14.21 8 12 8Z"
+                fill="url(#brandGrad)"
+              />
               <defs>
-                <linearGradient id="brandGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                <linearGradient
+                  id="brandGrad"
+                  x1="2"
+                  y1="2"
+                  x2="22"
+                  y2="22"
+                  gradientUnits="userSpaceOnUse"
+                >
                   <stop offset="0%" stopColor="#083d77" />
                   <stop offset="100%" stopColor="#05264b" />
                 </linearGradient>
@@ -140,7 +156,8 @@ export const RecordingApp: React.FC = () => {
         {status === "idle" && (
           <div>
             <p style={styles.desc}>
-              Capture your browser interaction to create high-fidelity walkthrough recordings automatically.
+              Capture your browser interaction to create high-fidelity walkthrough recordings
+              automatically.
             </p>
             <button style={styles.btnStart} onClick={startRecording}>
               Start Screen Recording

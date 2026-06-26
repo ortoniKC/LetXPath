@@ -74,9 +74,7 @@ export const AboutTab: React.FC = () => {
           }}
         >
           <li>Generate reliable XPath expressions & CSS locators instantly.</li>
-          <li>
-            Support for Cypress, Playwright, Selenium (Java, C#, Python), and Protractor.
-          </li>
+          <li>Support for Cypress, Playwright, Selenium (Java, C#, Python), and Protractor.</li>
           <li>Interactive smart recorder which compiles script actions into full tests.</li>
           <li>Dynamic WebTable parsing and locator prioritization setup.</li>
           <li>100% open-source and local storage secured.</li>
@@ -100,12 +98,7 @@ export const AboutTab: React.FC = () => {
           >
             🐙 GitHub Repository
           </a>
-          <a
-            href="https://letcode.in"
-            target="_blank"
-            rel="noreferrer"
-            style={styles.aboutLink}
-          >
+          <a href="https://letcode.in" target="_blank" rel="noreferrer" style={styles.aboutLink}>
             🌐 LetCode Homepage
           </a>
           <a
