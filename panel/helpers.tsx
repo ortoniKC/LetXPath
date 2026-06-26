@@ -7,7 +7,7 @@ export const colorizeCode = (code: string, _lang: string): React.ReactNode => {
 
   // Regex to match comments, strings, keywords, numbers, builtins/objects, and method/variable identifiers
   const tokenRegex =
-    /(\/\/.*|#.*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:await|async|import|from|const|let|class|public|static|void|try|using|new|describe|it|def|return)\b|\b\d+\b|\b(?:cy|page|expect|assert|driver|browser|element|by|By)\b|[a-zA-Z0-9_$]+|[^a-zA-Z0-9_$\s]+|\s+)/g;
+    /(\/\/.*|#.*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b(?:await|async|import|from|const|let|class|public|static|void|try|using|new|describe|it|def|return)\b|\b\d+\b|\b(?:cy|page|expect|assert|driver|browser|element|by|By)\b|[a-zA-Z0-9_$]+|[^a-zA-Z0-9_$\s'"]+|\s+)/g;
 
   const tokens = code.split(tokenRegex);
   return tokens.map((token, idx) => {

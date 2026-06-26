@@ -27,7 +27,6 @@ export const AboutTab: React.FC<AboutTabProps> = ({ copyToClipboard }) => {
         <div style={{ display: "flex", flexDirection: "column" }}>
           <span
             style={{
-              color: "#ffffff",
               fontSize: "12px",
               fontWeight: 600,
               lineHeight: 1.2,

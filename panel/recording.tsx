@@ -202,15 +202,17 @@ const styles = {
     alignItems: "center",
     height: "100vh",
     width: "100vw",
-    background: "radial-gradient(circle at 50% 50%, #ffffff 0%, #ebebd3 100%)", // white to beige
+    background: "#080a10",
+    backgroundImage: "radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(66, 184, 131, 0.08) 0px, transparent 50%)",
+    fontFamily: '"Outfit", "Inter", -apple-system, BlinkMacSystemFont, sans-serif',
   },
   card: {
-    backgroundColor: "#ffffff", // white card background
-    border: "1px solid #d0d0b8", // beige border
+    backgroundColor: "#101423",
+    border: "1px solid rgba(255, 255, 255, 0.05)",
     borderRadius: "12px",
     padding: "16px 20px",
     textAlign: "center" as const,
-    boxShadow: "0 10px 25px rgba(8, 61, 119, 0.12)",
+    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.25)",
     width: "290px",
     boxSizing: "border-box" as const,
   },
@@ -229,39 +231,39 @@ const styles = {
     margin: 0,
     fontSize: "15px",
     fontWeight: 700,
-    color: "#083d77", // Primary blue
+    color: "#f1f5f9",
     letterSpacing: "-0.025em",
   },
   desc: {
-    color: "#5c697a", // Subdued slate
+    color: "#94a3b8",
     fontSize: "11px",
     lineHeight: "1.4",
     margin: "0 0 16px 0",
   },
   descLoading: {
-    color: "#083d77", // Primary blue
+    color: "#6366f1",
     fontSize: "11px",
     lineHeight: "1.4",
     margin: "0 0 16px 0",
     fontWeight: 500,
   },
   descRecording: {
-    color: "#b91c1c", // Recording active is red
+    color: "#ef4444",
     fontSize: "11px",
     lineHeight: "1.4",
     margin: "0 0 12px 0",
     fontWeight: 500,
   },
   btnStart: {
-    background: "linear-gradient(135deg, #083d77 0%, #05264b 100%)", // Primary blue gradient
-    color: "#ffffff", // White text
+    background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+    color: "#ffffff",
     border: "none",
     borderRadius: "6px",
     padding: "8px 16px",
     fontSize: "12px",
     fontWeight: 600,
     cursor: "pointer",
-    boxShadow: "0 4px 12px rgba(8, 61, 119, 0.3)",
+    boxShadow: "0 4px 12px rgba(99, 102, 241, 0.35)",
     transition: "transform 0.2s, box-shadow 0.2s",
     width: "100%",
     boxSizing: "border-box" as const,
@@ -276,8 +278,8 @@ const styles = {
   spinner: {
     width: "24px",
     height: "24px",
-    border: "2px solid rgba(8, 61, 119, 0.1)",
-    borderTop: "2px solid #083d77",
+    border: "2px solid rgba(255, 255, 255, 0.1)",
+    borderTop: "2px solid #6366f1",
     borderRadius: "50%",
     animation: "pulse 1s linear infinite",
   },
@@ -291,8 +293,8 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    backgroundColor: "#ebebd3", // Beige timer box
-    border: "1px solid #d0d0b8", // Beige border
+    backgroundColor: "rgba(255, 255, 255, 0.02)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
     padding: "6px 14px",
     borderRadius: "20px",
   },
@@ -301,19 +303,19 @@ const styles = {
     width: "8px",
     height: "8px",
     borderRadius: "50%",
-    backgroundColor: "#b91c1c", // Recording dot
-    boxShadow: "0 0 8px #b91c1c",
+    backgroundColor: "#ef4444",
+    boxShadow: "0 0 8px #ef4444",
     animation: "pulse 1.5s infinite",
   },
   timer: {
-    color: "#1e293b", // Slate dark text
+    color: "#f1f5f9",
     fontSize: "13px",
     fontWeight: 700,
     fontFamily: 'Consolas, Monaco, "Courier New", monospace',
     letterSpacing: "0.05em",
   },
   btnStop: {
-    background: "linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%)", // Alert red gradient
+    background: "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)",
     color: "#ffffff",
     border: "none",
     borderRadius: "6px",
@@ -321,7 +323,7 @@ const styles = {
     fontSize: "11px",
     fontWeight: 700,
     cursor: "pointer",
-    boxShadow: "0 4px 12px rgba(185, 28, 28, 0.3)",
+    boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)",
     transition: "transform 0.2s",
     width: "100%",
     boxSizing: "border-box" as const,

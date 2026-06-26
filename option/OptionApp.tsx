@@ -353,18 +353,23 @@ const OptionApp: React.FC = () => {
           --color-success: #10b981;
         }
         .theme-dark {
-          --bg-primary: #090d16;
-          --bg-secondary: #111827;
-          --bg-card: #1f2937;
-          --border-color: #374151;
+          --bg-primary: #080a10;
+          --bg-secondary: #101423;
+          --bg-card: #101423;
+          --border-color: rgba(255, 255, 255, 0.05);
           --color-primary: #6366f1;
           --color-primary-hover: #818cf8;
           --color-primary-tint: rgba(99, 102, 241, 0.15);
-          --text-primary: #f3f4f6;
-          --text-secondary: #9ca3af;
+          --text-primary: #f1f5f9;
+          --text-secondary: #94a3b8;
           --text-light: #ffffff;
-          --color-alert: #f87171;
-          --color-success: #34d399;
+          --color-alert: #ef4444;
+          --color-success: #42b883;
+          background-color: var(--bg-primary) !important;
+          background-image:
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(66, 184, 131, 0.08) 0px, transparent 50%) !important;
+          background-attachment: fixed !important;
         }
 
         body {

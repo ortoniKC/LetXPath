@@ -8,6 +8,7 @@ import {
   getSeleniumPython,
   getProtractor,
   getCypress,
+  colorizeCode,
 } from "./helpers";
 
 describe("Panel Helpers - Selector Actions", () => {
@@ -96,5 +97,28 @@ describe("Panel Helpers - Code Generation", () => {
   it("should generate correct Cypress selector", () => {
     expect(getCypress("CSS", cssSelector)).toBe(`cy.get("${cssSelector}")`);
     expect(getCypress("Unique ID", uniqueId)).toBe(`cy.get("#${uniqueId}")`);
+  });
+});
+
+describe("Panel Helpers - Syntax Highlighting", () => {
+  it("should tokenize code correctly and parse async/await/page keywords properly", () => {
+    const code = "test('recorded test', async ({ page }) => { await page.goto('url'); });";
+    const result = colorizeCode(code, "playwrightJS");
+    
+    expect(result).toBeDefined();
+    
+    const elements = result as React.ReactElement[];
+    
+    const stringToken = elements.find(el => el && el.props.children === "'recorded test'");
+    expect(stringToken).toBeDefined();
+    expect(stringToken?.props.style.color).toBe("#ce9178");
+    
+    const asyncToken = elements.find(el => el && el.props.children === "async");
+    expect(asyncToken).toBeDefined();
+    expect(asyncToken?.props.style.color).toBe("#569cd6");
+    
+    const pageToken = elements.find(el => el && el.props.children === "page");
+    expect(pageToken).toBeDefined();
+    expect(pageToken?.props.style.color).toBe("#9cdcfe");
   });
 });

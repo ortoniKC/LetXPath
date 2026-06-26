@@ -143,11 +143,11 @@ export const RecorderTab: React.FC<RecorderTabProps> = ({
             <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
               {isRecordingActive ? (
                 <button style={styles.btnStopRecord} onClick={handleStopRecording}>
-                  Stop Recording
+                  Stop Steps
                 </button>
               ) : (
                 <button style={styles.btnStartRecord} onClick={handleStartRecording}>
-                  Start Recording
+                  Generate Steps
                 </button>
               )}
               <button style={styles.btnClear} onClick={handleClearRecording}>

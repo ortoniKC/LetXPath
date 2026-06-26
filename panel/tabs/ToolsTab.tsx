@@ -50,8 +50,20 @@ export const ToolsTab: React.FC<ToolsTabProps> = ({
               e.key === "Enter" && handleCustomSearch()
             }
           />
-          <button style={styles.btnFind} onClick={handleCustomSearch}>
-            Find
+          <button style={styles.btnFind} onClick={handleCustomSearch} title="Find / Search locator">
+            <svg
+              viewBox="0 0 24 24"
+              width="12"
+              height="12"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
           </button>
           <button style={styles.btnClear} onClick={handleClearHighlight}>
             Clear

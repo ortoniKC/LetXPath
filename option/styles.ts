@@ -3,7 +3,7 @@ export const styles = {
     backgroundColor: "var(--bg-primary)",
     minHeight: "100vh",
     position: "relative" as const,
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontFamily: "'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     color: "var(--text-primary)",
     boxSizing: "border-box" as const,
   },

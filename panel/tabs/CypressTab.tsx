@@ -70,7 +70,19 @@ export const CypressTab: React.FC<CypressTabProps> = ({
                 }
                 title="Verify and highlight element"
               >
-                Find
+                <svg
+                  viewBox="0 0 24 24"
+                  width="11"
+                  height="11"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
               </button>
               <select
                 className="form-select select-sm"
