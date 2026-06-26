@@ -18,11 +18,11 @@ export const AboutTab: React.FC<AboutTabProps> = ({ copyToClipboard }) => {
         }}
       >
         <img
-          src="../assets/32.png"
+          src="../assets/ortoni-studio-logo.png"
           width="20px"
           height="20px"
           alt="Ortoni Studio logo"
-          style={{ borderRadius: "4px" }}
+          style={{ borderRadius: "4px", objectFit: "contain" }}
         />
         <div style={{ display: "flex", flexDirection: "column" }}>
           <span

@@ -562,7 +562,17 @@ const OptionApp: React.FC = () => {
         {/* Left Sidebar */}
         <div style={styles.sidebar}>
           <div style={styles.sidebarBrand}>
-            <div style={styles.logoBadge}>L</div>
+            <img
+              src="../assets/ortoni-studio-logo.png"
+              alt="Ortoni Studio Logo"
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "8px",
+                objectFit: "contain",
+                boxShadow: "0 4px 12px var(--color-primary-tint)",
+              }}
+            />
             <div style={{ flex: 1 }}>
               <div style={styles.brandTitle}>Ortoni Studio</div>
               <div style={styles.brandSubtitle}>Developer settings</div>

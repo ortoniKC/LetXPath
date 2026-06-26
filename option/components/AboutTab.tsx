@@ -22,23 +22,17 @@ export const AboutTab: React.FC = () => {
             borderBottom: "1px solid var(--border-color)",
           }}
         >
-          <div
+          <img
+            src="../assets/ortoni-studio-logo.png"
+            alt="Ortoni Studio Logo"
             style={{
               width: "64px",
               height: "64px",
               borderRadius: "16px",
-              background: "linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "32px",
-              color: "#ffffff",
-              fontWeight: "bold",
-              boxShadow: "0 8px 24px rgba(79, 70, 229, 0.4)",
+              objectFit: "contain",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
             }}
-          >
-            L
-          </div>
+          />
           <div>
             <h2
               style={{
