@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { colorizeCode } from "../panel/helpers";
 import { APPVERSION } from "../panel/constants";
+import { FRAMEWORKS } from "./constants";
+import { styles } from "./styles";
+import { GeneralTab } from "./components/GeneralTab";
+import { SelectorsTab } from "./components/SelectorsTab";
+import { TemplatesTab } from "./components/TemplatesTab";
+import { EmailsTab } from "./components/EmailsTab";
+import { AboutTab } from "./components/AboutTab";
 
 interface TemplateGroup {
   click: string;
@@ -36,76 +43,11 @@ interface ChromeStorageResult {
   emailProvider?: string;
   mailosaurApiKey?: string;
   mailosaurServerId?: string;
+  theme?: "light" | "dark";
 }
-
-interface FrameworkOption {
-  id: string;
-  name: string;
-  subtitle: string;
-  icon: string;
-  accent: string;
-}
-
-const FRAMEWORKS: FrameworkOption[] = [
-  {
-    id: "javas",
-    name: "Selenium Java",
-    subtitle: "Standard Java WebDriver actions",
-    icon: "☕",
-    accent: "24, 95%, 52%",
-  },
-  {
-    id: "playwrightJS",
-    name: "Playwright (Node)",
-    subtitle: "Modern JS/TS test framework",
-    icon: "🎭",
-    accent: "168, 100%, 40%",
-  },
-  {
-    id: "playwrightJava",
-    name: "Playwright (Java)",
-    subtitle: "Java bindings for Playwright API",
-    icon: "🚀",
-    accent: "200, 100%, 50%",
-  },
-  {
-    id: "py",
-    name: "Selenium Python",
-    subtitle: "Python bindings for Selenium",
-    icon: "🐍",
-    accent: "45, 100%, 48%",
-  },
-  {
-    id: "csharp",
-    name: "Selenium C#",
-    subtitle: "C# .NET driver actions",
-    icon: "🎯",
-    accent: "265, 100%, 65%",
-  },
-  {
-    id: "protractorjs",
-    name: "Protractor (Angular)",
-    subtitle: "Angular E2E automation library",
-    icon: "🛡️",
-    accent: "350, 100%, 60%",
-  },
-  {
-    id: "cypress",
-    name: "Cypress",
-    subtitle: "Developer-friendly web test runner",
-    icon: "🌲",
-    accent: "160, 100%, 40%",
-  },
-  {
-    id: "custom",
-    name: "Custom Framework",
-    subtitle: "Define your own POM structures",
-    icon: "🛠️",
-    accent: "38, 92%, 50%",
-  },
-];
 
 const OptionApp: React.FC = () => {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [activeTab, setActiveTab] = useState<"general" | "selectors" | "templates" | "emails" | "about">(
     "general",
   );
@@ -155,6 +97,7 @@ const OptionApp: React.FC = () => {
           "emailProvider",
           "mailosaurApiKey",
           "mailosaurServerId",
+          "theme",
         ],
         (result: ChromeStorageResult) => {
           if (result.langID) setLangID(result.langID);
@@ -162,6 +105,7 @@ const OptionApp: React.FC = () => {
           if (result.emailProvider) setEmailProvider(result.emailProvider as any);
           if (result.mailosaurApiKey) setMailosaurApiKey(result.mailosaurApiKey);
           if (result.mailosaurServerId) setMailosaurServerId(result.mailosaurServerId);
+          if (result.theme) setTheme(result.theme);
 
           const priority = result.selectorPriority || "data-testid, id, name, class";
           setSelectorPriority(priority);
@@ -198,6 +142,8 @@ const OptionApp: React.FC = () => {
       setEmailProvider((localStorage.getItem("emailProvider") as any) || "inboxkitten");
       setMailosaurApiKey(localStorage.getItem("mailosaurApiKey") || "");
       setMailosaurServerId(localStorage.getItem("mailosaurServerId") || "");
+      const localTheme = localStorage.getItem("theme") as "light" | "dark";
+      if (localTheme) setTheme(localTheme);
 
       const priority = localStorage.getItem("selectorPriority") || "data-testid, id, name, class";
       setSelectorPriority(priority);
@@ -208,6 +154,20 @@ const OptionApp: React.FC = () => {
       setTextvalue(localStorage.getItem("textvalue") || DEFAULT_TEMPLATES[localCustomLang].text);
       setAttrvalue(localStorage.getItem("attrvalue") || DEFAULT_TEMPLATES[localCustomLang].attr);
     }
+
+    const storageListener = (changes: any) => {
+      if (changes.theme) {
+        setTheme(changes.theme.newValue);
+      }
+    };
+    if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.onChanged) {
+      chrome.storage.onChanged.addListener(storageListener);
+    }
+    return () => {
+      if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.onChanged) {
+        chrome.storage.onChanged.removeListener(storageListener);
+      }
+    };
   }, []);
 
   const handleCustomLangChange = (newLang: "jscs" | "javacs") => {
@@ -372,14 +332,43 @@ const OptionApp: React.FC = () => {
   };
 
   return (
-    <div style={styles.appContainer}>
+    <div className={theme === "light" ? "theme-light" : "theme-dark"} style={styles.appContainer}>
       <style
         dangerouslySetInnerHTML={{
           __html: `
+        .theme-light {
+          --bg-primary: #f3f4f6;
+          --bg-secondary: #ffffff;
+          --bg-card: #ffffff;
+          --border-color: #e5e7eb;
+          --color-primary: #4f46e5;
+          --color-primary-hover: #4338ca;
+          --color-primary-tint: rgba(79, 70, 229, 0.08);
+          --text-primary: #1f2937;
+          --text-secondary: #4b5563;
+          --text-light: #ffffff;
+          --color-alert: #ef4444;
+          --color-success: #10b981;
+        }
+        .theme-dark {
+          --bg-primary: #090d16;
+          --bg-secondary: #111827;
+          --bg-card: #1f2937;
+          --border-color: #374151;
+          --color-primary: #6366f1;
+          --color-primary-hover: #818cf8;
+          --color-primary-tint: rgba(99, 102, 241, 0.15);
+          --text-primary: #f3f4f6;
+          --text-secondary: #9ca3af;
+          --text-light: #ffffff;
+          --color-alert: #f87171;
+          --color-success: #34d399;
+        }
+
         body {
           margin: 0;
-          background-color: #080b10 !important;
-          color: #c9d1d9;
+          background-color: var(--bg-primary) !important;
+          color: var(--text-primary);
           overflow-x: hidden;
         }
 
@@ -389,14 +378,14 @@ const OptionApp: React.FC = () => {
           height: 8px;
         }
         ::-webkit-scrollbar-track {
-          background: #080b10;
+          background: var(--bg-primary);
         }
         ::-webkit-scrollbar-thumb {
-          background: #21262d;
+          background: var(--color-primary-tint);
           border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-          background: #30363d;
+          background: var(--color-primary);
         }
 
         /* Hover animations and transitions */
@@ -404,8 +393,8 @@ const OptionApp: React.FC = () => {
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .sidebar-btn:hover {
-          background-color: rgba(255, 255, 255, 0.05);
-          color: #ffffff !important;
+          background-color: var(--color-primary-tint);
+          color: var(--color-primary) !important;
           transform: translateX(4px);
         }
 
@@ -415,13 +404,13 @@ const OptionApp: React.FC = () => {
         }
         .framework-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(56, 189, 248, 0.15);
-          border-color: #38bdf8 !important;
+          box-shadow: 0 8px 24px var(--color-primary-tint);
+          border-color: var(--color-primary) !important;
         }
         .framework-card.active {
-          border-color: #4f46e5 !important;
-          background: linear-gradient(145deg, rgba(79, 70, 229, 0.1) 0%, rgba(17, 24, 39, 0.7) 100%) !important;
-          box-shadow: 0 12px 30px rgba(79, 70, 229, 0.2), 0 0 25px rgba(79, 70, 229, 0.15);
+          border-color: var(--color-primary) !important;
+          background: linear-gradient(145deg, var(--color-primary-tint) 0%, var(--bg-card) 100%) !important;
+          box-shadow: 0 8px 20px var(--color-primary-tint);
         }
 
         .priority-pill {
@@ -429,41 +418,41 @@ const OptionApp: React.FC = () => {
         }
         .priority-pill:hover {
           transform: scale(1.03);
-          background-color: #1f2937 !important;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          background-color: var(--bg-card) !important;
+          box-shadow: 0 4px 12px var(--color-primary-tint);
         }
 
         .form-select, .form-input, .form-textarea {
           transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
-          background-color: #0d1117 !important;
-          border: 1px solid #21262d !important;
-          color: #c9d1d9 !important;
+          background-color: var(--bg-card) !important;
+          border: 1px solid var(--border-color) !important;
+          color: var(--text-primary) !important;
           border-radius: 8px !important;
           padding: 10px 14px !important;
           font-size: 13px !important;
         }
         .form-select:focus, .form-input:focus, .form-textarea:focus {
-          border-color: #4f46e5 !important;
-          box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25) !important;
-          background-color: #121824 !important;
+          border-color: var(--color-primary) !important;
+          box-shadow: 0 0 0 3px var(--color-primary-tint) !important;
+          background-color: var(--bg-card) !important;
           outline: none;
         }
 
         .btn-gradient {
-          background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%) !important;
+          background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%) !important;
           border: none !important;
           border-radius: 8px !important;
-          color: #ffffff !important;
+          color: var(--text-light) !important;
           font-weight: 600 !important;
           padding: 12px 24px !important;
           cursor: pointer !important;
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-          box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35) !important;
+          box-shadow: 0 4px 14px var(--color-primary-tint) !important;
         }
         .btn-gradient:hover {
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5) !important;
-          filter: brightness(1.1);
+          box-shadow: 0 6px 20px var(--color-primary-tint) !important;
+          filter: brightness(1.05);
         }
         .btn-gradient:active {
           transform: translateY(1px);
@@ -471,17 +460,17 @@ const OptionApp: React.FC = () => {
 
         .btn-outline {
           background: transparent !important;
-          border: 1px solid #30363d !important;
+          border: 1px solid var(--color-primary) !important;
           border-radius: 8px !important;
-          color: #c9d1d9 !important;
+          color: var(--color-primary) !important;
           font-weight: 500 !important;
           padding: 10px 20px !important;
           cursor: pointer !important;
           transition: all 0.2s ease !important;
         }
         .btn-outline:hover {
-          border-color: #8b949e !important;
-          background-color: rgba(255, 255, 255, 0.03) !important;
+          border-color: var(--color-primary-hover) !important;
+          background-color: var(--color-primary-tint) !important;
         }
 
         /* Toast slide-in/out */
@@ -503,7 +492,7 @@ const OptionApp: React.FC = () => {
           position: absolute;
           width: 600px;
           height: 600px;
-          background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, rgba(59, 130, 246, 0.05) 50%, transparent 100%);
+          background: radial-gradient(circle, var(--color-primary-tint) 0%, rgba(235, 235, 211, 0.02) 50%, transparent 100%);
           top: -200px;
           right: -200px;
           z-index: -1;
@@ -572,9 +561,33 @@ const OptionApp: React.FC = () => {
         <div style={styles.sidebar}>
           <div style={styles.sidebarBrand}>
             <div style={styles.logoBadge}>L</div>
-            <div>
+            <div style={{ flex: 1 }}>
               <div style={styles.brandTitle}>Ortoni Studio</div>
               <div style={styles.brandSubtitle}>Developer settings</div>
+            </div>
+            <div
+              style={{
+                cursor: "pointer",
+                fontSize: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "8px",
+                borderRadius: "50%",
+                transition: "background-color 0.2s",
+              }}
+              onClick={() => {
+                const nextTheme = theme === "light" ? "dark" : "light";
+                setTheme(nextTheme);
+                if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
+                  chrome.storage.local.set({ theme: nextTheme });
+                } else {
+                  localStorage.setItem("theme", nextTheme);
+                }
+              }}
+              title={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
+            >
+              {theme === "light" ? "🌙" : "☀️"}
             </div>
           </div>
 
@@ -585,9 +598,9 @@ const OptionApp: React.FC = () => {
               style={{
                 ...styles.sidebarLink,
                 backgroundColor:
-                  activeTab === "general" ? "rgba(79, 70, 229, 0.12)" : "transparent",
-                color: activeTab === "general" ? "#38bdf8" : "#8b949e",
-                borderLeft: activeTab === "general" ? "4px solid #4f46e5" : "4px solid transparent",
+                  activeTab === "general" ? "var(--color-primary-tint)" : "transparent",
+                color: activeTab === "general" ? "var(--color-primary)" : "var(--text-secondary)",
+                borderLeft: activeTab === "general" ? "4px solid var(--color-primary)" : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>⚙️</span> Snippet Framework
@@ -598,10 +611,10 @@ const OptionApp: React.FC = () => {
               style={{
                 ...styles.sidebarLink,
                 backgroundColor:
-                  activeTab === "selectors" ? "rgba(79, 70, 229, 0.12)" : "transparent",
-                color: activeTab === "selectors" ? "#38bdf8" : "#8b949e",
+                  activeTab === "selectors" ? "var(--color-primary-tint)" : "transparent",
+                color: activeTab === "selectors" ? "var(--color-primary)" : "var(--text-secondary)",
                 borderLeft:
-                  activeTab === "selectors" ? "4px solid #4f46e5" : "4px solid transparent",
+                  activeTab === "selectors" ? "4px solid var(--color-primary)" : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>🎯</span> Selector Priorities
@@ -612,10 +625,10 @@ const OptionApp: React.FC = () => {
               style={{
                 ...styles.sidebarLink,
                 backgroundColor:
-                  activeTab === "templates" ? "rgba(79, 70, 229, 0.12)" : "transparent",
-                color: activeTab === "templates" ? "#38bdf8" : "#8b949e",
+                  activeTab === "templates" ? "var(--color-primary-tint)" : "transparent",
+                color: activeTab === "templates" ? "var(--color-primary)" : "var(--text-secondary)",
                 borderLeft:
-                  activeTab === "templates" ? "4px solid #4f46e5" : "4px solid transparent",
+                  activeTab === "templates" ? "4px solid var(--color-primary)" : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>📝</span> Custom Templates
@@ -626,10 +639,10 @@ const OptionApp: React.FC = () => {
               style={{
                 ...styles.sidebarLink,
                 backgroundColor:
-                  activeTab === "emails" ? "rgba(79, 70, 229, 0.12)" : "transparent",
-                color: activeTab === "emails" ? "#38bdf8" : "#8b949e",
+                  activeTab === "emails" ? "var(--color-primary-tint)" : "transparent",
+                color: activeTab === "emails" ? "var(--color-primary)" : "var(--text-secondary)",
                 borderLeft:
-                  activeTab === "emails" ? "4px solid #4f46e5" : "4px solid transparent",
+                  activeTab === "emails" ? "4px solid var(--color-primary)" : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>✉️</span> Email Testing
@@ -639,9 +652,9 @@ const OptionApp: React.FC = () => {
               onClick={() => setActiveTab("about")}
               style={{
                 ...styles.sidebarLink,
-                backgroundColor: activeTab === "about" ? "rgba(79, 70, 229, 0.12)" : "transparent",
-                color: activeTab === "about" ? "#38bdf8" : "#8b949e",
-                borderLeft: activeTab === "about" ? "4px solid #4f46e5" : "4px solid transparent",
+                backgroundColor: activeTab === "about" ? "var(--color-primary-tint)" : "transparent",
+                color: activeTab === "about" ? "var(--color-primary)" : "var(--text-secondary)",
+                borderLeft: activeTab === "about" ? "4px solid var(--color-primary)" : "4px solid transparent",
               }}
             >
               <span style={{ marginRight: "10px" }}>ℹ️</span> About Extension
@@ -649,12 +662,12 @@ const OptionApp: React.FC = () => {
           </div>
 
           <div style={styles.sidebarFooter}>
-            <div style={{ fontSize: "11px", color: "#484f58" }}>Ortoni Studio Project</div>
+            <div style={{ fontSize: "11px", color: "var(--text-secondary)" }}>Ortoni Studio Project</div>
             <div
               style={{
                 fontSize: "12px",
                 fontWeight: "600",
-                color: "#8b949e",
+                color: "var(--text-secondary)",
                 marginTop: "2px",
               }}
             >
@@ -665,1231 +678,65 @@ const OptionApp: React.FC = () => {
 
         {/* Main Panel Content */}
         <div style={styles.mainPanel}>
-          {/* TAB 1: GENERAL (Snippet Target Framework Selection) */}
           {activeTab === "general" && (
-            <div style={styles.tabContent}>
-              <div style={styles.sectionHeader}>
-                <h1 style={styles.mainTitle}>Snippet Frameworks</h1>
-                <p style={styles.mainSubtitle}>
-                  Choose the default test automation framework generated when copying locators.
-                </p>
-              </div>
-
-              {/* Frameworks grid selection */}
-              <div style={styles.frameworksGrid}>
-                {FRAMEWORKS.map((f) => {
-                  const isActive = langID === f.id;
-                  return (
-                    <div
-                      key={f.id}
-                      onClick={() => {
-                        setLangID(f.id);
-                        if (
-                          typeof chrome !== "undefined" &&
-                          chrome.storage &&
-                          chrome.storage.local
-                        ) {
-                          chrome.storage.local.set({ langID: f.id });
-                        } else {
-                          localStorage.setItem("langID", f.id);
-                        }
-                        showToast(`Target framework switched to ${f.name}`);
-                      }}
-                      className={`framework-card ${isActive ? "active" : ""}`}
-                      style={{
-                        ...styles.frameworkCard,
-                        border: isActive ? "1px solid #4f46e5" : "1px solid #21262d",
-                      }}
-                    >
-                      <div style={styles.cardHighlightDot} />
-                      <div
-                        style={{
-                          ...styles.cardIconBox,
-                          backgroundColor: `rgba(${f.accent}, 0.1)`,
-                          color: `rgb(${f.accent})`,
-                          border: `1px solid rgba(${f.accent}, 0.25)`,
-                        }}
-                      >
-                        {f.icon}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={styles.cardFrameworkName}>{f.name}</div>
-                        <div style={styles.cardFrameworkSubtitle}>{f.subtitle}</div>
-                      </div>
-                      {isActive && <div style={styles.cardActiveCheck}>✓</div>}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Live Preview Panel */}
-              <div style={styles.previewContainer}>
-                <div style={styles.previewHeader}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                    }}
-                  >
-                    <span style={styles.pulseDot} />
-                    <span
-                      style={{
-                        fontSize: "11px",
-                        textTransform: "uppercase",
-                        letterSpacing: "1px",
-                        fontWeight: "bold",
-                        color: "#8b949e",
-                      }}
-                    >
-                      Output Syntax Preview ({langID})
-                    </span>
-                  </div>
-                  <div style={{ fontSize: "11px", color: "#58a6ff" }}>Auto-compiles instantly</div>
-                </div>
-                <div style={styles.previewBody}>
-                  <pre style={styles.codePre}>
-                    <code>{colorizeCode(getCodeSample(), langID)}</code>
-                  </pre>
-                </div>
-              </div>
-            </div>
+            <GeneralTab
+              langID={langID}
+              setLangID={setLangID}
+              showToast={showToast}
+              getCodeSample={getCodeSample}
+            />
           )}
 
-          {/* TAB 2: SELECTORS PRIORITIZATION */}
           {activeTab === "selectors" && (
-            <div style={styles.tabContent}>
-              <div style={styles.sectionHeader}>
-                <h1 style={styles.mainTitle}>Attribute Prioritization</h1>
-                <p style={styles.mainSubtitle}>
-                  Define the order in which HTML attributes are queried to find unique web elements.
-                </p>
-              </div>
-
-              <div style={styles.card}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "20px",
-                  }}
-                >
-                  <h3 style={{ margin: 0, fontSize: "15px", color: "#ffffff" }}>
-                    Priority Order List
-                  </h3>
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <button
-                      className="btn-outline"
-                      onClick={() => setRawTextMode(!rawTextMode)}
-                      style={{ padding: "6px 12px", fontSize: "12px" }}
-                    >
-                      {rawTextMode ? "🌐 Interactive Mode" : "✏️ Raw Text Edit"}
-                    </button>
-                    <button
-                      className="btn-outline"
-                      onClick={resetToDefaultPriority}
-                      style={{ padding: "6px 12px", fontSize: "12px" }}
-                    >
-                      ↺ Restore Default
-                    </button>
-                  </div>
-                </div>
-
-                {!rawTextMode ? (
-                  <>
-                    <div
-                      style={{
-                        color: "#8b949e",
-                        fontSize: "13px",
-                        marginBottom: "16px",
-                        lineHeight: "1.4",
-                      }}
-                    >
-                      Drag-style order list. Use the{" "}
-                      <strong style={{ color: "#58a6ff" }}>left (◂)</strong> and{" "}
-                      <strong style={{ color: "#58a6ff" }}>right (▸)</strong> buttons on each badge
-                      to change priorities. Ortoni Studio evaluates from left to right.
-                    </div>
-
-                    <div style={styles.priorityPillContainer}>
-                      {tagList.map((tag, idx) => (
-                        <div key={tag + idx} className="priority-pill" style={styles.priorityPill}>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "6px",
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontSize: "11px",
-                                color: "#8b949e",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              {idx + 1}
-                            </span>
-                            <span style={{ color: "#ffffff", fontWeight: "500" }}>{tag}</span>
-                          </div>
-
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: "2px",
-                              borderLeft: "1px solid #30363d",
-                              paddingLeft: "8px",
-                              marginLeft: "4px",
-                            }}
-                          >
-                            <button
-                              onClick={() => moveTagLeft(idx)}
-                              disabled={idx === 0}
-                              style={{
-                                ...styles.pillButton,
-                                opacity: idx === 0 ? 0.3 : 1,
-                                cursor: idx === 0 ? "not-allowed" : "pointer",
-                              }}
-                              title="Increase priority"
-                            >
-                              ◂
-                            </button>
-                            <button
-                              onClick={() => moveTagRight(idx)}
-                              disabled={idx === tagList.length - 1}
-                              style={{
-                                ...styles.pillButton,
-                                opacity: idx === tagList.length - 1 ? 0.3 : 1,
-                                cursor: idx === tagList.length - 1 ? "not-allowed" : "pointer",
-                              }}
-                              title="Decrease priority"
-                            >
-                              ▸
-                            </button>
-                            <button
-                              onClick={() => deleteTag(idx)}
-                              style={{
-                                ...styles.pillButton,
-                                color: "#ff5f56",
-                                fontWeight: "bold",
-                              }}
-                              title="Delete attribute"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Add Tag Section */}
-                    <div style={styles.addTagWrapper}>
-                      <input
-                        type="text"
-                        className="form-input"
-                        value={newTagInput}
-                        onChange={(e) => setNewTagInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") addTag();
-                        }}
-                        placeholder="e.g. data-cy, alt, role"
-                        style={{ flex: 1, maxWidth: "240px" }}
-                      />
-                      <button
-                        className="btn-gradient"
-                        onClick={addTag}
-                        style={{ padding: "10px 18px", fontSize: "12px" }}
-                      >
-                        + Add Attribute
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <div>
-                    <label
-                      style={{
-                        display: "block",
-                        color: "#8b949e",
-                        fontSize: "13px",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      Comma separated attribute string:
-                    </label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      value={selectorPriority}
-                      onChange={(e) => handleRawPriorityChange(e.target.value)}
-                      placeholder="e.g. data-testid, id, name, class"
-                      style={{ width: "100%", boxSizing: "border-box" }}
-                    />
-                    <div
-                      style={{
-                        color: "#8b949e",
-                        fontSize: "12px",
-                        marginTop: "8px",
-                      }}
-                    >
-                      Recommended:{" "}
-                      <code style={{ color: "#58a6ff" }}>
-                        data-testid, data-cy, id, name, class
-                      </code>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Informational Guidance Panel */}
-              <div style={styles.infoCard}>
-                <div
-                  style={{
-                    fontSize: "15px",
-                    fontWeight: "bold",
-                    color: "#ffffff",
-                    marginBottom: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                >
-                  <span>💡</span> How Prioritization Works
-                </div>
-                <div
-                  style={{
-                    color: "#c9d1d9",
-                    fontSize: "13px",
-                    lineHeight: "1.6",
-                  }}
-                >
-                  When Ortoni Studio scans a web element on a page, it loops through your
-                  prioritized list of attributes. If it finds a unique element using the highest
-                  priority attribute (e.g. <code style={styles.codeText}>data-testid</code>), it
-                  creates a selector instantly. If that fails or is non-unique, it proceeds to the
-                  next attribute in the list. Setting test-ids at the top ensures robust locator
-                  generation.
-                </div>
-              </div>
-            </div>
+            <SelectorsTab
+              rawTextMode={rawTextMode}
+              setRawTextMode={setRawTextMode}
+              resetToDefaultPriority={resetToDefaultPriority}
+              tagList={tagList}
+              moveTagLeft={moveTagLeft}
+              moveTagRight={moveTagRight}
+              deleteTag={deleteTag}
+              newTagInput={newTagInput}
+              setNewTagInput={setNewTagInput}
+              addTag={addTag}
+              selectorPriority={selectorPriority}
+              handleRawPriorityChange={handleRawPriorityChange}
+            />
           )}
 
-          {/* TAB 3: CUSTOM POM TEMPLATES BUILDER */}
           {activeTab === "templates" && (
-            <div style={styles.tabContent}>
-              <div style={styles.sectionHeader}>
-                <h1 style={styles.mainTitle}>Custom Page Object Templates</h1>
-                <p style={styles.mainSubtitle}>
-                  Configure dynamic structural templates to match your internal framework design
-                  patterns.
-                </p>
-              </div>
-
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1.2fr 1fr",
-                  gap: "20px",
-                }}
-              >
-                {/* Form fields */}
-                <div style={styles.card}>
-                  <form
-                    onSubmit={handleSaveAll}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "16px",
-                    }}
-                  >
-                    <div>
-                      <label
-                        style={{
-                          display: "block",
-                          fontSize: "13px",
-                          fontWeight: "600",
-                          color: "#8b949e",
-                          marginBottom: "8px",
-                        }}
-                      >
-                        Framework Target Language
-                      </label>
-                      <div style={styles.radioContainer}>
-                        <label style={styles.radioLabel}>
-                          <input
-                            type="radio"
-                            name="customLangType"
-                            checked={customLang === "jscs"}
-                            onChange={() => handleCustomLangChange("jscs")}
-                            style={{ marginRight: "8px" }}
-                          />
-                          Protractor JS/TS
-                        </label>
-                        <label style={styles.radioLabel}>
-                          <input
-                            type="radio"
-                            name="customLangType"
-                            checked={customLang === "javacs"}
-                            onChange={() => handleCustomLangChange("javacs")}
-                            style={{ marginRight: "8px" }}
-                          />
-                          Selenium Java / POM
-                        </label>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div style={styles.textareaHeader}>
-                        <span>Click Template</span>
-                        <span style={styles.textareaTag}>{"${vn}, ${lc}, ${mn}"}</span>
-                      </div>
-                      <textarea
-                        className="form-textarea"
-                        rows={3}
-                        value={clickvalue}
-                        onChange={(e) => setClickvalue(e.target.value)}
-                        placeholder="Click template string"
-                        style={styles.codeTextarea}
-                      />
-                    </div>
-
-                    <div>
-                      <div style={styles.textareaHeader}>
-                        <span>sendKeys Template</span>
-                        <span style={styles.textareaTag}>{"${vn}, ${lc}, ${mn}"}</span>
-                      </div>
-                      <textarea
-                        className="form-textarea"
-                        rows={3}
-                        value={sendvalue}
-                        onChange={(e) => setSendvalue(e.target.value)}
-                        placeholder="SendKeys template"
-                        style={styles.codeTextarea}
-                      />
-                    </div>
-
-                    <div>
-                      <div style={styles.textareaHeader}>
-                        <span>getText Template</span>
-                        <span style={styles.textareaTag}>{"${vn}, ${lc}, ${mn}"}</span>
-                      </div>
-                      <textarea
-                        className="form-textarea"
-                        rows={3}
-                        value={textvalue}
-                        onChange={(e) => setTextvalue(e.target.value)}
-                        placeholder="GetText template"
-                        style={styles.codeTextarea}
-                      />
-                    </div>
-
-                    <div>
-                      <div style={styles.textareaHeader}>
-                        <span>getAttribute Template</span>
-                        <span style={styles.textareaTag}>{"${vn}, ${lc}, ${mn}"}</span>
-                      </div>
-                      <textarea
-                        className="form-textarea"
-                        rows={3}
-                        value={attrvalue}
-                        onChange={(e) => setAttrvalue(e.target.value)}
-                        placeholder="GetAttribute template"
-                        style={styles.codeTextarea}
-                      />
-                    </div>
-
-                    <button type="submit" className="btn-gradient" style={{ marginTop: "10px" }}>
-                      💾 Save Custom Templates
-                    </button>
-                  </form>
-                </div>
-
-                {/* Guide & Real-time Compilation Preview */}
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "20px",
-                  }}
-                >
-                  {/* Real-time Compiler Playground */}
-                  <div style={styles.card}>
-                    <h3
-                      style={{
-                        margin: "0 0 4px 0",
-                        fontSize: "15px",
-                        color: "#ffffff",
-                      }}
-                    >
-                      Playground Compiler
-                    </h3>
-                    <p
-                      style={{
-                        margin: "0 0 16px 0",
-                        fontSize: "12px",
-                        color: "#8b949e",
-                      }}
-                    >
-                      Mock Element: <code style={{ color: "#58a6ff" }}>button#login-btn</code>,
-                      locator: <code style={{ color: "#58a6ff" }}>"//button[@id='login']"</code>
-                    </p>
-
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "14px",
-                      }}
-                    >
-                      <div>
-                        <div style={styles.compilerLabel}>Compiled Click Action</div>
-                        <div style={styles.compilerBox}>
-                          <pre style={{ margin: 0 }}>
-                            <code>
-                              {colorizeCode(
-                                compileTemplate(
-                                  clickvalue,
-                                  "loginBtn",
-                                  customLang === "jscs"
-                                    ? `element(by.id('login'))`
-                                    : `By.xpath("//button[@id='login']")`,
-                                  "LoginBtn",
-                                ),
-                                customLang === "jscs" ? "protractorjs" : "javas",
-                              )}
-                            </code>
-                          </pre>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div style={styles.compilerLabel}>Compiled SendKeys Action</div>
-                        <div style={styles.compilerBox}>
-                          <pre style={{ margin: 0 }}>
-                            <code>
-                              {colorizeCode(
-                                compileTemplate(
-                                  sendvalue,
-                                  "loginBtn",
-                                  customLang === "jscs"
-                                    ? `element(by.id('login'))`
-                                    : `By.xpath("//button[@id='login']")`,
-                                  "LoginBtn",
-                                ),
-                                customLang === "jscs" ? "protractorjs" : "javas",
-                              )}
-                            </code>
-                          </pre>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div style={styles.compilerLabel}>Compiled GetText Action</div>
-                        <div style={styles.compilerBox}>
-                          <pre style={{ margin: 0 }}>
-                            <code>
-                              {colorizeCode(
-                                compileTemplate(
-                                  textvalue,
-                                  "loginBtn",
-                                  customLang === "jscs"
-                                    ? `element(by.id('login'))`
-                                    : `By.xpath("//button[@id='login']")`,
-                                  "LoginBtn",
-                                ),
-                                customLang === "jscs" ? "protractorjs" : "javas",
-                              )}
-                            </code>
-                          </pre>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Token Reference Table */}
-                  <div style={styles.card}>
-                    <h3
-                      style={{
-                        margin: "0 0 12px 0",
-                        fontSize: "15px",
-                        color: "#ffffff",
-                      }}
-                    >
-                      Available Variables
-                    </h3>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "10px",
-                      }}
-                    >
-                      <div style={styles.tokenRow}>
-                        <code style={styles.tokenCode}>{"${lc}"}</code>
-                        <div style={styles.tokenDesc}>
-                          Evaluates to the selector/locator expression.
-                        </div>
-                      </div>
-                      <div style={styles.tokenRow}>
-                        <code style={styles.tokenCode}>{"${vn}"}</code>
-                        <div style={styles.tokenDesc}>
-                          Camel-cased variable name (e.g. loginButton).
-                        </div>
-                      </div>
-                      <div style={styles.tokenRow}>
-                        <code style={styles.tokenCode}>{"${mn}"}</code>
-                        <div style={styles.tokenDesc}>Method suffix string (e.g. LoginButton).</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <TemplatesTab
+              customLang={customLang}
+              handleCustomLangChange={handleCustomLangChange}
+              clickvalue={clickvalue}
+              setClickvalue={setClickvalue}
+              sendvalue={sendvalue}
+              setSendvalue={setSendvalue}
+              textvalue={textvalue}
+              setTextvalue={setTextvalue}
+              attrvalue={attrvalue}
+              setAttrvalue={setAttrvalue}
+              handleSaveAll={handleSaveAll}
+            />
           )}
 
-          {/* TAB: EMAIL TESTING */}
           {activeTab === "emails" && (
-            <div style={styles.tabContent}>
-              <div style={styles.sectionHeader}>
-                <h1 style={styles.mainTitle}>Email Opt Testing Settings</h1>
-                <p style={styles.mainSubtitle}>
-                  Choose your disposable email service provider and configure API access keys.
-                </p>
-              </div>
-
-              <div style={styles.card}>
-                <h3 style={styles.cardTitle}>Choose Email Provider</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "24px" }}>
-                  <div
-                    onClick={() => setEmailProvider("inboxkitten")}
-                    style={{
-                      border: emailProvider === "inboxkitten" ? "2px solid #4f46e5" : "1px solid #21262d",
-                      borderRadius: "8px",
-                      padding: "16px",
-                      cursor: "pointer",
-                      backgroundColor: emailProvider === "inboxkitten" ? "rgba(79, 70, 229, 0.08)" : "#0d1117",
-                      transition: "all 0.2s",
-                      boxShadow: emailProvider === "inboxkitten" ? "0 0 10px rgba(79, 70, 229, 0.2)" : "none",
-                    }}
-                  >
-                    <div style={{ fontSize: "24px", marginBottom: "8px" }}>🐱</div>
-                    <div style={{ fontWeight: "bold", fontSize: "14px", color: "#ffffff", marginBottom: "4px" }}>Inbox Kitten</div>
-                    <div style={{ fontSize: "11px", color: "#8b949e", lineHeight: "1.4" }}>
-                      Public boxes at @inboxkitten.com. Completely free, requires no setup.
-                    </div>
-                  </div>
-
-                  <div
-                    onClick={() => setEmailProvider("maildrop")}
-                    style={{
-                      border: emailProvider === "maildrop" ? "2px solid #4f46e5" : "1px solid #21262d",
-                      borderRadius: "8px",
-                      padding: "16px",
-                      cursor: "pointer",
-                      backgroundColor: emailProvider === "maildrop" ? "rgba(79, 70, 229, 0.08)" : "#0d1117",
-                      transition: "all 0.2s",
-                      boxShadow: emailProvider === "maildrop" ? "0 0 10px rgba(79, 70, 229, 0.2)" : "none",
-                    }}
-                  >
-                    <div style={{ fontSize: "24px", marginBottom: "8px" }}>💧</div>
-                    <div style={{ fontWeight: "bold", fontSize: "14px", color: "#ffffff", marginBottom: "4px" }}>Maildrop</div>
-                    <div style={{ fontSize: "11px", color: "#8b949e", lineHeight: "1.4" }}>
-                      Public boxes at @maildrop.cc. High performance, supports GraphQL.
-                    </div>
-                  </div>
-
-                  <div
-                    onClick={() => setEmailProvider("mailosaur")}
-                    style={{
-                      border: emailProvider === "mailosaur" ? "2px solid #4f46e5" : "1px solid #21262d",
-                      borderRadius: "8px",
-                      padding: "16px",
-                      cursor: "pointer",
-                      backgroundColor: emailProvider === "mailosaur" ? "rgba(79, 70, 229, 0.08)" : "#0d1117",
-                      transition: "all 0.2s",
-                      boxShadow: emailProvider === "mailosaur" ? "0 0 10px rgba(79, 70, 229, 0.2)" : "none",
-                    }}
-                  >
-                    <div style={{ fontSize: "24px", marginBottom: "8px" }}>🦖</div>
-                    <div style={{ fontWeight: "bold", fontSize: "14px", color: "#ffffff", marginBottom: "4px" }}>Mailosaur</div>
-                    <div style={{ fontSize: "11px", color: "#8b949e", lineHeight: "1.4" }}>
-                      Secure testing server at @mailosaur.net. Requires API key & Server ID.
-                    </div>
-                  </div>
-                </div>
-
-                {emailProvider === "mailosaur" && (
-                  <div style={{ borderTop: "1px solid #21262d", paddingTop: "20px" }}>
-                    <h4 style={{ color: "#ffffff", fontSize: "13px", margin: "0 0 12px 0" }}>Mailosaur Credentials</h4>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
-                      <div>
-                        <label style={{ display: "block", color: "#8b949e", fontSize: "11px", marginBottom: "6px" }}>
-                          Mailosaur API Key
-                        </label>
-                        <input
-                          type="password"
-                          value={mailosaurApiKey}
-                          onChange={(e) => setMailosaurApiKey(e.target.value)}
-                          placeholder="Your Mailosaur API Key..."
-                          style={{
-                            width: "100%",
-                            padding: "8px 12px",
-                            backgroundColor: "#0d1117",
-                            border: "1px solid #30363d",
-                            borderRadius: "6px",
-                            color: "#c9d1d9",
-                            fontSize: "12px",
-                            boxSizing: "border-box" as const,
-                          }}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ display: "block", color: "#8b949e", fontSize: "11px", marginBottom: "6px" }}>
-                          Mailosaur Server ID
-                        </label>
-                        <input
-                          type="text"
-                          value={mailosaurServerId}
-                          onChange={(e) => setMailosaurServerId(e.target.value)}
-                          placeholder="Your Mailosaur Server ID..."
-                          style={{
-                            width: "100%",
-                            padding: "8px 12px",
-                            backgroundColor: "#0d1117",
-                            border: "1px solid #30363d",
-                            borderRadius: "6px",
-                            color: "#c9d1d9",
-                            fontSize: "12px",
-                            boxSizing: "border-box" as const,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <button
-                  onClick={handleSaveEmails}
-                  style={{
-                    backgroundColor: "#238636",
-                    color: "#ffffff",
-                    border: "none",
-                    borderRadius: "6px",
-                    padding: "8px 16px",
-                    fontSize: "12px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    boxShadow: "0 2px 4px rgba(35, 134, 54, 0.2)",
-                  }}
-                >
-                  Save Configuration
-                </button>
-              </div>
-            </div>
+            <EmailsTab
+              emailProvider={emailProvider}
+              setEmailProvider={setEmailProvider}
+              mailosaurApiKey={mailosaurApiKey}
+              setMailosaurApiKey={setMailosaurApiKey}
+              mailosaurServerId={mailosaurServerId}
+              setMailosaurServerId={setMailosaurServerId}
+              handleSaveEmails={handleSaveEmails}
+            />
           )}
 
-          {/* TAB 4: ABOUT PAGE */}
-          {activeTab === "about" && (
-            <div style={styles.tabContent}>
-              <div style={styles.sectionHeader}>
-                <h1 style={styles.mainTitle}>About Ortoni Studio</h1>
-                <p style={styles.mainSubtitle}>
-                  Learn more about the extension and get resources for automation testing.
-                </p>
-              </div>
-
-              <div style={styles.card}>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "20px",
-                    alignItems: "center",
-                    marginBottom: "24px",
-                    paddingBottom: "20px",
-                    borderBottom: "1px solid #21262d",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "64px",
-                      height: "64px",
-                      borderRadius: "16px",
-                      background: "linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "32px",
-                      color: "#ffffff",
-                      fontWeight: "bold",
-                      boxShadow: "0 8px 24px rgba(79, 70, 229, 0.4)",
-                    }}
-                  >
-                    L
-                  </div>
-                  <div>
-                    <h2
-                      style={{
-                        margin: "0 0 4px 0",
-                        color: "#ffffff",
-                        fontSize: "20px",
-                      }}
-                    >
-                      Ortoni Studio Pro
-                    </h2>
-                    <div style={{ color: "#8b949e", fontSize: "13px" }}>
-                      Open Source XPath & Selector Tool • Version 3.0.2
-                    </div>
-                  </div>
-                </div>
-
-                <h3
-                  style={{
-                    color: "#ffffff",
-                    fontSize: "16px",
-                    margin: "0 0 10px 0",
-                  }}
-                >
-                  Core Features
-                </h3>
-                <ul
-                  style={{
-                    color: "#c9d1d9",
-                    fontSize: "13.5px",
-                    lineHeight: "1.8",
-                    margin: "0 0 24px 0",
-                    paddingLeft: "20px",
-                  }}
-                >
-                  <li>Generate reliable XPath expressions & CSS locators instantly.</li>
-                  <li>
-                    Support for Cypress, Playwright, Selenium (Java, C#, Python), and Protractor.
-                  </li>
-                  <li>Interactive smart recorder which compiles script actions into full tests.</li>
-                  <li>Dynamic WebTable parsing and locator prioritization setup.</li>
-                  <li>100% open-source and local storage secured.</li>
-                </ul>
-
-                <h3
-                  style={{
-                    color: "#ffffff",
-                    fontSize: "16px",
-                    margin: "0 0 12px 0",
-                  }}
-                >
-                  Useful Links
-                </h3>
-                <div style={{ display: "flex", gap: "12px" }}>
-                  <a
-                    href="https://github.com/ortoniKC/LetXPath"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={styles.aboutLink}
-                  >
-                    🐙 GitHub Repository
-                  </a>
-                  <a
-                    href="https://letcode.in"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={styles.aboutLink}
-                  >
-                    🌐 LetCode Homepage
-                  </a>
-                  <a
-                    href="https://letcode.in/shadow"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={styles.aboutLink}
-                  >
-                    🧪 Test Playground
-                  </a>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  ...styles.card,
-                  marginTop: "20px",
-                  background:
-                    "linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.02) 100%)",
-                  borderColor: "rgba(16, 185, 129, 0.2)",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "600",
-                    color: "#10b981",
-                    marginBottom: "6px",
-                  }}
-                >
-                  ⭐ Support the Project
-                </div>
-                <div
-                  style={{
-                    color: "#c9d1d9",
-                    fontSize: "13px",
-                    lineHeight: "1.5",
-                  }}
-                >
-                  If you find Ortoni Studio helpful, please consider leaving a review on the Chrome
-                  Web Store or giving our GitHub repository a star. It helps other developers find
-                  the tool!
-                </div>
-              </div>
-            </div>
-          )}
+          {activeTab === "about" && <AboutTab />}
         </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  appContainer: {
-    backgroundColor: "#080b10",
-    minHeight: "100vh",
-    position: "relative" as const,
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    color: "#c9d1d9",
-    boxSizing: "border-box" as const,
-  },
-  dashboardContainer: {
-    maxWidth: "1200px",
-    margin: "0 auto",
-    padding: "40px 20px",
-    display: "grid",
-    gridTemplateColumns: "260px 1fr",
-    gap: "30px",
-    boxSizing: "border-box" as const,
-  },
-  sidebar: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "24px",
-    backgroundColor: "#0d1117",
-    border: "1px solid #21262d",
-    borderRadius: "16px",
-    padding: "24px",
-    height: "fit-content",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
-    position: "sticky" as const,
-    top: "40px",
-  },
-  sidebarBrand: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    paddingBottom: "16px",
-    borderBottom: "1px solid #21262d",
-  },
-  logoBadge: {
-    width: "36px",
-    height: "36px",
-    borderRadius: "8px",
-    background: "linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "18px",
-    color: "#ffffff",
-    fontWeight: "bold",
-    boxShadow: "0 4px 12px rgba(79, 70, 229, 0.3)",
-  },
-  brandTitle: {
-    fontSize: "15px",
-    fontWeight: "bold",
-    color: "#ffffff",
-  },
-  brandSubtitle: {
-    fontSize: "11px",
-    color: "#8b949e",
-    marginTop: "1px",
-  },
-  navGroup: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "8px",
-  },
-  sidebarLink: {
-    display: "flex",
-    alignItems: "center",
-    padding: "12px 14px",
-    borderRadius: "8px",
-    fontSize: "13px",
-    fontWeight: "500",
-    border: "none",
-    textAlign: "left" as const,
-    cursor: "pointer",
-    width: "100%",
-    boxSizing: "border-box" as const,
-  },
-  sidebarFooter: {
-    marginTop: "12px",
-    paddingTop: "16px",
-    borderTop: "1px solid #21262d",
-  },
-  mainPanel: {
-    flex: 1,
-    minWidth: 0, // avoids flex items overflowing
-  },
-  tabContent: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "24px",
-  },
-  sectionHeader: {
-    marginBottom: "8px",
-  },
-  mainTitle: {
-    fontSize: "24px",
-    fontWeight: 800,
-    color: "#ffffff",
-    margin: "0 0 6px 0",
-    letterSpacing: "-0.5px",
-  },
-  mainSubtitle: {
-    fontSize: "14px",
-    color: "#8b949e",
-    margin: 0,
-    lineHeight: "1.4",
-  },
-  frameworksGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-    gap: "16px",
-  },
-  frameworkCard: {
-    position: "relative" as const,
-    backgroundColor: "#0d1117",
-    borderRadius: "12px",
-    padding: "16px 18px",
-    display: "flex",
-    alignItems: "center",
-    gap: "14px",
-    boxSizing: "border-box" as const,
-    overflow: "hidden",
-  },
-  cardHighlightDot: {
-    position: "absolute" as const,
-    width: "3px",
-    height: "24px",
-    left: 0,
-    top: "calc(50% - 12px)",
-    borderRadius: "0 4px 4px 0",
-    backgroundColor: "transparent",
-  },
-  cardIconBox: {
-    width: "38px",
-    height: "38px",
-    borderRadius: "8px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "18px",
-    flexShrink: 0,
-  },
-  cardFrameworkName: {
-    fontSize: "13px",
-    fontWeight: "600",
-    color: "#ffffff",
-  },
-  cardFrameworkSubtitle: {
-    fontSize: "11px",
-    color: "#8b949e",
-    marginTop: "2px",
-    lineHeight: "1.3",
-  },
-  cardActiveCheck: {
-    width: "18px",
-    height: "18px",
-    borderRadius: "50%",
-    backgroundColor: "#4f46e5",
-    color: "#ffffff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "10px",
-    fontWeight: "bold",
-    flexShrink: 0,
-  },
-  previewContainer: {
-    backgroundColor: "#0d1117",
-    border: "1px solid #21262d",
-    borderRadius: "12px",
-    overflow: "hidden",
-  },
-  previewHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "12px 20px",
-    backgroundColor: "#161b22",
-    borderBottom: "1px solid #21262d",
-  },
-  pulseDot: {
-    width: "6px",
-    height: "6px",
-    borderRadius: "50%",
-    backgroundColor: "#3b82f6",
-    boxShadow: "0 0 8px #3b82f6",
-  },
-  previewBody: {
-    padding: "20px",
-    overflowX: "auto" as const,
-  },
-  codePre: {
-    margin: 0,
-    backgroundColor: "transparent",
-    fontFamily: "'JetBrains Mono', Consolas, Monaco, monospace",
-    fontSize: "13px",
-    lineHeight: "1.6",
-  },
-  card: {
-    backgroundColor: "#0d1117",
-    border: "1px solid #21262d",
-    borderRadius: "12px",
-    padding: "24px",
-    boxSizing: "border-box" as const,
-  },
-  cardTitle: {
-    fontSize: "16px",
-    fontWeight: "bold",
-    color: "#ffffff",
-    margin: "0 0 16px 0",
-  },
-  infoCard: {
-    backgroundColor: "#161b22",
-    border: "1px solid #30363d",
-    borderRadius: "12px",
-    padding: "20px",
-    boxSizing: "border-box" as const,
-  },
-  codeText: {
-    color: "#58a6ff",
-    backgroundColor: "rgba(88, 166, 255, 0.08)",
-    padding: "2px 6px",
-    borderRadius: "4px",
-    fontSize: "12px",
-    fontFamily: "monospace",
-  },
-  priorityPillContainer: {
-    display: "flex",
-    flexWrap: "wrap" as const,
-    gap: "10px",
-    margin: "16px 0",
-  },
-  priorityPill: {
-    backgroundColor: "#161b22",
-    border: "1px solid #30363d",
-    padding: "6px 12px 6px 14px",
-    borderRadius: "20px",
-    fontSize: "12px",
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "10px",
-  },
-  pillButton: {
-    background: "none",
-    border: "none",
-    color: "#8b949e",
-    cursor: "pointer",
-    padding: "2px 4px",
-    fontSize: "11px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  addTagWrapper: {
-    display: "flex",
-    gap: "10px",
-    marginTop: "20px",
-    alignItems: "center",
-  },
-  radioContainer: {
-    display: "flex",
-    gap: "16px",
-    margin: "4px 0",
-  },
-  radioLabel: {
-    display: "inline-flex",
-    alignItems: "center",
-    cursor: "pointer",
-    fontSize: "13px",
-    color: "#c9d1d9",
-  },
-  textareaHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "6px",
-  },
-  textareaTag: {
-    fontSize: "10px",
-    color: "#8b949e",
-    backgroundColor: "#161b22",
-    padding: "2px 6px",
-    borderRadius: "4px",
-    fontFamily: "monospace",
-  },
-  codeTextarea: {
-    fontFamily: "'JetBrains Mono', Consolas, Monaco, monospace",
-    fontSize: "12px",
-    lineHeight: "1.5",
-    width: "100%",
-    boxSizing: "border-box" as const,
-    resize: "vertical" as const,
-  },
-  compilerLabel: {
-    fontSize: "11px",
-    textTransform: "uppercase" as const,
-    fontWeight: "bold",
-    color: "#8b949e",
-    marginBottom: "4px",
-  },
-  compilerBox: {
-    backgroundColor: "#080b10",
-    border: "1px solid #21262d",
-    borderRadius: "8px",
-    padding: "12px",
-    fontFamily: "'JetBrains Mono', Consolas, Monaco, monospace",
-    fontSize: "12px",
-    lineHeight: "1.5",
-    overflowX: "auto" as const,
-  },
-  tokenRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "8px 12px",
-    backgroundColor: "#161b22",
-    borderRadius: "8px",
-    border: "1px solid #30363d",
-  },
-  tokenCode: {
-    color: "#58a6ff",
-    fontWeight: "bold",
-    fontSize: "13px",
-    fontFamily: "monospace",
-    minWidth: "50px",
-  },
-  tokenDesc: {
-    fontSize: "12px",
-    color: "#8b949e",
-  },
-  aboutLink: {
-    display: "inline-flex",
-    alignItems: "center",
-    padding: "10px 16px",
-    borderRadius: "8px",
-    border: "1px solid #30363d",
-    color: "#c9d1d9",
-    textDecoration: "none",
-    fontSize: "13px",
-    fontWeight: "500",
-    transition: "all 0.2s ease",
-    backgroundColor: "#161b22",
-  },
 };
 
 export default OptionApp;

@@ -404,13 +404,13 @@ export const EmailTestingTab: React.FC = () => {
           {isLoading && messages.length === 0 ? (
             <div style={styles.loaderCenter}>
               <div style={styles.spinner}></div>
-              <p style={{ fontSize: "11px", color: "#8b949e", marginTop: "10px" }}>Loading inbox...</p>
+              <p style={{ fontSize: "11px", color: "var(--text-secondary)", marginTop: "10px" }}>Loading inbox...</p>
             </div>
           ) : messages.length === 0 ? (
             <div style={styles.emptyInbox}>
               <div style={styles.pulseDot}></div>
-              <p style={{ fontWeight: 600, fontSize: "12px", color: "#ffffff" }}>Waiting for incoming emails...</p>
-              <p style={{ fontSize: "10px", color: "#8b949e", textAlign: "center", marginTop: "4px" }}>
+              <p style={{ fontWeight: 600, fontSize: "12px", color: "var(--text-primary)" }}>Waiting for incoming emails...</p>
+              <p style={{ fontSize: "10px", color: "var(--text-secondary)", textAlign: "center", marginTop: "4px" }}>
                 Send a message to <code>{emailAddress}</code> to see it appear here.
               </p>
             </div>
@@ -424,8 +424,8 @@ export const EmailTestingTab: React.FC = () => {
                     onClick={() => selectMessage(msg)}
                     style={{
                       ...styles.messageCard,
-                      border: isSelected ? "1px solid #4f46e5" : "1px solid #21262d",
-                      backgroundColor: isSelected ? "rgba(79, 70, 229, 0.1)" : "#0d1117",
+                      border: isSelected ? "1px solid var(--color-primary)" : "1px solid var(--border-color)",
+                      backgroundColor: isSelected ? "var(--color-primary-tint)" : "var(--bg-secondary)",
                     }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
@@ -447,12 +447,12 @@ export const EmailTestingTab: React.FC = () => {
           {!selectedMessage ? (
             <div style={styles.emptyViewer}>
               <div style={{ fontSize: "32px", marginBottom: "8px" }}>✉️</div>
-              <p style={{ fontSize: "12px", color: "#8b949e" }}>Select an email from the list to preview</p>
+              <p style={{ fontSize: "12px", color: "var(--text-secondary)" }}>Select an email from the list to preview</p>
             </div>
           ) : isLoadingBody ? (
             <div style={styles.loaderCenter}>
               <div style={styles.spinner}></div>
-              <p style={{ fontSize: "11px", color: "#8b949e", marginTop: "10px" }}>Loading message body...</p>
+              <p style={{ fontSize: "11px", color: "var(--text-secondary)", marginTop: "10px" }}>Loading message body...</p>
             </div>
           ) : (
             <div style={styles.viewerContainer}>
@@ -475,7 +475,7 @@ export const EmailTestingTab: React.FC = () => {
                     style={styles.bodyIframe}
                   />
                 ) : (
-                  <div style={{ padding: "20px", textAlign: "center", color: "#8b949e" }}>
+                  <div style={{ padding: "20px", textAlign: "center", color: "var(--text-secondary)" }}>
                     Failed to render email content.
                   </div>
                 )}
@@ -493,8 +493,8 @@ const styles = {
     display: "flex",
     flexDirection: "column" as const,
     height: "calc(100vh - 44px)",
-    backgroundColor: "#080b10",
-    color: "#c9d1d9",
+    backgroundColor: "var(--bg-primary)",
+    color: "var(--text-primary)",
     boxSizing: "border-box" as const,
     position: "relative" as const,
   },
@@ -503,38 +503,39 @@ const styles = {
     top: "12px",
     left: "50%",
     transform: "translateX(-50%)",
-    backgroundColor: "#4f46e5",
-    color: "#ffffff",
+    backgroundColor: "var(--color-primary)",
+    border: "1px solid var(--color-primary-tint)",
+    color: "var(--text-light)",
     padding: "6px 14px",
     borderRadius: "20px",
     fontSize: "11px",
     fontWeight: "bold",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+    boxShadow: "0 4px 10px var(--color-primary-tint)",
     zIndex: 1000,
   },
   topDashboard: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#0d1117",
-    borderBottom: "1px solid #21262d",
+    backgroundColor: "var(--bg-secondary)",
+    borderBottom: "1px solid var(--border-color)",
     padding: "8px 12px",
     gap: "12px",
   },
   providerBadge: {
-    backgroundColor: "#21262d",
-    border: "1px solid #30363d",
+    backgroundColor: "var(--bg-primary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "12px",
     padding: "3px 10px",
     fontSize: "10px",
     fontWeight: "bold",
-    color: "#e2e8f0",
+    color: "var(--color-primary)",
   },
   emailGeneratorRow: {
     display: "flex",
     alignItems: "center",
-    backgroundColor: "#080b10",
-    border: "1px solid #21262d",
+    backgroundColor: "var(--bg-secondary)",
+    border: "1px solid var(--border-color)",
     borderRadius: "6px",
     padding: "2px",
     flex: 1,
@@ -544,7 +545,7 @@ const styles = {
     flex: 1,
     background: "none",
     border: "none",
-    color: "#38bdf8",
+    color: "var(--color-primary)",
     fontSize: "11px",
     fontFamily: "monospace",
     fontWeight: "bold",
@@ -562,21 +563,21 @@ const styles = {
     transition: "background 0.2s",
   },
   btnPrimary: {
-    backgroundColor: "#4f46e5",
-    color: "#ffffff",
+    backgroundColor: "var(--color-primary)",
+    color: "var(--text-light)",
     border: "none",
     borderRadius: "4px",
     padding: "4px 10px",
     fontSize: "10px",
     fontWeight: 600,
     cursor: "pointer",
-    boxShadow: "0 2px 4px rgba(79, 229, 229, 0.2)",
+    boxShadow: "0 2px 4px var(--color-primary-tint)",
     outline: "none",
   },
   btnSec: {
-    backgroundColor: "#21262d",
-    border: "1px solid #30363d",
-    color: "#c9d1d9",
+    backgroundColor: "var(--bg-primary)",
+    border: "1px solid var(--color-primary)",
+    color: "var(--color-primary)",
     borderRadius: "4px",
     padding: "3px 8px",
     fontSize: "9px",
@@ -587,7 +588,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     fontSize: "10px",
-    color: "#8b949e",
+    color: "var(--text-secondary)",
     cursor: "pointer",
     userSelect: "none" as const,
   },
@@ -598,16 +599,16 @@ const styles = {
   },
   leftList: {
     width: "35%",
-    borderRight: "1px solid #21262d",
+    borderRight: "1px solid var(--border-color)",
     overflowY: "auto" as const,
     padding: "8px",
     boxSizing: "border-box" as const,
-    backgroundColor: "#080b10",
+    backgroundColor: "var(--bg-primary)",
   },
   rightViewer: {
     width: "65%",
     height: "100%",
-    backgroundColor: "#0d1117",
+    backgroundColor: "var(--bg-primary)",
     overflow: "hidden",
   },
   loaderCenter: {
@@ -621,8 +622,8 @@ const styles = {
   spinner: {
     width: "20px",
     height: "20px",
-    border: "2px solid rgba(79, 70, 229, 0.1)",
-    borderTop: "2px solid #4f46e5",
+    border: "2px solid var(--color-primary-tint)",
+    borderTop: "2px solid var(--color-primary)",
     borderRadius: "50%",
     animation: "spin 1s linear infinite",
   },
@@ -639,8 +640,8 @@ const styles = {
     width: "8px",
     height: "8px",
     borderRadius: "50%",
-    backgroundColor: "#10b981",
-    boxShadow: "0 0 8px #10b981",
+    backgroundColor: "var(--color-primary)",
+    boxShadow: "0 0 8px var(--color-primary)",
     animation: "pulse 1.8s infinite",
     marginBottom: "12px",
   },
@@ -652,7 +653,7 @@ const styles = {
     boxSizing: "border-box" as const,
   },
   senderText: {
-    color: "#ffffff",
+    color: "var(--color-primary)",
     fontWeight: "bold",
     fontSize: "11px",
     whiteSpace: "nowrap" as const,
@@ -661,11 +662,11 @@ const styles = {
     maxWidth: "140px",
   },
   dateText: {
-    color: "#8b949e",
+    color: "var(--text-secondary)",
     fontSize: "9px",
   },
   subjectText: {
-    color: "#e2e8f0",
+    color: "var(--text-secondary)",
     fontSize: "10px",
     marginTop: "4px",
     whiteSpace: "nowrap" as const,
@@ -686,24 +687,24 @@ const styles = {
     boxSizing: "border-box" as const,
   },
   viewerHeader: {
-    backgroundColor: "#161b22",
-    borderBottom: "1px solid #21262d",
+    backgroundColor: "var(--bg-secondary)",
+    borderBottom: "1px solid var(--border-color)",
     padding: "12px 16px",
   },
   viewerSubject: {
     margin: "0 0 6px 0",
     fontSize: "14px",
     fontWeight: "bold",
-    color: "#ffffff",
+    color: "var(--color-primary)",
   },
   viewerSender: {
     fontSize: "10px",
-    color: "#8b949e",
+    color: "var(--text-secondary)",
     marginTop: "2px",
   },
   bodyWrapper: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "var(--bg-secondary)",
     overflow: "hidden",
     position: "relative" as const,
   },

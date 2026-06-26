@@ -128,8 +128,8 @@ export const RecordingApp: React.FC = () => {
               <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12 8C9.79 8 8 9.79 8 12C8 14.21 9.79 16 12 16C14.21 16 16 14.21 16 12C16 9.79 14.21 8 12 8Z" fill="url(#brandGrad)"/>
               <defs>
                 <linearGradient id="brandGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#818cf8" />
-                  <stop offset="100%" stopColor="#c084fc" />
+                  <stop offset="0%" stopColor="#083d77" />
+                  <stop offset="100%" stopColor="#05264b" />
                 </linearGradient>
               </defs>
             </svg>
@@ -185,17 +185,15 @@ const styles = {
     alignItems: "center",
     height: "100vh",
     width: "100vw",
-    background: "radial-gradient(circle at 50% 50%, #111827 0%, #030712 100%)",
+    background: "radial-gradient(circle at 50% 50%, #ffffff 0%, #ebebd3 100%)", // white to beige
   },
   card: {
-    backgroundColor: "rgba(17, 24, 39, 0.75)",
-    backdropFilter: "blur(12px)",
-    WebkitBackdropFilter: "blur(12px)",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
+    backgroundColor: "#ffffff", // white card background
+    border: "1px solid #d0d0b8", // beige border
     borderRadius: "12px",
     padding: "16px 20px",
     textAlign: "center" as const,
-    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4)",
+    boxShadow: "0 10px 25px rgba(8, 61, 119, 0.12)",
     width: "290px",
     boxSizing: "border-box" as const,
   },
@@ -214,41 +212,39 @@ const styles = {
     margin: 0,
     fontSize: "15px",
     fontWeight: 700,
-    background: "linear-gradient(135deg, #a5b4fc 0%, #e9d5ff 100%)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
+    color: "#083d77", // Primary blue
     letterSpacing: "-0.025em",
   },
   desc: {
-    color: "#9ca3af",
+    color: "#5c697a", // Subdued slate
     fontSize: "11px",
     lineHeight: "1.4",
     margin: "0 0 16px 0",
   },
   descLoading: {
-    color: "#6366f1",
+    color: "#083d77", // Primary blue
     fontSize: "11px",
     lineHeight: "1.4",
     margin: "0 0 16px 0",
     fontWeight: 500,
   },
   descRecording: {
-    color: "#10b981",
+    color: "#b91c1c", // Recording active is red
     fontSize: "11px",
     lineHeight: "1.4",
     margin: "0 0 12px 0",
     fontWeight: 500,
   },
   btnStart: {
-    background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-    color: "#ffffff",
+    background: "linear-gradient(135deg, #083d77 0%, #05264b 100%)", // Primary blue gradient
+    color: "#ffffff", // White text
     border: "none",
     borderRadius: "6px",
     padding: "8px 16px",
     fontSize: "12px",
     fontWeight: 600,
     cursor: "pointer",
-    boxShadow: "0 4px 12px rgba(99, 102, 241, 0.3)",
+    boxShadow: "0 4px 12px rgba(8, 61, 119, 0.3)",
     transition: "transform 0.2s, box-shadow 0.2s",
     width: "100%",
     boxSizing: "border-box" as const,
@@ -263,8 +259,8 @@ const styles = {
   spinner: {
     width: "24px",
     height: "24px",
-    border: "2px solid rgba(99, 102, 241, 0.1)",
-    borderTop: "2px solid #818cf8",
+    border: "2px solid rgba(8, 61, 119, 0.1)",
+    borderTop: "2px solid #083d77",
     borderRadius: "50%",
     animation: "pulse 1s linear infinite",
   },
@@ -278,8 +274,8 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
-    border: "1px solid rgba(255, 255, 255, 0.05)",
+    backgroundColor: "#ebebd3", // Beige timer box
+    border: "1px solid #d0d0b8", // Beige border
     padding: "6px 14px",
     borderRadius: "20px",
   },
@@ -288,19 +284,19 @@ const styles = {
     width: "8px",
     height: "8px",
     borderRadius: "50%",
-    backgroundColor: "#ef4444",
-    boxShadow: "0 0 8px #ef4444",
+    backgroundColor: "#b91c1c", // Recording dot
+    boxShadow: "0 0 8px #b91c1c",
     animation: "pulse 1.5s infinite",
   },
   timer: {
-    color: "#ffffff",
+    color: "#1e293b", // Slate dark text
     fontSize: "13px",
     fontWeight: 700,
     fontFamily: 'Consolas, Monaco, "Courier New", monospace',
     letterSpacing: "0.05em",
   },
   btnStop: {
-    background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+    background: "linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%)", // Alert red gradient
     color: "#ffffff",
     border: "none",
     borderRadius: "6px",
@@ -308,7 +304,7 @@ const styles = {
     fontSize: "11px",
     fontWeight: 700,
     cursor: "pointer",
-    boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)",
+    boxShadow: "0 4px 12px rgba(185, 28, 28, 0.3)",
     transition: "transform 0.2s",
     width: "100%",
     boxSizing: "border-box" as const,
