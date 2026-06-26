@@ -64,47 +64,33 @@ describe("Panel Helpers - Code Generation", () => {
 
   it("should generate correct Selenium Java selector", () => {
     expect(getSeleniumJava("CSS", cssSelector)).toBe(
-      `driver.findElement(By.cssSelector("${cssSelector}"))`
+      `driver.findElement(By.cssSelector("${cssSelector}"))`,
     );
-    expect(getSeleniumJava("Unique ID", uniqueId)).toBe(
-      `driver.findElement(By.id("${uniqueId}"))`
-    );
+    expect(getSeleniumJava("Unique ID", uniqueId)).toBe(`driver.findElement(By.id("${uniqueId}"))`);
   });
 
   it("should generate correct Playwright Java selector", () => {
-    expect(getPlaywrightJava("CSS", cssSelector)).toBe(
-      `page.locator("${cssSelector}")`
-    );
-    expect(getPlaywrightJava("Unique ID", uniqueId)).toBe(
-      `page.locator("id=${uniqueId}")`
-    );
+    expect(getPlaywrightJava("CSS", cssSelector)).toBe(`page.locator("${cssSelector}")`);
+    expect(getPlaywrightJava("Unique ID", uniqueId)).toBe(`page.locator("id=${uniqueId}")`);
   });
 
   it("should generate correct Playwright JS selector", () => {
-    expect(getPlaywrightJS("CSS", cssSelector)).toBe(
-      `await page.locator("${cssSelector}")`
-    );
-    expect(getPlaywrightJS("Unique ID", uniqueId)).toBe(
-      `await page.locator("id=${uniqueId}")`
-    );
+    expect(getPlaywrightJS("CSS", cssSelector)).toBe(`await page.locator("${cssSelector}")`);
+    expect(getPlaywrightJS("Unique ID", uniqueId)).toBe(`await page.locator("id=${uniqueId}")`);
   });
 
   it("should generate correct Selenium Python selector", () => {
     expect(getSeleniumPython("CSS", cssSelector)).toBe(
-      `driver.find_element(by=By.CSS_SELECTOR, value="${cssSelector}")`
+      `driver.find_element(by=By.CSS_SELECTOR, value="${cssSelector}")`,
     );
     expect(getSeleniumPython("Unique ID", uniqueId)).toBe(
-      `driver.find_element(by=By.ID, value="${uniqueId}")`
+      `driver.find_element(by=By.ID, value="${uniqueId}")`,
     );
   });
 
   it("should generate correct Protractor selector", () => {
-    expect(getProtractor("CSS", cssSelector)).toBe(
-      `element(by.css("${cssSelector}"))`
-    );
-    expect(getProtractor("Unique ID", uniqueId)).toBe(
-      `element(by.id("${uniqueId}"))`
-    );
+    expect(getProtractor("CSS", cssSelector)).toBe(`element(by.css("${cssSelector}"))`);
+    expect(getProtractor("Unique ID", uniqueId)).toBe(`element(by.id("${uniqueId}"))`);
   });
 
   it("should generate correct Cypress selector", () => {
