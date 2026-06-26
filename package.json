@@ -1,6 +1,6 @@
 {
   "name": "ortoni-studio",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Open-source project - XPath Finder",
   "main": "index.js",
   "type": "module",

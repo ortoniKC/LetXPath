@@ -1,5 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
+import { APPVERSION } from "../../panel/constants";
 
 export const AboutTab: React.FC = () => {
   return (
@@ -41,10 +42,10 @@ export const AboutTab: React.FC = () => {
                 fontSize: "20px",
               }}
             >
-              Ortoni Studio Pro
+              Ortoni Studio
             </h2>
             <div style={{ color: "var(--text-secondary)", fontSize: "13px" }}>
-              Open Source XPath & Selector Tool • Version 3.0.2
+              Open Source XPath & Selector Tool • Version {APPVERSION}
             </div>
           </div>
         </div>
@@ -96,7 +97,7 @@ export const AboutTab: React.FC = () => {
             🌐 LetCode Homepage
           </a>
           <a
-            href="https://letcode.in/shadow"
+            href="https://letcode.in/test"
             target="_blank"
             rel="noreferrer"
             style={styles.aboutLink}

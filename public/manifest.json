@@ -3,7 +3,7 @@
   "short_name": "Ortoni Studio",
   "description": "XPath and Selector Finder, simple and useful, open-source project by LetCode with Koushik",
   "author": "Koushik Chatterjee",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "manifest_version": 3,
   "icons": {
     "16": "assets/16.png",
