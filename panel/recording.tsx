@@ -203,7 +203,8 @@ const styles = {
     height: "100vh",
     width: "100vw",
     background: "#080a10",
-    backgroundImage: "radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(66, 184, 131, 0.08) 0px, transparent 50%)",
+    backgroundImage:
+      "radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(66, 184, 131, 0.08) 0px, transparent 50%)",
     fontFamily: '"Outfit", "Inter", -apple-system, BlinkMacSystemFont, sans-serif',
   },
   card: {

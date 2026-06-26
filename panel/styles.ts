@@ -411,7 +411,7 @@ export const styles = {
   btnClear: {
     border: "none",
     backgroundColor: "transparent",
-    color: "var(--color-alert)",
+    color: "var(--color-secondary)",
     padding: "2px 4px",
     fontSize: "10px",
     cursor: "pointer",

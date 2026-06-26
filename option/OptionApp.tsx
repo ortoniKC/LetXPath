@@ -692,9 +692,7 @@ const OptionApp: React.FC = () => {
           </div>
 
           <div style={styles.sidebarFooter}>
-            <div style={{ fontSize: "11px", color: "var(--text-secondary)" }}>
-              Ortoni Studio Project
-            </div>
+            <div style={{ fontSize: "11px", color: "var(--text-secondary)" }}>Ortoni Studio</div>
             <div
               style={{
                 fontSize: "12px",

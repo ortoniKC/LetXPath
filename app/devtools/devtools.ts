@@ -27,6 +27,8 @@ chrome.devtools.panels.elements.createSidebarPane("Ortoni Studio", (sideBar) => 
 
   sideBar.onShown.addListener(() => {
     isActive = true;
+    chrome.devtools.panels.elements.onSelectionChanged.removeListener(updatePanel);
+    chrome.devtools.panels.elements.onSelectionChanged.addListener(updatePanel);
     updatePanel();
   });
 
